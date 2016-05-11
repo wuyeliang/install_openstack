@@ -1,0 +1,29 @@
+#controller system information
+HOST_NAME=wuyeliang
+MANAGER_IP=192.168.8.71
+ALL_PASSWORD=Changeme_123
+CONTROLLER_COMPUTER=True
+
+#For neutron information
+NET_DEVICE_NAME=enp0s8
+NEUTRON_PUBLIC_NET="216.168.10.0/24"
+PUBLIC_NET_GW="216.168.10.1"
+PUBLIC_NET_START="216.168.10.10"
+PUBLIC_NET_END="216.168.10.240"
+SECOND_NET="216.168.10.253/24"
+NEUTRON_DNS="10.248.2.5"
+
+
+#[DEMO_NET_ADDR]
+NEUTRON_PRIVATE_NET="10.168.124.0/24"
+PRIVATE_NET_GW="10.168.124.1"
+PRIVATE_NET_DNS="10.248.2.5"
+
+#For cinder
+#please input disk or partition by blank to separate
+#eg1:CINDER_DISK='/dev/vdb /dev/vdc'
+#eg2:CINDER_DISK='/dev/vdb1 /dev/vdc1'
+#CINDER_DISK='/dev/sdb' 
+#BLOCK_CINDER_DISK='/dev/sdb'
+
+
