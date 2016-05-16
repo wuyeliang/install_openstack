@@ -1,11 +1,11 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/liberty-log.sh ]
+if [  -e $PWD/lib/mitaka-log.sh ]
 then	
-	source $PWD/lib/liberty-log.sh
+	source $PWD/lib/mitaka-log.sh
 else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -16,14 +16,14 @@ else
 	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-liberty_tag/computer.tag  ]
+if [  -e /etc/openstack-mitaka_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-liberty_tag/presystem.tag ]
+if [ -f  /etc/openstack-mitaka_tag/presystem.tag ]
 then 
 	log_info "config system have installed ."
 else
@@ -31,7 +31,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-liberty_tag/install_mariadb.tag ]
+if [ -f  /etc/openstack-mitaka_tag/install_mariadb.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you had install mariadb."	
@@ -69,10 +69,10 @@ FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
 function fn_install_mariadb () {
 yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y
 fn_log "yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y"
-rm -rf /etc/my.cnf.d/mariadb_openstack.cnf &&  cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/mariadb_openstack.cnf
-fn_log "cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/mariadb_openstack.cnf"
-echo " " >>/etc/my.cnf.d/mariadb_openstack.cnf
-echo "bind-address = ${FIRST_ETH_IP}" >>/etc/my.cnf.d/mariadb_openstack.cnf
+rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
+fn_log "cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
+echo " " >>/etc/my.cnf.d/openstack.cnf
+echo "bind-address = ${FIRST_ETH_IP}" >>/etc/my.cnf.d/openstack.cnf
 
 #start mariadb
 systemctl enable mariadb.service &&  systemctl start mariadb.service 
@@ -127,14 +127,17 @@ then
 else
 	fn_test_rabbit
 fi
-
+yum  -y install memcached python-memcached
+fn_log "yum  -y install memcached python-memcached"
+systemctl enable memcached.service && systemctl restart memcached.service
+fn_log "systemctl enable memcached.service && systemctl restart memcached.service"
 
 
 echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###   Install Mariadb and Rabbitmq Sucessed.#### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
-if  [ ! -d /etc/openstack-liberty_tag ]
+if  [ ! -d /etc/openstack-mitaka_tag ]
 then 
-	mkdir -p /etc/openstack-liberty_tag  
+	mkdir -p /etc/openstack-mitaka_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/install_mariadb.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_mariadb.tag

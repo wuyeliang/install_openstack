@@ -1,10 +1,10 @@
 #!/bin/bash
 INSTALL_PATH=$PWD
-if [  -e $PWD/lib/liberty-log.sh ]
+if [  -e $PWD/lib/mitaka-log.sh ]
 then	
-	source $PWD/lib/liberty-log.sh
+	source $PWD/lib/mitaka-log.sh
 else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -37,8 +37,13 @@ cat << EOF
 6) Install Cinder.
 7) Install Neutron.
 8) Install Dashboard.
+9) Install Manila.
+10) Install Heat.
+11) Install Ceilometer
 0) Quit
 EOF
+
+
 
 read -p "please input one number for install :" install_number
 expr ${install_number}+0 >/dev/null
@@ -88,11 +93,26 @@ then
 	/bin/bash $PWD/etc/install_neutron_two.sh
 	log_info "/bin/bash $PWD/etc/install_neutron_one.sh"
 	fn_install_openstack_controller
-	elif  [ ${install_number}  -eq 8 ]
+elif  [ ${install_number}  -eq 8 ]
 then
 	/bin/bash ${INSTALL_PATH}/etc/install_dashboard.sh
 	log_info "/bin/bash $PWD/etc/install_dashboard.sh."
 	fn_install_openstack_controller
+elif  [ ${install_number}  -eq 9 ]
+then
+	/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
+	log_info "/bin/bash $PWD/etc/install_manila.sh."
+	fn_install_openstack_controller	
+elif  [ ${install_number}  -eq 10 ]
+then
+	/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
+	log_info "/bin/bash $PWD/etc/install_heat.sh."
+	fn_install_openstack_controller
+elif  [ ${install_number}  -eq 11 ]
+then
+	/bin/bash ${INSTALL_PATH}/etc/install_ceilometer.sh
+	log_info "/bin/bash $PWD/etc/install_ceilometer.sh."
+	fn_install_openstack_controller	
 elif  [ ${install_number}  -eq 0 ]
 then 
     log_info "exit intalll."
@@ -115,13 +135,13 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/usr/bin/bash ./etc/liberty-computer_system.sh
-		fn_log "/usr/bin/bash ./etc/liberty-computer_system.sh"
+		/usr/bin/bash ./etc/mitaka-computer_system.sh
+		fn_log "/usr/bin/bash ./etc/mitaka-computer_system.sh"
 		fn_install_openstack_computer
 	;;
 	2)
-		/usr/bin/bash ./etc/liberty-computer_install.sh
-		fn_log "/usr/bin/bash ./etc/liberty-computer_install.sh"
+		/usr/bin/bash ./etc/mitaka-computer_install.sh
+		fn_log "/usr/bin/bash ./etc/mitaka-computer_install.sh"
 		fn_install_openstack_computer
 	;;
 	0)
@@ -142,7 +162,6 @@ cat << EOF
 1) Install Controller Node Service.
 2) Install Computer Node Service.
 3) Install Block Node Service (Cinder).
-4) Install Network Node Service.
 0) Quit
 EOF
 read -p "please input one number for install :" install_number
@@ -162,47 +181,12 @@ case ${install_number} in
 		fn_log "fn_install_openstack_block"
 		fn_install_openstack_block
 	;;
-	4)
-		fn_install_openstack_network
-		fn_log "fn_install_openstack_network"
-		fn_install_openstack_network
-	;;
 	0)
 		exit 1
 	;;
 	*)
 		echo -e "\033[41;37m please input one number. \033[0m"
 		fn_install_openstack
-	;;
-esac 
-
-}
-
-function  fn_install_openstack_network () {
-
-cat << EOF
-1) Configure System Environment.
-2) Install Neutron Service.
-0) Quit
-EOF
-read -p "please input one number for install :" install_number
-case ${install_number} in
-	1)
-		/usr/bin/bash ./etc/liberty-network_system.sh
-		fn_log "/usr/bin/bash ./etc/liberty-network_system.sh"
-		fn_install_openstack_network
-	;;
-	2)
-		/usr/bin/bash ./etc/liberty-network-neutron.sh
-		fn_log "/usr/bin/bash ./etc/liberty-network-neutron.sh"
-		fn_install_openstack_network
-	;;
-	0)
-		fn_install_openstack
-	;;
-	*)
-		echo -e "\033[41;37m please input one number. \033[0m"
-		fn_install_openstack_network
 	;;
 esac 
 
@@ -219,13 +203,13 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/usr/bin/bash ./etc/liberty-block_storage_system.sh
-		fn_log "/usr/bin/bash ./etc/liberty-block_storage_system.sh"
+		/usr/bin/bash ./etc/mitaka-block_storage_system.sh
+		fn_log "/usr/bin/bash ./etc/mitaka-block_storage_system.sh"
 		fn_install_openstack_block
 	;;
 	2)
-		/usr/bin/bash ./etc/liberty-block_install.sh
-		fn_log "/usr/bin/bash ./etc/liberty-block_install.sh"
+		/usr/bin/bash ./etc/mitaka-block_install.sh
+		fn_log "/usr/bin/bash ./etc/mitaka-block_install.sh"
 		fn_install_openstack_block
 	;;
 	0)

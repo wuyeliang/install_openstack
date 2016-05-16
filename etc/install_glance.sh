@@ -1,11 +1,11 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/liberty-log.sh ]
+if [  -e $PWD/lib/mitaka-log.sh ]
 then	
-	source $PWD/lib/liberty-log.sh
+	source $PWD/lib/mitaka-log.sh
 else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -17,14 +17,14 @@ else
 	exit 1
 fi
 
-if [  -e /etc/openstack-liberty_tag/computer.tag  ]
+if [  -e /etc/openstack-mitaka_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-liberty_tag/config_keystone.tag ]
+if [ -f  /etc/openstack-mitaka_tag/config_keystone.tag ]
 then 
 	log_info "mkeystone have installed ."
 else
@@ -32,7 +32,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-liberty_tag/install_glance.tag ]
+if [ -f  /etc/openstack-mitaka_tag/install_glance.tag ]
 then 
 	echo -e "\033[41;37m you haved install glance \033[0m"
 	log_info "you haved install glance."	
@@ -61,8 +61,9 @@ if [ ${USER_GLANCE}x = glancex ]
 then
 	log_info "openstack user had created  glance"
 else
-	openstack user create  glance  --password ${ALL_PASSWORD}
-	fn_log "openstack user create  glance  --password ${ALL_PASSWORD}"
+	
+	openstack user create  --domain default glance  --password ${ALL_PASSWORD}
+	fn_log "openstack user create --domain default glance  --password ${ALL_PASSWORD}"
 	openstack role add --project service --user glance admin
 	fn_log "openstack role add --project service --user glance admin"
 fi
@@ -110,23 +111,24 @@ else
 	fn_test_network
 fi
 
-yum clean all && yum install openstack-glance python-glance python-glanceclient -y
-fn_log "yum clean all && yum install openstack-glance python-glance python-glanceclient -y"
+yum clean all && yum install openstack-glance -y
+fn_log "yum clean all && yum install openstack-glance -y"
 unset http_proxy https_proxy ftp_proxy no_proxy 
 
 [ -f /etc/glance/glance-api.conf_bak ] || cp -a /etc/glance/glance-api.conf /etc/glance/glance-api.conf_bak
-openstack-config --set  /etc/glance/glance-api.conf database connection  mysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_plugin  password && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_domain_id  default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken user_domain_id  default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken password  ${ALL_PASSWORD} && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_name  service  && openstack-config --set  /etc/glance/glance-api.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-api.conf glance_store default_store  file && openstack-config --set  /etc/glance/glance-api.conf glance_store filesystem_store_datadir  /var/lib/glance/images/ && openstack-config --set  /etc/glance/glance-api.conf DEFAULT notification_driver  noop && openstack-config --set  /etc/glance/glance-api.conf DEFAULT verbose  True 
-fn_log "openstack-config --set  /etc/glance/glance-api.conf database connection  mysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_plugin  password && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_domain_id  default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken user_domain_id  default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken password  ${ALL_PASSWORD} && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_name  service  && openstack-config --set  /etc/glance/glance-api.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-api.conf glance_store default_store  file && openstack-config --set  /etc/glance/glance-api.conf glance_store filesystem_store_datadir  /var/lib/glance/images/ && openstack-config --set  /etc/glance/glance-api.conf DEFAULT notification_driver  noop && openstack-config --set  /etc/glance/glance-api.conf DEFAULT verbose  True "
+openstack-config --set  /etc/glance/glance-api.conf database connection  mysql+pymysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken memcached_servers  ${HOSTNAME}:11211 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_type   password && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_domain_name  default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken user_domain_name   default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken password  ${ALL_PASSWORD} && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_name  service  && openstack-config --set  /etc/glance/glance-api.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-api.conf glance_store stores  file,http && openstack-config --set  /etc/glance/glance-api.conf glance_store default_store  file && openstack-config --set  /etc/glance/glance-api.conf glance_store filesystem_store_datadir  /var/lib/glance/images/  
+fn_log  "openstack-config --set  /etc/glance/glance-api.conf database connection  mysql+pymysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken memcached_servers  ${HOSTNAME}:11211 && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken auth_type   password && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_domain_name  default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken user_domain_name   default && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken password  ${ALL_PASSWORD} && openstack-config --set  /etc/glance/glance-api.conf keystone_authtoken project_name  service  && openstack-config --set  /etc/glance/glance-api.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-api.conf glance_store stores  file,http && openstack-config --set  /etc/glance/glance-api.conf glance_store default_store  file && openstack-config --set  /etc/glance/glance-api.conf glance_store filesystem_store_datadir  /var/lib/glance/images/ && openstack-config --set  /etc/glance/glance-api.conf DEFAULT verbose  True "
 
 [ -f /etc/glance/glance-registry.conf_bak ] || cp -a /etc/glance/glance-registry.conf /etc/glance/glance-registry.conf_bak
-openstack-config --set  /etc/glance/glance-registry.conf database connection  mysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_plugin  password && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_domain_id  default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken user_domain_id  default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_name  service && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken password ${ALL_PASSWORD} &&  openstack-config --set  /etc/glance/glance-registry.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-registry.conf DEFAULT notification_driver  noop && openstack-config --set  /etc/glance/glance-registry.conf DEFAULT verbose  True 
-fn_log "openstack-config --set  /etc/glance/glance-registry.conf database connection  mysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_plugin  password && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_domain_id  default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken user_domain_id  default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_name  service && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken password ${ALL_PASSWORD} &&  openstack-config --set  /etc/glance/glance-registry.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-registry.conf DEFAULT notification_driver  noop && openstack-config --set  /etc/glance/glance-registry.conf DEFAULT verbose  True "
+openstack-config --set  /etc/glance/glance-registry.conf database connection  mysql+pymysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance &&  openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken memcached_servers  ${HOSTNAME}:11211  && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_type  password && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_domain_name   default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken user_domain_name   default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_name  service && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken password ${ALL_PASSWORD} &&  openstack-config --set  /etc/glance/glance-registry.conf paste_deploy flavor  keystone  
+fn_log  "openstack-config --set  /etc/glance/glance-registry.conf database connection  mysql+pymysql://glance:${ALL_PASSWORD}@${HOSTNAME}/glance &&  openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken memcached_servers  ${HOSTNAME}:11211  && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken auth_type  password && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_domain_name   default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken user_domain_name   default && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken project_name  service && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken username  glance && openstack-config --set  /etc/glance/glance-registry.conf keystone_authtoken password ${ALL_PASSWORD} &&  openstack-config --set  /etc/glance/glance-registry.conf paste_deploy flavor  keystone && openstack-config --set  /etc/glance/glance-registry.conf DEFAULT verbose  True "
 
 su -s /bin/sh -c "glance-manage db_sync" glance 
 fn_log "su -s /bin/sh -c "glance-manage db_sync" glance"
 
-systemctl enable openstack-glance-api.service openstack-glance-registry.service &&  systemctl start openstack-glance-api.service openstack-glance-registry.service 
-fn_log "systemctl enable openstack-glance-api.service openstack-glance-registry.service &&  systemctl start openstack-glance-api.service openstack-glance-registry.service "
+systemctl enable openstack-glance-api.service   openstack-glance-registry.service  && systemctl start openstack-glance-api.service   openstack-glance-registry.service
+fn_log "systemctl enable openstack-glance-api.service   openstack-glance-registry.service  && systemctl start openstack-glance-api.service   openstack-glance-registry.service"
+
 
 
 function fn_add_source () {
@@ -145,16 +147,13 @@ fi
 
 
 
-
+sleep 20
 
 
 function fn_create_image () {
 source /root/admin-openrc.sh  && \
 cp -a $PWD/lib/cirros-0.3.4-x86_64-disk.img /tmp/  && \
-glance image-create --name "cirros-0.3.4-x86_64" --file /tmp/cirros-0.3.4-x86_64-disk.img  \
---disk-format qcow2 --container-format bare --visibility public --progress
-
-
+openstack image create "cirros"   --file /tmp/cirros-0.3.4-x86_64-disk.img   --disk-format qcow2 --container-format bare   --public
 fn_log "create image"
 
 glance image-list
@@ -174,8 +173,8 @@ echo -e "\033[32m ###        Install Glance Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
 
-if  [ ! -d /etc/openstack-liberty_tag ]
+if  [ ! -d /etc/openstack-mitaka_tag ]
 then 
-	mkdir -p /etc/openstack-liberty_tag  
+	mkdir -p /etc/openstack-mitaka_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/install_glance.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_glance.tag
