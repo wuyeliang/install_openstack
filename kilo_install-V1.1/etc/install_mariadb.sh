@@ -1,29 +1,34 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/liberty-log.sh ]
-then	
-	source $PWD/lib/liberty-log.sh
-else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
-	exit 1
-fi
-#input variable
-if [  -e $PWD/lib/installrc ]
-then	
-	source $PWD/lib/installrc 
-else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
-	exit 1
-fi
-if [  -e /etc/openstack-liberty_tag/computer.tag  ]
-then
-	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
-	log_error "Oh no ! you can't execute this script on computer node. "
-	exit 1 
-fi
+function log_info ()
+{
+DATE_N=`date "+%Y-%m-%d %H:%M:%S"`
+USER_N=`whoami`
+echo "${DATE_N} ${USER_N} execute $0 [INFO] $@" >>/var/log/openstack-kilo
 
-if [ -f  /etc/openstack-liberty_tag/presystem.tag ]
+}
+
+function log_error ()
+{
+DATE_N=`date "+%Y-%m-%d %H:%M:%S"`
+USER_N=`whoami`
+echo -e "\033[41;37m ${DATE_N} ${USER_N} execute $0 [ERROR] $@ \033[0m"  >>/var/log/openstack-kilo
+
+}
+
+function fn_log ()  {
+if [  $? -eq 0  ]
+then
+	log_info "$@ sucessed."
+	echo -e "\033[32m $@ sucessed. \033[0m"
+else
+	log_error "$@ failed."
+	echo -e "\033[41;37m $@ failed. \033[0m"
+	exit
+fi
+}
+if [ -f  /etc/openstack-kilo_tag/presystem.tag ]
 then 
 	log_info "config system have installed ."
 else
@@ -31,7 +36,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-liberty_tag/install_mariadb.tag ]
+if [ -f  /etc/openstack-kilo_tag/install_mariadb.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you had install mariadb."	
@@ -58,8 +63,7 @@ else
 fi
 
 
- yum install python-openstackclient -y
- fn_log " yum install python-openstackclient -y"
+
 yum clean all && yum install openstack-selinux -y
 fn_log "yum clean all && yum install openstack-selinux -y"
 FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
@@ -67,8 +71,8 @@ FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
 
 
 function fn_install_mariadb () {
-yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y
-fn_log "yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y"
+yum clean all && yum install mariadb mariadb-server MySQL-python -y
+fn_log "yum clean all && yum install mariadb mariadb-server MySQL-python -y"
 rm -rf /etc/my.cnf.d/mariadb_openstack.cnf &&  cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/mariadb_openstack.cnf
 fn_log "cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/mariadb_openstack.cnf"
 echo " " >>/etc/my.cnf.d/mariadb_openstack.cnf
@@ -80,8 +84,8 @@ fn_log "systemctl enable mariadb.service &&  systemctl start mariadb.service"
 mysql_secure_installation <<EOF
 
 y
-${ALL_PASSWORD}
-${ALL_PASSWORD}
+Changeme_123
+Changeme_123
 y
 y
 y
@@ -107,8 +111,8 @@ fn_log "yum clean all && yum install rabbitmq-server -y"
 systemctl enable rabbitmq-server.service &&  systemctl start rabbitmq-server.service 
 fn_log "systemctl enable rabbitmq-server.service &&  systemctl start rabbitmq-server.service"
 
-rabbitmqctl add_user openstack ${ALL_PASSWORD}
-fn_log "rabbitmqctl add_user openstack ${ALL_PASSWORD}"
+rabbitmqctl add_user openstack Changeme_123
+fn_log "rabbitmqctl add_user openstack Changeme_123"
 rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 fn_log "rabbitmqctl set_permissions openstack ".*" ".*" ".*""
 }
@@ -131,10 +135,10 @@ fi
 
 
 echo -e "\033[32m ################################################ \033[0m"
-echo -e "\033[32m ###   Install Mariadb and Rabbitmq Sucessed.#### \033[0m"
+echo -e "\033[32m ###   install mariadb and rabbitmq sucessed.#### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
-if  [ ! -d /etc/openstack-liberty_tag ]
+if  [ ! -d /etc/openstack-kilo_tag ]
 then 
-	mkdir -p /etc/openstack-liberty_tag  
+	mkdir -p /etc/openstack-kilo_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/install_mariadb.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-kilo_tag/install_mariadb.tag

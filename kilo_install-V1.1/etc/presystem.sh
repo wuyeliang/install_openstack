@@ -1,48 +1,43 @@
 #！/bin/bash
 #log function
-if [  -e $PWD/lib/liberty-log.sh ]
-then	
-	source $PWD/lib/liberty-log.sh
-else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
-	exit 1
-fi
-#input variable
-if [  -e $PWD/lib/installrc ]
-then	
-	source $PWD/lib/installrc 
-else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
-	exit 1
-fi
-if [  -e /etc/openstack-liberty_tag/presystem-computer.tag  ]
+function log_info ()
+{
+DATE_N=`date "+%Y-%m-%d %H:%M:%S"`
+USER_N=`whoami`
+echo "${DATE_N} ${USER_N} execute $0 [INFO] $@" >>/var/log/openstack-kilo
+
+}
+
+function log_error ()
+{
+DATE_N=`date "+%Y-%m-%d %H:%M:%S"`
+USER_N=`whoami`
+echo -e "\033[41;37m ${DATE_N} ${USER_N} execute $0 [ERROR] $@ \033[0m"  >>/var/log/openstack-kilo
+
+}
+
+function fn_log ()  {
+if [  $? -eq 0  ]
 then
-	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
-	log_error "Oh no ! you can't execute this script on computer node. "
-	exit 1 
+	log_info "$@ sucessed."
+	echo -e "\033[32m $@ sucessed. \033[0m"
+else
+	log_error "$@ failed."
+	echo -e "\033[41;37m $@ failed. \033[0m"
+	exit
 fi
-
-
-
-if [   ${HOST_NAME}x = x  -o ${MANAGER_IP}x = x -o ${ALL_PASSWORD}x  = x  -o ${NET_DEVICE_NAME}x = x ]
-then
-	echo -e "\033[41;37m please check $PWD/lib/installr . \033[0m"
-	exit 1
-fi
-
+}
 OS_VERSION=`cat /etc/centos-release | awk -F " " '{print$4}' | awk -F "." '{print$3}'`
 if [  ${OS_VERSION} -eq 1503 ]
 then
-	log_info "the system is CentOS7.1."
-else
-	echo -e "\033[41;37m you should install OS system by CentOS-7-x86_64-DVD-1503-01.iso. \033[0m"
-	log_error "you should install OS system by CentOS-7-x86_64-DVD-1503-01.iso."
+	echo -e "\033[41;37m you should install OS system by CentOS-7.0-1406-x86_64-DVD.iso. \033[0m"
+	log_error "you should install OS system by CentOS-7.0-1406-x86_64-DVD.iso."
 	exit 1
 fi
 
 
-NAMEHOST=${HOST_NAME}
-FIRST_ETH_IP=${MANAGER_IP}
+FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
+FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
 
 if [  -z ${FIRST_ETH_IP} ]
 then
@@ -51,21 +46,31 @@ then
 	exit 1
 fi
 
-if [ -f  /etc/openstack-liberty_tag/presystem.tag ]
+if [ -f  /etc/openstack-kilo_tag/presystem.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
 	exit
 fi
 
-
-if  [ ! -d /etc/openstack-liberty_tag ]
+read -p "please hostname for system [default:controller] :" install_number
+if  [ -z ${install_number}  ]
 then 
-	mkdir -p /etc/openstack-liberty_tag  
+    echo "controller" >$PWD/lib/hostname
+    NAMEHOST=controller
+else
+	echo "${install_number}" >$PWD/lib/hostname
+fi
+if  [ ! -d /etc/openstack-kilo_tag ]
+then 
+	mkdir -p /etc/openstack-kilo_tag  
 fi
 
 
+NAMEHOST=`cat $PWD/lib/hostname`
 
+FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
+FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
 
 
 
@@ -90,14 +95,21 @@ else
 fi
 
 
-
+#set hostname
+function fn_set_hostname () {
 hostnamectl set-hostname ${NAMEHOST}
-fn_log "hostnamectl set-hostname ${NAMEHOST}"
-cat $PWD/lib/hosts >/etc/hosts
-fn_log "cat $PWD/lib/hosts >/etc/hosts"
+fn_log "set hostname"
+echo "${FIRST_ETH_IP} ${NAMEHOST} " >>/etc/hosts
+fn_log  "modify hosts"
+}
 
-
-
+HOSTS_STATUS=`cat /etc/hosts | grep $FIRST_ETH_IP`
+if [  -z  "${HOSTS_STATUS}"  ]
+then
+	fn_set_hostname
+else
+	log_info "hostname had seted"
+fi
 
 
 
@@ -121,23 +133,20 @@ fn_log "yum clean all && yum install ntp -y"
 #modify /etc/ntp.conf 
 if [ -f /etc/ntp.conf  ]
 then 
-	cp -a /etc/ntp.conf /etc/ntp.conf_bak && \
-	sed -i "/^# Please\ consider\ joining\ the\ pool/i server\ 127.127.1.0" /etc/ntp.conf && \
-	sed -i "/^# Please\ consider\ joining\ the\ pool/i fudge\ 127.127.1.0\ stratum\ 0" /etc/ntp.conf
+	cp -a /etc/ntp.conf /etc/ntp.conf_bak
+	sed -i 's/^restrict\ default\ nomodify\ notrap\ nopeer\ noquery/restrict\ default\ nomodify\ /' /etc/ntp.conf && sed -i "/^# Please\ consider\ joining\ the\ pool/iserver\ ${NAMEHOST}\ iburst  " /etc/ntp.conf
 	fn_log "modify /etc/ntp.conf"
 fi 
 #restart ntp 
-systemctl enable ntpd.service &&  systemctl start ntpd.service 
-fn_log "systemctl enable ntpd.service &&  systemctl start ntpd.service "
-service chronyd stop
-chkconfig chronyd off
-
+systemctl enable ntpd.service && systemctl start ntpd.service  
+fn_log "systemctl enable ntpd.service && systemctl start ntpd.service"
 sleep 10
-ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/install_ntp.tag
+ntpq -c peers 
+ntpq -c assoc
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-kilo_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-liberty_tag/install_ntp.tag ]
+if  [ -f /etc/openstack-kilo_tag/install_ntp.tag ]
 then
 	log_info "ntp had installed."
 else
@@ -163,7 +172,7 @@ yum clean all && yum install http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epe
 fn_log "yum clean all && yum install http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm -y"
 
 
-yum clean all && yum install centos-release-openstack-liberty -y
+yum clean all && yum install http://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm -y
 fn_log "yum clean all && yum install http://rdo.fedorapeople.org/openstack-kilo/rdo-release-kilo.rpm -y"
 }
 
@@ -188,9 +197,9 @@ fi
 
 
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/presystem.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-kilo_tag/presystem.tag
 echo -e "\033[32m ################################# \033[0m"
-echo -e "\033[32m ##   Configure  System Sucessed.#### \033[0m"
+echo -e "\033[32m ##   preset  systen sucessed.#### \033[0m"
 echo -e "\033[32m ################################# \033[0m"
 
 echo -e "\033[41;37m begin to reboot system to enforce kernel \033[0m"

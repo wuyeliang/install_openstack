@@ -1,0 +1,13 @@
+#please input disk or partition by blank to separate
+#eg1:CINDER_DISK=/dev/vdb /dev/vdc 
+#eg2:CINDER_DISK=/dev/vdb1 /dev/vdc1 
+#CINDER_DISK=/dev/vdb /dev/vdc 
+
+
+
+
+
+
+
+
+

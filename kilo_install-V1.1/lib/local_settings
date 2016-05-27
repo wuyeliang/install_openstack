@@ -1,10 +1,12 @@
 import os
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 from django.utils.translation import ugettext_lazy as _
 
-
 from openstack_dashboard import exceptions
-from openstack_dashboard.settings import HORIZON_CONFIG
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -19,7 +21,8 @@ WEBROOT = '/dashboard/'
 # LOGIN_REDIRECT_URL can be used as an alternative for
 # HORIZON_CONFIG.user_home, if user_home is not set.
 # Do not set it to '/home/', as this will cause circular redirect loop
-#LOGIN_REDIRECT_URL = WEBROOT
+# LOGIN_REDIRECT_URL = WEBROOT
+
 
 # Required for Django 1.5.
 # If horizon is running in production (DEBUG is False), set this
@@ -27,7 +30,8 @@ WEBROOT = '/dashboard/'
 # For more information see:
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 #ALLOWED_HOSTS = ['horizon.example.com', 'localhost']
-ALLOWED_HOSTS = ['*', ]
+#ALLOWED_HOSTS = '*'
+ALLOWED_HOSTS = ['*']
 
 # Set SSL proxy settings:
 # For Django 1.4+ pass this header from the proxy after terminating the SSL,
@@ -35,8 +39,6 @@ ALLOWED_HOSTS = ['*', ]
 # For more information see:
 # https://docs.djangoproject.com/en/1.4/ref/settings/#secure-proxy-ssl-header
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
-# https://docs.djangoproject.com/en/1.5/ref/settings/#secure-proxy-ssl-header
-#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # If Horizon is being served through SSL, then uncomment the following two
 # settings to better secure the cookies from security exploits
@@ -64,13 +66,28 @@ ALLOWED_HOSTS = ['*', ]
 #OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = 'Default'
 
 # Set Console type:
-# valid options are "AUTO"(default), "VNC", "SPICE", "RDP", "SERIAL" or None
+# valid options would be "AUTO"(default), "VNC", "SPICE", "RDP", "SERIAL" or None
 # Set to None explicitly if you want to deactivate the console.
 #CONSOLE_TYPE = "AUTO"
 
-# Show backdrop element outside the modal, do not close the modal
-# after clicking on backdrop.
-#HORIZON_CONFIG["modal_backdrop"] = "static"
+# Default OpenStack Dashboard configuration.
+HORIZON_CONFIG = {
+    'user_home': 'openstack_dashboard.views.get_user_home',
+    'ajax_queue_limit': 10,
+    'auto_fade_alerts': {
+        'delay': 3000,
+        'fade_duration': 1500,
+        'types': ['alert-success', 'alert-info']
+    },
+    'help_url': "http://docs.openstack.org",
+    'exceptions': {'recoverable': exceptions.RECOVERABLE,
+                   'not_found': exceptions.NOT_FOUND,
+                   'unauthorized': exceptions.UNAUTHORIZED},
+    'modal_backdrop': 'static',
+    'angular_modules': [],
+    'js_files': [],
+    'js_spec_files': [],
+}
 
 # Specify a regular expression to validate user passwords.
 #HORIZON_CONFIG["password_validator"] = {
@@ -90,18 +107,18 @@ ALLOWED_HOSTS = ['*', ]
 # including on the login form.
 #HORIZON_CONFIG["disable_password_reveal"] = False
 
-LOCAL_PATH = '/tmp'
 
 # Set custom secret key:
 # You can either set it to a specific value or you can let horizon generate a
 # default secret key that is unique on this machine, e.i. regardless of the
-# amount of Python WSGI workers (if used behind Apache+mod_wsgi): However,
-# there may be situations where you would want to set this explicitly, e.g.
-# when multiple dashboard instances are distributed on different machines
-# (usually behind a load-balancer). Either you have to make sure that a session
-# gets all requests routed to the same dashboard instance or you set the same
-# SECRET_KEY for all of them.
-SECRET_KEY='941a4a6c92ca43c4adca'
+# amount of Python WSGI workers (if used behind Apache+mod_wsgi): However, there
+# may be situations where you would want to set this explicitly, e.g. when
+# multiple dashboard instances are distributed on different machines (usually
+# behind a load-balancer). Either you have to make sure that a session gets all
+# requests routed to the same dashboard instance or you set the same SECRET_KEY
+# for all of them.
+LOCAL_PATH = '/tmp'
+SECRET_KEY='d7b47b003701d52cea8d'
 
 # We recommend you use memcached for development; otherwise after every reload
 # of the django development server, you will have to login again. To use
@@ -204,7 +221,6 @@ OPENSTACK_KEYSTONE_BACKEND = {
 OPENSTACK_HYPERVISOR_FEATURES = {
     'can_set_mount_point': False,
     'can_set_password': False,
-    'requires_keypair': False,
 }
 
 # The OPENSTACK_CINDER_FEATURES settings can be used to enable optional
@@ -225,19 +241,6 @@ OPENSTACK_NEUTRON_NETWORK = {
     'enable_lb': True,
     'enable_firewall': True,
     'enable_vpn': True,
-    'enable_fip_topology_check': True,
-
-    # Neutron can be configured with a default Subnet Pool to be used for IPv4
-    # subnet-allocation. Specify the label you wish to display in the Address
-    # pool selector on the create subnet step if you want to use this feature.
-    'default_ipv4_subnet_pool_label': None,
-
-    # Neutron can be configured with a default Subnet Pool to be used for IPv6
-    # subnet-allocation. Specify the label you wish to display in the Address
-    # pool selector on the create subnet step if you want to use this feature.
-    # You must set this to enable IPv6 Prefix Delegation in a PD-capable
-    # environment.
-    'default_ipv6_subnet_pool_label': None,
 
     # The profile_support option is used to detect if an external router can be
     # configured via the dashboard. When using specific plugins the
@@ -254,7 +257,6 @@ OPENSTACK_NEUTRON_NETWORK = {
     # types in this list will be available to choose from when creating a
     # port.
     # VNIC types include 'normal', 'macvtap' and 'direct'.
-    # Set to empty list or None to disable VNIC type selection.
     'supported_vnic_types': ['*']
 }
 
@@ -267,7 +269,6 @@ OPENSTACK_NEUTRON_NETWORK = {
 #        ('aki', _('AKI - Amazon Kernel Image')),
 #        ('ami', _('AMI - Amazon Machine Image')),
 #        ('ari', _('ARI - Amazon Ramdisk Image')),
-#        ('docker', _('Docker')),
 #        ('iso', _('ISO - Optical Disk Image')),
 #        ('ova', _('OVA - Open Virtual Appliance')),
 #        ('qcow2', _('QCOW2 - QEMU Emulator')),
@@ -320,7 +321,8 @@ DROPDOWN_MAX_ITEMS = 30
 
 # The timezone of the server. This should correspond with the timezone
 # of your entire OpenStack installation, and hopefully be in UTC.
-TIME_ZONE = "UTC"
+#TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Shanghai"
 
 # When launching an instance, the menu of available flavors is
 # sorted by RAM usage, ascending. If you would like a different sort order,
@@ -338,7 +340,7 @@ TIME_ZONE = "UTC"
 # Set this to True to display an 'Admin Password' field on the Change Password
 # form to verify that it is indeed the admin logged-in who wants to change
 # the password.
-#ENFORCE_PASSWORD_CHECK = False
+# ENFORCE_PASSWORD_CHECK = False
 
 # Modules that provide /auth routes that can be used to handle different types
 # of user authentication. Add auth plugins that require extra route handling to
@@ -352,18 +354,8 @@ TIME_ZONE = "UTC"
 # OpenStack services are using to determine role based access control in the
 # target installation.
 
-
-# Map of local copy of service policy files.
-# Please insure that your identity policy file matches the one being used on
-# your keystone servers. There is an alternate policy file that may be used
-# in the Keystone v3 multi-domain case, policy.v3cloudsample.json.
-# This file is not included in the Horizon repository by default but can be
-# found at
-# http://git.openstack.org/cgit/openstack/keystone/tree/etc/ \
-# policy.v3cloudsample.json
-# Having matching policy files on the Horizon and Keystone servers is essential
-# for normal operation. This holds true for all services and their policy files.
-POLICY_FILES_PATH = '/etc/openstack-dashboard'
+# Path to directory containing policy.json files
+# POLICY_FILES_PATH = os.path.join(ROOT_PATH, "conf")
 POLICY_FILES_PATH = '/etc/openstack-dashboard'
 # Map of local copy of service policy files
 #POLICY_FILES = {
@@ -380,12 +372,12 @@ POLICY_FILES_PATH = '/etc/openstack-dashboard'
 # creating users and databases on database instances is turned on.
 # To disable these extensions set the permission here to something
 # unusable such as ["!"].
-#TROVE_ADD_USER_PERMS = []
-#TROVE_ADD_DATABASE_PERMS = []
+# TROVE_ADD_USER_PERMS = []
+# TROVE_ADD_DATABASE_PERMS = []
 
 # Change this patch to the appropriate static directory containing
 # two files: _variables.scss and _styles.scss
-#CUSTOM_THEME_PATH = 'themes/default'
+#CUSTOM_THEME_PATH = 'static/themes/default'
 
 LOGGING = {
     'version': 1,
@@ -632,12 +624,6 @@ SECURITY_GROUP_RULES = {
 # algorithms supported by Python's hashlib library.
 #OPENSTACK_TOKEN_HASH_ALGORITHM = 'md5'
 
-# Hashing tokens from Keystone keeps the Horizon session data smaller, but it
-# doesn't work in some cases when using PKI tokens.  Uncomment this value and
-# set it to False if using PKI tokens and there are 401 errors due to token
-# hashing.
-#OPENSTACK_TOKEN_HASH_ENABLED = True
-
 # AngularJS requires some settings to be made available to
 # the client side. Some settings are required by in-tree / built-in horizon
 # features. These settings must be added to REST_API_REQUIRED_SETTINGS in the
@@ -658,11 +644,3 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES']
 # and are not encrypted on the browser. This is an experimental API and
 # may be deprecated in the future without notice.
 #REST_API_ADDITIONAL_SETTINGS = []
-
-# DISALLOW_IFRAME_EMBED can be used to prevent Horizon from being embedded
-# within an iframe. Legacy browsers are still vulnerable to a Cross-Frame
-# Scripting (XFS) vulnerability, so this option allows extra security hardening
-# where iframes are not used in deployment. Default setting is True.
-# For more information see:
-# http://tinyurl.com/anticlickjack
-#DISALLOW_IFRAME_EMBED = True

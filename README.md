@@ -1,2 +1,1 @@
-# install_openstack
-autoinstall openstack by shell
+请参见http://blog.csdn.net/wylfengyujiancheng
