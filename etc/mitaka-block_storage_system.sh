@@ -1,10 +1,10 @@
 #!/bin/bash
 #log function
-if [  -e $PWD/lib/liberty-log.sh ]
+if [  -e $PWD/lib/mitaka-log.sh ]
 then	
-	source $PWD/lib/liberty-log.sh
+	source $PWD/lib/mitaka-log.sh
 else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -17,29 +17,29 @@ else
 fi
 
 
-if [ -f  /etc/openstack-liberty_tag/presystem.tag ]
+if [ -f  /etc/openstack-mitaka_tag/presystem.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
 	exit
 fi
-if [  -e /etc/openstack-liberty_tag/config_keystone.tag  ]
+if [  -e /etc/openstack-mitaka_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
 	exit 1
 fi
 OS_VERSION=`cat /etc/centos-release | awk -F " " '{print$4}' | awk -F "." '{print$3}'`
-if [  ${OS_VERSION} -eq 1503 ]
+if [  ${OS_VERSION} -eq 1511 ]
 then
-	log_info "the system is CentOS7.1."
+	log_info "the system is CentOS7.2."
 else
-	echo -e "\033[41;37m you should install OS system by CentOS-7-x86_64-DVD-1503-01.iso. \033[0m"
-	log_error "you should install OS system by CentOS-7-x86_64-DVD-1503-01.iso."
+	echo -e "\033[41;37m you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso. \033[0m"
+	log_error "you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso."
 	exit 1
 fi
 
-if [  -e /etc/openstack-liberty_tag/config_keystone.tag  ]
+if [  -e /etc/openstack-mitaka_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
@@ -111,10 +111,10 @@ chkconfig chronyd off
 service chronyd stop
 sleep 10
 ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/install_ntp.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-liberty_tag/install_ntp.tag ]
+if  [ -f /etc/openstack-mitaka_tag/install_ntp.tag ]
 then
 	log_info "ntp had installed."
 else
@@ -137,12 +137,12 @@ then
 	cd /etc/yum.repos.d/ &&  rm -rf CentOS-*
 	fn_log "cd /etc/yum.repos.d/ &&  rm -rf CentOS-*"
 fi
-if  [ ! -d /etc/openstack-liberty_tag ]
+if  [ ! -d /etc/openstack-mitaka_tag ]
 then
-	mkdir  /etc/openstack-liberty_tag
+	mkdir  /etc/openstack-mitaka_tag
 fi
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/presystem.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/presystem.tag
 echo -e "\033[32m #################################### \033[0m"
 echo -e "\033[32m ##   Configure  Systen Sucessed.#### \033[0m"
 echo -e "\033[32m #################################### \033[0m"

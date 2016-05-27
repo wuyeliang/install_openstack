@@ -1,16 +1,20 @@
 #controller system information
-HOST_NAME=wuyeliang
+HOST_NAME=mitaka
+#controller manager IP
 MANAGER_IP=192.168.8.71
 ALL_PASSWORD=Changeme_123
+#controler secondary net device 
+NET_DEVICE_NAME=enp0s8
+#install openstack-nova-compute on controller,please give it True or  False.
 CONTROLLER_COMPUTER=True
 
 #For neutron information
-NET_DEVICE_NAME=enp0s8
-NEUTRON_PUBLIC_NET="216.168.10.0/24"
-PUBLIC_NET_GW="216.168.10.1"
-PUBLIC_NET_START="216.168.10.10"
-PUBLIC_NET_END="216.168.10.240"
-SECOND_NET="216.168.10.253/24"
+#[FLOATING_METWORK_ADDR]
+NEUTRON_PUBLIC_NET="10.168.10.0/24"
+PUBLIC_NET_GW="10.168.10.1"
+PUBLIC_NET_START="10.168.10.10"
+PUBLIC_NET_END="10.168.10.240"
+SECOND_NET="10.168.10.253/24"
 NEUTRON_DNS="10.248.2.5"
 
 
@@ -23,7 +27,13 @@ PRIVATE_NET_DNS="10.248.2.5"
 #please input disk or partition by blank to separate
 #eg1:CINDER_DISK='/dev/vdb /dev/vdc'
 #eg2:CINDER_DISK='/dev/vdb1 /dev/vdc1'
+#controller disk for cinder 
 #CINDER_DISK='/dev/sdb' 
+#block node disk for cinder
 #BLOCK_CINDER_DISK='/dev/sdb'
 
+
+#for manila
+#please input disk or partition by blank to separate
+#MANILA_DISK='/dev/sdb'
 

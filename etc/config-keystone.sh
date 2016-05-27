@@ -1,11 +1,11 @@
 #!/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/liberty-log.sh ]
+if [  -e $PWD/lib/mitaka-log.sh ]
 then	
-	source $PWD/lib/liberty-log.sh
+	source $PWD/lib/mitaka-log.sh
 else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -23,14 +23,14 @@ else
 	echo -e "\033[41;37m you should unset proxy. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-liberty_tag/computer.tag  ]
+if [  -e /etc/openstack-mitaka_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-liberty_tag/install_mariadb.tag ]
+if [ -f  /etc/openstack-mitaka_tag/install_mariadb.tag ]
 then 
 	log_info "mariadb have installed ."
 else
@@ -38,9 +38,9 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-liberty_tag/config_keystone.tag ]
+if [ -f  /etc/openstack-mitaka_tag/config_keystone.tag ]
 then 
-	echo -e "\033[41;37m etc/openstack-liberty_tag/config_keystone.tag \033[0m"
+	echo -e "\033[41;37m etc/openstack-mitaka_tag/config_keystone.tag \033[0m"
 	log_info "you had install keystone."	
 	exit
 fi
@@ -80,6 +80,7 @@ else
 	fn_create_keystone_database
 fi
                    
+				   
 yum clean all && yum install openstack-keystone httpd mod_wsgi   memcached python-memcached -y
 fn_log "yum clean all && yum install openstack-keystone httpd mod_wsgi python-openstackclient memcached python-memcached -y"
 
@@ -96,29 +97,21 @@ ADMIN_TOKEN=c5e3192e2fa2eda7500d
 openstack-config --set /etc/keystone/keystone.conf DEFAULT admin_token $ADMIN_TOKEN 
 fn_log "openstack-config --set /etc/keystone/keystone.conf DEFAULT admin_token $ADMIN_TOKEN "
                                                       
-openstack-config --set /etc/keystone/keystone.conf database connection mysql://keystone:${ALL_PASSWORD}@$HOSTNAME/keystone  
-fn_log "openstack-config --set /etc/keystone/keystone.conf database connection mysql://keystone:${ALL_PASSWORD}@$HOSTNAME/keystone "
+openstack-config --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:${ALL_PASSWORD}@$HOSTNAME/keystone  
+fn_log "openstack-config --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:${ALL_PASSWORD}@$HOSTNAME/keystone "
+
+openstack-config --set /etc/keystone/keystone.conf token provider  fernet
+fn_log "openstack-config --set /etc/keystone/keystone.conf token provider  fernet"
 
 
-openstack-config --set /etc/keystone/keystone.conf memcache servers localhost:11211
+#openstack-config --set /etc/keystone/keystone.conf  DEFAULT  verbose  True 
+#fn_log "openstack-config --set /etc/keystone/keystone.conf  DEFAULT  verbose  True "
 
-fn_log "openstack-config --set /etc/keystone/keystone.conf memcache servers localhost:11211"
+su -s /bin/sh -c "keystone-manage db_sync" keystone
+fn_log "su -s /bin/sh -c "keystone-manage db_sync" keystone"
 
-
-openstack-config --set /etc/keystone/keystone.conf token provider  uuid
-fn_log "openstack-config --set /etc/keystone/keystone.conf token provider  uuid"
-
-openstack-config --set /etc/keystone/keystone.conf token driver  memcache
-fn_log "openstack-config --set /etc/keystone/keystone.conf token driver  memcache "
-
-openstack-config --set /etc/keystone/keystone.conf revoke driver  sql 
-fn_log "openstack-config --set /etc/keystone/keystone.conf revoke driver  sql "
-openstack-config --set /etc/keystone/keystone.conf  DEFAULT  verbose  True 
-fn_log "openstack-config --set /etc/keystone/keystone.conf  DEFAULT  verbose  True "
-
-
-su -s /bin/sh -c "keystone-manage db_sync" keystone 
-fn_log "su -s /bin/sh -c "keystone-manage db_sync" keystone "
+keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+fn_log "keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone "
 
 [ -f /etc/httpd/conf/httpd.conf_bak  ] || cp -a /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf_bak
 fn_log "[ -f /etc/httpd/conf/httpd.conf_bak  ] || cp -a /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf_bak"
@@ -126,7 +119,14 @@ fn_log "[ -f /etc/httpd/conf/httpd.conf_bak  ] || cp -a /etc/httpd/conf/httpd.co
 sed  -i  "s/#ServerName www.example.com:80/ServerName ${HOSTNAME}/" /etc/httpd/conf/httpd.conf
 fn_log "sed  -i  's/#ServerName www.example.com:80/ServerName $HOSTNAME/' /etc/httpd/conf/httpd.conf"
 
-
+RESULT_HTTP=`cat /etc/httpd/conf/httpd.conf | grep $HOSTNAME | awk -F " " '{print$2}'`
+if [ ${RESULT_HTTP} = ${HOSTNAME}  ]
+then
+	log_info "http servername is ${HOSTNAME} "
+else
+	log_error "http servername is null"
+	exit 1
+fi
 
 rm -rf /etc/httpd/conf.d/wsgi-keystone.conf  && cp -a $PWD/lib/wsgi-keystone.conf  /etc/httpd/conf.d/wsgi-keystone.conf 
 fn_log "cp -a $PWD/lib/wsgi-keystone.conf  /etc/httpd/conf.d/wsgi-keystone.conf "
@@ -159,12 +159,18 @@ if [  ${ENDPOINT_LIST_INTERNAL}  -eq 1  ]  && [ ${ENDPOINT_LIST_PUBLIC}  -eq  1 
 then
 	log_info "openstack endpoint had created."
 else
-	openstack endpoint create --region RegionOne   identity public http://${NAMEHOST}:5000/v2.0 && openstack endpoint create --region RegionOne   identity internal http://${NAMEHOST}:5000/v2.0 && openstack endpoint create --region RegionOne   identity admin http://${NAMEHOST}:35357/v2.0
-	fn_log "openstack endpoint create --region RegionOne   identity public http://${NAMEHOST}:5000/v2.0 && openstack endpoint create --region RegionOne   identity internal http://${NAMEHOST}:5000/v2.0 && openstack endpoint create --region RegionOne   identity admin http://${NAMEHOST}:35357/v2.0"
+	openstack endpoint create --region RegionOne   identity public http://${NAMEHOST}:5000/v3 && openstack endpoint create --region RegionOne   identity internal http://${NAMEHOST}:5000/v3 && openstack endpoint create --region RegionOne   identity admin http://${NAMEHOST}:35357/v3
+	fn_log "openstack endpoint create --region RegionOne   identity public http://${NAMEHOST}:5000/v3 && openstack endpoint create --region RegionOne   identity internal http://${NAMEHOST}:5000/v3 && openstack endpoint create --region RegionOne   identity admin http://${NAMEHOST}:35357/v3"
 fi
 
-
-
+DEFAULT_DOMAIN=`openstack domain list | grep default | awk -F " " '{print$4}'`
+if [  ${DEFAULT_DOMAIN}x  = defaultx ]
+then
+	log_info "default domain had created."
+else
+	openstack domain create --description "Default Domain" default
+	fn_log "openstack domain create --description "Default Domain" default"
+fi
 
 PROJECT_ADMIN=`openstack project list | grep admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${PROJECT_ADMIN}x = adminx ]
@@ -176,7 +182,7 @@ else
 fi
 
 
-USER_LIST=`openstack user list | grep  admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+USER_LIST=`openstack user list | grep  admin |grep -v  heat_domain_admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 
 if [ ${USER_LIST}x = adminx ]
 then
@@ -229,7 +235,7 @@ else
 	fn_log "openstack user create  demo  --password ${ALL_PASSWORD}"
 fi
 
-ROLE_LIST=`openstack role list | grep user  |awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+ROLE_LIST=`openstack role list | grep user  |awk -F "|" '{print$3}' | awk -F " " '{print$1}'  | grep -v  heat_stack_user`
 if [ ${ROLE_LIST}x = userx ]
 then
 	log_info "openstack role had  created user."
@@ -242,12 +248,14 @@ fi
 
 
 unset OS_TOKEN OS_URL
-openstack --os-auth-url http://$HOSTNAME:35357/v3   --os-project-domain-id default --os-user-domain-id default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}
-fn_log "openstack --os-auth-url http://$HOSTNAME:35357/v3   --os-project-domain-id default --os-user-domain-id default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}"
+
+openstack --os-auth-url http://$HOSTNAME:35357/v3  --os-project-domain-name default --os-user-domain-name default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}
+fn_log "openstack --os-auth-url http://$HOSTNAME:35357/v3  --os-project-domain-name default --os-user-domain-name default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}"
 
 
-openstack --os-auth-url http://$HOSTNAME:5000/v3   --os-project-domain-id default --os-user-domain-id default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}
-fn_log "openstack --os-auth-url http://$HOSTNAME:5000/v3   --os-project-domain-id default --os-user-domain-id default   --os-project-name demo --os-username demo --os-auth-type  token issue --os-password ${ALL_PASSWORD}"
+
+openstack --os-auth-url http://$HOSTNAME:5000/v3   --os-project-domain-name default --os-user-domain-name default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}
+fn_log "openstack --os-auth-url http://$HOSTNAME:5000/v3   --os-project-domain-name default --os-user-domain-name default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}"
 
 
 
@@ -274,8 +282,8 @@ echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###       Install Keystone Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
-if  [ ! -d /etc/openstack-liberty_tag ]
+if  [ ! -d /etc/openstack-mitaka_tag ]
 then 
-	mkdir -p /etc/openstack-liberty_tag  
+	mkdir -p /etc/openstack-mitaka_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/config_keystone.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/config_keystone.tag

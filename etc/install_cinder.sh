@@ -1,11 +1,11 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/liberty-log.sh ]
+if [  -e $PWD/lib/mitaka-log.sh ]
 then	
-	source $PWD/lib/liberty-log.sh
+	source $PWD/lib/mitaka-log.sh
 else
-	echo -e "\033[41;37m $PWD/liberty-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -16,13 +16,13 @@ else
 	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-liberty_tag/computer.tag  ]
+if [  -e /etc/openstack-mitaka_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
-if [ -f  /etc/openstack-liberty_tag/install_nova.tag ]
+if [ -f  /etc/openstack-mitaka_tag/install_nova.tag ]
 then 
 	log_info "nova have installed ."
 else
@@ -30,7 +30,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-liberty_tag/install_cinder.tag ]
+if [ -f  /etc/openstack-mitaka_tag/install_cinder.tag ]
 then 
 	echo -e "\033[41;37m you had install cinder \033[0m"
 	log_info "you had install cinder."	
@@ -119,20 +119,19 @@ else
 	fn_test_network
 fi
 				  
-yum clean all &&  yum install openstack-cinder python-cinderclient -y
-fn_log "yum clean all &&  yum install openstack-cinder python-cinderclient python-oslo-db -y"
-rm -rf /etc/cinder/cinder.conf  && cp /usr/share/cinder/cinder-dist.conf /etc/cinder/cinder.conf && chown -R cinder:cinder /etc/cinder/cinder.conf
+yum clean all &&  yum install openstack-cinder -y
+fn_log "yum clean all &&  yum install openstack-cinder -y"
 
-fn_log "rm -rf /etc/cinder/cinder.conf  && cp /usr/share/cinder/cinder-dist.conf /etc/cinder/cinder.conf && chown -R cinder:cinder /etc/cinder/cinder.conf"
+
+[ -f /etc/cinder/cinder.conf_bak  ] || cp -a  /etc/cinder/cinder.conf  /etc/cinder/cinder.conf_bak 
+fn_log "[ -f /etc/cinder/cinder.conf_bak  ] || cp -a  /etc/cinder/cinder.conf  /etc/cinder/cinder.conf_bak "
+
 unset http_proxy https_proxy ftp_proxy no_proxy
 
-FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
-FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
+FIRST_ETH_IP=${MANAGER_IP}
 
-
-
-openstack-config --set /etc/cinder/cinder.conf  database connection  mysql://cinder:${ALL_PASSWORD}@${NAMEHOST}/cinder && openstack-config --set /etc/cinder/cinder.conf  DEFAULT rpc_backend  rabbit &&  openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_host  ${NAMEHOST} && openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_userid  openstack && openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD} && openstack-config --set /etc/cinder/cinder.conf  DEFAULT auth_strategy  keystone && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_uri  http://${NAMEHOST}:5000 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_url  http://${NAMEHOST}:35357 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_plugin  password && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken project_domain_id  default && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken user_domain_id  default && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken project_name  service && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken username  cinder && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken password  ${ALL_PASSWORD} &&  openstack-config --set /etc/cinder/cinder.conf  DEFAULT my_ip  ${FIRST_ETH_IP} && openstack-config --set /etc/cinder/cinder.conf  oslo_concurrency lock_path  /var/lib/cinder/tmp && openstack-config --set /etc/cinder/cinder.conf  DEFAULT verbose  True 
-fn_log "openstack-config --set /etc/cinder/cinder.conf  database connection  mysql://cinder:${ALL_PASSWORD}@${NAMEHOST}/cinder && openstack-config --set /etc/cinder/cinder.conf  DEFAULT rpc_backend  rabbit &&  openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_host  ${NAMEHOST} && openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_userid  openstack && openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD} && openstack-config --set /etc/cinder/cinder.conf  DEFAULT auth_strategy  keystone && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_uri  http://${NAMEHOST}:5000 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_url  http://${NAMEHOST}:35357 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_plugin  password && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken project_domain_id  default && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken user_domain_id  default && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken project_name  service && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken username  cinder && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken password  ${ALL_PASSWORD} &&  openstack-config --set /etc/cinder/cinder.conf  DEFAULT my_ip  ${FIRST_ETH_IP} && openstack-config --set /etc/cinder/cinder.conf  oslo_concurrency lock_path  /var/lock/cinder && openstack-config --set /etc/cinder/cinder.conf  DEFAULT verbose  True "
+openstack-config --set /etc/cinder/cinder.conf  database connection  mysql+pymysql://cinder:${ALL_PASSWORD}@${NAMEHOST}/cinder && openstack-config --set /etc/cinder/cinder.conf  DEFAULT rpc_backend  rabbit &&  openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_host  ${NAMEHOST} && openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_userid  openstack && openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD} && openstack-config --set /etc/cinder/cinder.conf  DEFAULT auth_strategy  keystone && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_uri  http://${NAMEHOST}:5000 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_url  http://${NAMEHOST}:35357 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken memcached_servers  ${NAMEHOST}:11211 && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken auth_type   password && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken project_domain_name   default && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken user_domain_name   default && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken project_name  service && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken username  cinder && openstack-config --set /etc/cinder/cinder.conf  keystone_authtoken password  ${ALL_PASSWORD} &&  openstack-config --set /etc/cinder/cinder.conf  oslo_concurrency lock_path  /var/lib/cinder/tmp && openstack-config --set /etc/cinder/cinder.conf  DEFAULT my_ip  ${MANAGER_IP}
+fn_log "configurer /etc/cinder/cinder.conf "
 
 
 su -s /bin/sh -c "cinder-manage db sync" cinder 
@@ -142,7 +141,7 @@ openstack-config --set /etc/nova/nova.conf  cinder os_region_name  RegionOne
 fn_log "openstack-config --set /etc/nova/nova.conf  cinder os_region_name  RegionOne"
 systemctl restart openstack-nova-api.service
 fn_log "systemctl restart openstack-nova-api.service"
-systemctl enable openstack-cinder-api.service openstack-cinder-scheduler.service  && systemctl start openstack-cinder-api.service openstack-cinder-scheduler.service   
+systemctl enable openstack-cinder-api.service openstack-cinder-scheduler.service  && systemctl restart openstack-cinder-api.service openstack-cinder-scheduler.service   
 fn_log "systemctl enable openstack-cinder-api.service openstack-cinder-scheduler.service  && systemctl start openstack-cinder-api.service openstack-cinder-scheduler.service   "
 
 #test network
@@ -156,15 +155,15 @@ fn_log "curl www.baidu.com >/dev/null "
 }
 
 
-
+#for storage service 
 if  [ -f /etc/yum.repos.d/repo.repo ]
 then
 	log_info " use local yum."
 else 
 	fn_test_network
 fi
-yum clean all &&  yum install qemu  lvm2 -y
-fn_log "yum clean all &&  yum install qemu  lvm2 -y"
+yum clean all &&  yum install   lvm2 -y
+fn_log "yum clean all &&  yum install   lvm2 -y"
 
 systemctl enable lvm2-lvmetad.service  &&  systemctl start lvm2-lvmetad.service
 fn_log "systemctl enable lvm2-lvmetad.service  &&  systemctl start lvm2-lvmetad.service"
@@ -181,8 +180,8 @@ else
 	pvcreate ${CINDER_DISK}  && vgcreate cinder-volumes ${CINDER_DISK}
 	fn_log "pvcreate ${CINDER_DISK}  && vgcreate cinder-volumes ${CINDER_DISK}"
 fi
-yum clean all &&  yum install openstack-cinder targetcli python-oslo-policy  -y
-fn_log "yum clean all &&  yum install openstack-cinder targetcli python-oslo-db python-oslo-log  MySQL-python  -y"
+yum clean all &&  yum install openstack-cinder targetcli   -y
+fn_log "yum clean all &&  yum install openstack-cinder targetcli -y"
 unset http_proxy https_proxy ftp_proxy no_proxy 
 
 openstack-config --set /etc/cinder/cinder.conf  lvm volume_driver  cinder.volume.drivers.lvm.LVMVolumeDriver  && \
@@ -191,10 +190,10 @@ openstack-config --set /etc/cinder/cinder.conf  lvm iscsi_protocol  iscsi  && \
 openstack-config --set /etc/cinder/cinder.conf  lvm iscsi_helper  lioadm  && \
 openstack-config --set /etc/cinder/cinder.conf  DEFAULT glance_host  ${NAMEHOST}  && \
 openstack-config --set /etc/cinder/cinder.conf  DEFAULT enabled_backends  lvm && \
-openstack-config --set /etc/cinder/cinder.conf  oslo_concurrency lock_path  /var/lib/cinder/tmp
-fn_log "openstack-config --set /etc/cinder/cinder.conf  lvm volume_driver  cinder.volume.drivers.lvm.LVMVolumeDriver  && openstack-config --set /etc/cinder/cinder.conf  lvm volume_group  cinder-volumes  && openstack-config --set /etc/cinder/cinder.conf  lvm iscsi_protocol  iscsi  && openstack-config --set /etc/cinder/cinder.conf  lvm iscsi_helper  lioadm  && openstack-config --set /etc/cinder/cinder.conf  DEFAULT glance_host  ${NAMEHOST}  && openstack-config --set /etc/cinder/cinder.conf  DEFAULT enabled_backends  lvm"
+openstack-config --set /etc/cinder/cinder.conf  DEFAULT glance_api_servers  http://${NAMEHOST}:9292
+fn_log "openstack-config --set /etc/cinder/cinder.conf  "
 
-systemctl enable openstack-cinder-volume.service target.service &&  systemctl start openstack-cinder-volume.service target.service 
+systemctl enable openstack-cinder-volume.service target.service &&  systemctl restart openstack-cinder-volume.service target.service 
 fn_log "systemctl enable openstack-cinder-volume.service target.service &&  systemctl start openstack-cinder-volume.service target.service "
 }
 
@@ -227,7 +226,7 @@ then
 	echo -e "\033[32m cinder status is ok \033[0m"
 else
 	log_error "cinder status is down."
-	echo -e "\033[41;37m cinder status is down. \033[0m"
+	echo -e "\033[41;37m cinder service-list result is down. \033[0m"
 	exit
 fi
 
@@ -235,11 +234,11 @@ fi
 echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###         Install Cinder Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
-if  [ ! -d /etc/openstack-liberty_tag ]
+if  [ ! -d /etc/openstack-mitaka_tag ]
 then 
-	mkdir -p /etc/openstack-liberty_tag  
+	mkdir -p /etc/openstack-mitaka_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-liberty_tag/install_cinder.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_cinder.tag
 
 
 
