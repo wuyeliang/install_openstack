@@ -1,14 +1,17 @@
-#controller system information
+#[controller system information]
 HOST_NAME=mitaka
 #controller manager IP
 MANAGER_IP=192.168.8.71
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
 NET_DEVICE_NAME=enp0s8
-#install openstack-nova-compute on controller
+#install openstack-nova-compute on controller,please give it True or False.
 CONTROLLER_COMPUTER=True
+#For database type.you can select it from percona and mariadb.
+DB_TYPE="percona"
 
-#For neutron information
+
+#[For neutron information]
 #[FLOATING_METWORK_ADDR]
 NEUTRON_PUBLIC_NET="10.168.10.0/24"
 PUBLIC_NET_GW="10.168.10.1"
@@ -23,17 +26,21 @@ NEUTRON_PRIVATE_NET="10.168.124.0/24"
 PRIVATE_NET_GW="10.168.124.1"
 PRIVATE_NET_DNS="10.248.2.5"
 
-#For cinder
+#[For cinder]
 #please input disk or partition by blank to separate
 #eg1:CINDER_DISK='/dev/vdb /dev/vdc'
 #eg2:CINDER_DISK='/dev/vdb1 /dev/vdc1'
-#controller disk for cinder 
+
+
+#if you want to running cinder-volume on controller, please give CINDER_DISK one option.
 #CINDER_DISK='/dev/sdb' 
+
+#if you have block node ,please give CINDER_DISK one option.
 #block node disk for cinder
 #BLOCK_CINDER_DISK='/dev/sdb'
 
 
-#for manila
+#[for manila]
 #please input disk or partition by blank to separate
 #MANILA_DISK='/dev/sdb'
 

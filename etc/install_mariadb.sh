@@ -1,4 +1,4 @@
-#！/bin/bash
+#!/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
 if [  -e $PWD/lib/mitaka-log.sh ]
@@ -65,6 +65,48 @@ fn_log "yum clean all && yum install openstack-selinux -y"
 FIRST_ETH_IP=${MANAGER_IP}
 
 
+function fn_install_percona () {
+if [ -e /var/log/mysqld.log  ]
+then
+	rm -rf /var/log/mysqld.log
+	fn_log "rm -rf /var/log/mysqld.log"
+fi
+if [ -e /var/lib/mysql ]
+then	
+	rm -rf  /var/lib/mysql
+	fn_log "rm -rf  /var/lib/mysql"
+fi
+
+yum install Percona-Server-server-57 -y
+fn_log "yum install Percona-Server-server-57 -y"
+rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
+fn_log "cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
+echo " " >>/etc/my.cnf.d/openstack.cnf
+echo "bind-address = ${MANAGER_IP}" >>/etc/my.cnf.d/openstack.cnf
+service mysqld restart
+fn_log "service mysqld restart"
+chkconfig mysqld on
+fn_log "chkconfig mysqld on"
+TMP_PASSWD=`cat /var/log/mysqld.log  | grep "A temporary password" | awk -F " " '{print$11}'`
+fn_log "set TMP_PASSWD=`cat /var/log/mysqld.log  | grep "A temporary password" | awk -F " " '{print$11}'` "
+echo "mysqladmin -u root -p"TMPPASSWD" password ${ALL_PASSWORD}"  >tmp_modify_passwd
+fn_log "echo "mysqladmin -u root -p"TMPPASSWD" password ${ALL_PASSWORD}"  >tmp_modify_passwd"
+sed -i "s/TMPPASSWD/${TMP_PASSWD}/g" tmp_modify_passwd
+fn_log "sed -i "s/TMPPASSWD/${TMP_PASSWD}/g" tmp_modify_passwd"
+bash -x  tmp_modify_passwd
+fn_log "bash -x  tmp_modify_passwd"
+rm -f  tmp_modify_passwd
+fn_log "rm -f  tmp_modify_passwd"
+ mysql_secure_installation -p${ALL_PASSWORD}<<EOF
+n
+y
+y
+y
+y 
+EOF
+fn_log "mysql_secure_installation"
+}
+
 function fn_install_mariadb () {
 yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y
 fn_log "yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y"
@@ -88,12 +130,32 @@ y
 EOF
 fn_log "mysql_secure_installation"
 }
-MARIADB_STATUS=`service mariadb status | grep Active | awk -F "("  '{print$2}' | awk -F ")"  '{print$1}'`
-if [ "${MARIADB_STATUS}"  = running ]
+
+
+
+
+function fn_install_db () {
+if [ ${DB_TYPE}x = mariadbx   ]
 then
-	log_info "mairadb had installl."
+	fn_install_mairadb
+	fn_log "fn_install_mairadb"
+elif [ ${DB_TYPE}x  = perconax  ]
+then
+	fn_install_percona
+	fn_log "fn_install_percona"
 else
-	fn_install_mariadb
+	echo -e "\033[41;37m please check option DB_TYPE in installrc ,please give mariadb or percona. \033[0m"
+	log_error "please check option DB_TYPE in installrc ,please give mariadb or percona."
+	exit 1 
+fi
+}
+
+mysql -uroot -p${ALL_PASSWORD} -e "show status" >/dev/null 
+if [ $? -eq 0  ]
+then
+	log_info "database had installed."
+else
+	fn_install_db
 fi
 
 

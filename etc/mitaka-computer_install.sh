@@ -102,9 +102,10 @@ sleep 20
 openstack compute service list
 fn_log "openstack compute service list"
 
-
 yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y
 fn_log "yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y"
+
+
 
 [ -f  /etc/neutron/neutron.conf_bak ]  ||  cp -a /etc/neutron/neutron.conf /etc/neutron/neutron.conf_bak   && \
 sed -i '/^connection/d' /etc/neutron/neutron.conf  && \

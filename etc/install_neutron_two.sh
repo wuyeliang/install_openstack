@@ -155,30 +155,6 @@ openstack-config --set   /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vxlan vn
 openstack-config --set   /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_ipset  True
 fn_log "config /etc/neutron/plugins/ml2/ml2_conf.ini "
 
-SECONF_ETH=${NET_DEVICE_NAME}
-FIRST_ETH_IP=${MANAGER_IP}
-[ -f  /etc/neutron/plugins/ml2/linuxbridge_agent.ini_bak ] || cp -a   /etc/neutron/plugins/ml2/linuxbridge_agent.ini   /etc/neutron/plugins/ml2/linuxbridge_agent.ini_bak 
-openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  linux_bridge physical_interface_mappings  provider:${SECONF_ETH} && \
-openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  vxlan  enable_vxlan  True && \
-openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  vxlan  local_ip  ${FIRST_ETH_IP} && \
-openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  vxlan l2_population  True && \
-openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup  enable_security_group  True && \
-openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup  firewall_driver  neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
-fn_log "config /etc/neutron/plugins/ml2/linuxbridge_agent.ini"
-
-[ -f   /etc/neutron/l3_agent.ini_bak ] || cp -a    /etc/neutron/l3_agent.ini    /etc/neutron/l3_agent.ini_bak 
-openstack-config --set  /etc/neutron/l3_agent.ini  DEFAULT     interface_driver  neutron.agent.linux.interface.BridgeInterfaceDriver && \
-openstack-config --set   /etc/neutron/l3_agent.ini  DEFAULT     external_network_bridge    && \
-openstack-config --set  /etc/neutron/l3_agent.ini  DEFAULT     verbose  True  
-fn_log "config /etc/neutron/l3_agent.ini "
-
-[ -f   /etc/neutron/dhcp_agent.ini_bak ] || cp -a    /etc/neutron/dhcp_agent.ini    /etc/neutron/dhcp_agent.ini_bak 
-openstack-config --set  /etc/neutron/dhcp_agent.ini  DEFAULT     interface_driver  neutron.agent.linux.interface.BridgeInterfaceDriver    && \
-openstack-config --set  /etc/neutron/dhcp_agent.ini  DEFAULT     dhcp_driver  neutron.agent.linux.dhcp.Dnsmasq   && \
-openstack-config --set  /etc/neutron/dhcp_agent.ini  DEFAULT     enable_isolated_metadata  True   && \
-openstack-config --set  /etc/neutron/dhcp_agent.ini  DEFAULT     verbose  True   
-fn_log "config /etc/neutron/dhcp_agent.ini "
-
 
 
 
@@ -214,13 +190,6 @@ fn_log "config /etc/nova/nova.conf"
 
 
 
-echo "dhcp-option-force=26,1450" >/etc/neutron/dnsmasq-neutron.conf
-fn_log "echo "dhcp-option-force=26,1450" >/etc/neutron/dnsmasq-neutron.conf"
-[ -f /etc/neutron/metadata_agent.ini_bak-2 ] || cp -a  /etc/neutron/metadata_agent.ini /etc/neutron/metadata_agent.ini_bak-2 && \
-openstack-config --set  /etc/neutron/metadata_agent.ini  DEFAULT nova_metadata_ip  ${NAMEHOST}   && \
-openstack-config --set  /etc/neutron/metadata_agent.ini  DEFAULT metadata_proxy_shared_secret  ${ALL_PASSWORD} && \
-openstack-config --set  /etc/neutron/metadata_agent.ini  DEFAULT verbose  True
-fn_log "config /etc/neutron/metadata_agent.ini"
 
 
 
@@ -233,123 +202,82 @@ fn_log "su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.c
 
 systemctl restart openstack-nova-api.service
 fn_log "systemctl restart openstack-nova-api.service"
-systemctl enable neutron-server.service   neutron-linuxbridge-agent.service neutron-dhcp-agent.service   neutron-metadata-agent.service &&  systemctl start neutron-server.service   neutron-linuxbridge-agent.service neutron-dhcp-agent.service   neutron-metadata-agent.service
-fn_log "systemctl enable neutron-server.service   neutron-linuxbridge-agent.service neutron-dhcp-agent.service   neutron-metadata-agent.service &&  systemctl start neutron-server.service   neutron-linuxbridge-agent.service neutron-dhcp-agent.service   neutron-metadata-agent.service"
-systemctl enable neutron-l3-agent.service && systemctl start neutron-l3-agent.service
-fn_log "systemctl enable neutron-l3-agent.service && systemctl start neutron-l3-agent.service"
 
-SECONF_ETH=${NET_DEVICE_NAME}
-
-nmcli connection modify ${SECONF_ETH} ipv4.addresses "${SECOND_NET}" && nmcli connection modify ${SECONF_ETH} ipv4.method manual && nmcli connection up  ${SECONF_ETH} 
-fn_log "nmcli connection modify ${SECONF_ETH} ipv4.addresses "${SECOND_NET}" && nmcli connection modify ${SECONF_ETH} ipv4.method manual && nmcli connection up  ${SECONF_ETH} "
+systemctl enable neutron-server.service && systemctl start neutron-server.service 
+fn_log "systemctl enable neutron-server.service && systemctl start neutron-server.service"
 
 
+function fn_install_computer_nova () {
+yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y
+fn_log "yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y"
+
+read -p "please input the local host network interface name [eg:eth2]:" DEV_NETWORK
+if [ -z  ${DEV_NETWORK}   ]
+then
+	echo -e "\033[41;37m please input the local host network interface name [eg:eth2]. \033[0m"
+	exit 1
+fi
+
+[ -f  /etc/neutron/neutron.conf_bak ]  ||  cp -a /etc/neutron/neutron.conf /etc/neutron/neutron.conf_bak   && \
+sed -i '/^connection/d' /etc/neutron/neutron.conf  && \
+openstack-config --set  /etc/neutron/neutron.conf DEFAULT rpc_backend  rabbit  && \
+openstack-config --set  /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_host  ${HOST_NAME}   && \
+openstack-config --set  /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_userid  openstack   && \
+openstack-config --set  /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD}   && \
+openstack-config --set  /etc/neutron/neutron.conf DEFAULT auth_strategy  keystone  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken auth_uri  http://${HOST_NAME}:5000  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken auth_url  http://${HOST_NAME}:35357  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken  memcached_servers  ${HOST_NAME}:11211  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken auth_type  password  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken project_domain_name   default  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken user_domain_name  default  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken project_name  service  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken username  neutron  && \
+openstack-config --set  /etc/neutron/neutron.conf keystone_authtoken password  ${ALL_PASSWORD}  && \
+openstack-config --set  /etc/neutron/neutron.conf oslo_concurrency  lock_path  /var/lib/neutron/tmp  
+fn_log "config /etc/neutron/neutron.conf "
+[ -f  /etc/neutron/plugins/ml2/linuxbridge_agent.ini_bak ] || cp -a   /etc/neutron/plugins/ml2/linuxbridge_agent.ini   /etc/neutron/plugins/ml2/linuxbridge_agent.ini_bak 
+openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  linux_bridge physical_interface_mappings  provider:${DEV_NETWORK} && \
+openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  vxlan  enable_vxlan  True && \
+openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  vxlan  local_ip  ${COMPUTER_MANAGER_IP} && \
+openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini  vxlan l2_population  True && \
+openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup  enable_security_group  True && \
+openstack-config --set   /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup  firewall_driver  neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+fn_log "config /etc/neutron/plugins/ml2/linuxbridge_agent.ini"
+openstack-config --set  /etc/nova/nova.conf neutron url  http://${HOST_NAME}:9696 && \
+openstack-config --set  /etc/nova/nova.conf neutron auth_url  http://${HOST_NAME}:35357 && \
+openstack-config --set  /etc/nova/nova.conf neutron auth_type  password && \
+openstack-config --set  /etc/nova/nova.conf neutron project_domain_name  default && \
+openstack-config --set  /etc/nova/nova.conf neutron user_domain_name  default && \
+openstack-config --set  /etc/nova/nova.conf neutron region_name  RegionOne && \
+openstack-config --set  /etc/nova/nova.conf neutron project_name  service && \
+openstack-config --set  /etc/nova/nova.conf neutron username  neutron && \
+openstack-config --set  /etc/nova/nova.conf neutron password  ${ALL_PASSWORD}
+fn_log "config /etc/nova/nova.conf"
+systemctl restart openstack-nova-compute.service 
+fn_log "systemctl restart openstack-nova-compute.service "
+systemctl enable neutron-linuxbridge-agent.service && systemctl start neutron-linuxbridge-agent.service
+fn_log "systemctl enable neutron-linuxbridge-agent.service && systemctl start neutron-linuxbridge-agent.service"
+
+}
+
+if [  ${CONTROLLER_COMPUTER}  = True   ]
+then
+	fn_install_computer_nova 
+	fn_log "fn_install_computer_nova "
+elif [ ${CONTROLLER_COMPUTER}  = False ]
+then
+	log_info "Do not install openstack-nova-compute on controller. "
+else
+	echo -e "\033[41;37m please check  CONTROLLER_COMPUTER option in installrc . \033[0m"
+	exit 1
+fi
 
 source /root/admin-openrc.sh
 neutron ext-list
 fn_log "neutron ext-list"
 neutron agent-list
 fn_log "neutron agent-list"
-source /root/demo-openrc.sh
-
-KEYPAIR=`nova keypair-list | grep  mykey | awk -F " " '{print$2}'`
-if [  ${KEYPAIR}x = mykeyx ]
-then
-	log_info "keypair had added."
-else
-	ssh-keygen -t dsa -f ~/.ssh/id_dsa -N ""
-	fn_log "ssh-keygen -t dsa -f ~/.ssh/id_dsa -N """
-	openstack keypair create --public-key ~/.ssh/id_dsa.pub mykey
-	fn_log "openstack keypair create --public-key ~/.ssh/id_dsa.pub mykey"
-fi
-
-SECRULE=`nova secgroup-list-rules  default | grep 22 | awk -F " " '{print$4}'`
-if [ x${SECRULE} = x22 ]
-then 
-	log_info "port 22 and icmp had add to secgroup."
-else
-	openstack security group rule create --proto icmp default 
-	fn_log "openstack security group rule create --proto icmp default "
-	openstack security group rule create --proto tcp --dst-port 22 default
-	fn_log "openstack security group rule create --proto tcp --dst-port 22 default"
-fi
-source /root/admin-openrc.sh
-
-PUBLIC_NET=`neutron net-list | grep provider |wc -l`
-if [ ${PUBLIC_NET}  -eq 0 ]
-then
-	neutron net-create --shared --provider:physical_network provider   --provider:network_type flat provider
-	fn_log "neutron net-create --shared --provider:physical_network provider   --provider:network_type flat provider"
-else
-	log_info "provider net is exist."
-fi
-
-SUB_PUBLIC_NET=`neutron subnet-list | grep provider |wc -l `
-if [ ${SUB_PUBLIC_NET}  -eq 0 ]
-then
-	neutron subnet-create --name provider   --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END}   --dns-nameserver ${NEUTRON_DNS} --gateway ${PUBLIC_NET_GW}    provider ${NEUTRON_PUBLIC_NET}
-	fn_log "neutron subnet-create --name provider   --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END}   --dns-nameserver ${NEUTRON_DNS} --gateway ${PUBLIC_NET_GW}    provider ${NEUTRON_PUBLIC_NET}"
-else
-	log_info "sub_public is exist."
-fi
-source /root/demo-openrc.sh
-PRIVATE_NET=`neutron net-list | grep selfservice |wc -l`
-if [ ${PRIVATE_NET}  -eq 0 ]
-then
-	neutron net-create selfservice
-	fn_log "neutron net-create selfservice"
-else
-	log_info "selfservice net is exist."
-fi
-SUB_PRIVATE_NET=`neutron subnet-list | grep selfservice |wc -l`
-if [ ${SUB_PRIVATE_NET}  -eq 0 ]
-then
-	neutron subnet-create --name selfservice   --dns-nameserver ${PRIVATE_NET_DNS} --gateway ${PRIVATE_NET_GW}  selfservice ${NEUTRON_PRIVATE_NET}
-	fn_log "neutron subnet-create --name selfservice   --dns-nameserver ${PRIVATE_NET_DNS}--gateway ${PRIVATE_NET_GW}  selfservice ${NEUTRON_PRIVATE_NET}"
-else
-	log_info "selfservice subnet is exist."
-fi
-source /root/admin-openrc.sh
-ROUTE_VALUE=`neutron net-show provider | grep router:external | awk -F " "  '{print$4}'`
-if [ ${ROUTE_VALUE}x  = Truex  ]
-then
-	log_info "the value had changed."
-else
-	neutron net-update provider --router:external
-	fn_log "neutron net-update provider --router:external"
-fi
-source /root/demo-openrc.sh
-ROUTE_NU=`neutron router-list | grep router | wc -l`
-if [ ${ROUTE_NU}  -eq 0 ]
-then
-	neutron router-create router
-	fn_log "neutron router-create router"
-	neutron router-interface-add router selfservice
-	fn_log "neutron router-interface-add router selfservice"
-	neutron router-gateway-set router provider
-	fn_log "neutron router-gateway-set router provider"
-else
-	log_info "router had created."
-fi
-
-source /root/admin-openrc.sh
-ip netns
-fn_log "ip netns"
-neutron router-port-list router
-fn_log "neutron router-port-list router"
-
-
-
-
-
-
-
-
-systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl restart libvirtd.service openstack-nova-compute.service 
-fn_log "systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service "
-
-systemctl restart neutron-dhcp-agent  neutron-l3-agent  neutron-linuxbridge-agent  neutron-metadata-agent neutron-server
-fn_log "systemctl restart neutron-dhcp-agent  neutron-l3-agent  neutron-linuxbridge-agent  neutron-metadata-agent neutron-server"
 
 if  [ ! -d /etc/openstack-mitaka_tag ]
 then 

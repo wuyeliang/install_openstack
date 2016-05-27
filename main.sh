@@ -151,6 +151,7 @@ cat << EOF
 1) Install Controller Node Service.
 2) Install Computer Node Service.
 3) Install Block Node Service (Cinder).
+4) Install Network Node Service.
 0) Quit
 EOF
 read -p "please input one number for install :" install_number
@@ -170,12 +171,47 @@ case ${install_number} in
 		fn_log "fn_install_openstack_block"
 		fn_install_openstack_block
 	;;
+	4)
+		fn_install_openstack_network
+		fn_log "fn_install_openstack_network"
+		fn_install_openstack_network
+	;;
 	0)
 		exit 1
 	;;
 	*)
 		echo -e "\033[41;37m please input one number. \033[0m"
 		fn_install_openstack
+	;;
+esac 
+
+}
+
+function  fn_install_openstack_network () {
+
+cat << EOF
+1) Configure System Environment.
+2) Install Neutron Service.
+0) Quit
+EOF
+read -p "please input one number for install :" install_number
+case ${install_number} in
+	1)
+		/usr/bin/bash ./etc/mitaka-network_system.sh
+		fn_log "/usr/bin/bash ./etc/mitaka-network_system.sh"
+		fn_install_openstack_network
+	;;
+	2)
+		/usr/bin/bash ./etc/mitaka-network-neutron.sh
+		fn_log "/usr/bin/bash ./etc/mitaka-network-neutron.sh"
+		fn_install_openstack_network
+	;;
+	0)
+		fn_install_openstack
+	;;
+	*)
+		echo -e "\033[41;37m please input one number. \033[0m"
+		fn_install_openstack_network
 	;;
 esac 
 
