@@ -147,25 +147,34 @@ fn_log "su -s /bin/sh -c "nova-manage db sync" nova "
 
 systemctl enable openstack-nova-api.service   openstack-nova-cert.service openstack-nova-consoleauth.service  openstack-nova-scheduler.service openstack-nova-conductor.service   openstack-nova-novncproxy.service && systemctl start openstack-nova-api.service   openstack-nova-cert.service openstack-nova-consoleauth.service  openstack-nova-scheduler.service openstack-nova-conductor.service   openstack-nova-novncproxy.service
 fn_log "systemctl enable openstack-nova-api.service   openstack-nova-cert.service openstack-nova-consoleauth.service  openstack-nova-scheduler.service openstack-nova-conductor.service   openstack-nova-novncproxy.service && systemctl start openstack-nova-api.service   openstack-nova-cert.service openstack-nova-consoleauth.service  openstack-nova-scheduler.service openstack-nova-conductor.service   openstack-nova-novncproxy.service"
+#test network
+function fn_test_network () {
+if [ -f $PWD/lib/proxy.sh ]
+then 
+	source  $PWD/lib/proxy.sh
+fi
+curl www.baidu.com >/dev/null   
+fn_log "curl www.baidu.com >/dev/null"
+}
 
 
 
+if  [ -f /etc/yum.repos.d/repo.repo ]
+then
+	log_info " use local yum."
+else 
+	fn_test_network
+fi
 
-
-
-
-
-
-
-
-
-#for computer node
-function fn_computer_service () {
 yum clean all && yum install openstack-nova-compute sysfsutils -y
 fn_log "yum clean all && yum install openstack-nova-compute sysfsutils -y"
 
 unset http_proxy https_proxy ftp_proxy no_proxy 
-FIRST_ETH_IP=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
+FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
+FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
+
+
+
 
 HARDWARE=`egrep -c '(vmx|svm)' /proc/cpuinfo`
 if [ ${HARDWARE}  -eq 0 ]
@@ -179,25 +188,6 @@ fi
 
 systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service 
 fn_log "systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service "
-
-}
-
-if [  ${CONTROLLER_COMPUTER}  = True   ]
-then
-	fn_computer_service 
-	fn_log "fn_computer_service "
-elif [ ${CONTROLLER_COMPUTER}  = False ]
-then
-	log_info "Do not install openstack-nova-compute on controller. "
-else
-	echo -e "\033[41;37m please check  CONTROLLER_COMPUTER option in installrc . \033[0m"
-	exit 1
-fi
-
-
-
-
-
 
 
 source /root/admin-openrc.sh

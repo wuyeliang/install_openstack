@@ -176,7 +176,6 @@ function fn_create_cinder_volumes () {
 if [  -z  ${CINDER_DISK} ]
 then 
 	log_info "there is not disk for cinder."
-	return 1
 else
 	pvcreate ${CINDER_DISK}  && vgcreate cinder-volumes ${CINDER_DISK}
 	fn_log "pvcreate ${CINDER_DISK}  && vgcreate cinder-volumes ${CINDER_DISK}"
