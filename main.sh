@@ -46,81 +46,70 @@ EOF
 
 
 read -p "please input one number for install :" install_number
-expr ${install_number}+0 >/dev/null
-if [ $? -eq 0 ]
-then
-	log_info "input is number."
-else
-	echo "please input one right number[0-3]"
-	log_info "input is string."
-	fn_install_openstack_controller
-fi
-if  [ -z ${install_number}  ]
-then 
-    echo "please input one right number[0-3]"
-	fn_install_openstack_controller
-elif [ ${install_number}  -eq 1 ]
-then
-	/bin/bash $PWD/etc/presystem.sh
-	log_info "/bin/bash $PWD/etc/presystem.sh."
-elif  [ ${install_number}  -eq 2 ]
-then
-	/bin/bash $PWD/etc/install_mariadb.sh
-	log_info "/bin/bash $PWD/etc/install_mariadb.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 3 ]
-then
-	/bin/bash $PWD/etc/config-keystone.sh
-	log_info "/bin/bash $PWD/etc/config-keystone.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 4 ]
-then
-	/bin/bash $PWD/etc/install_glance.sh
-	log_info "/bin/bash $PWD/etc/install_glance.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 5 ]
-then
-	/bin/bash $PWD/etc/install_nova.sh  
-	log_info "/bin/bash $PWD/etc/install_nova.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 6 ]
-then
-	/bin/bash $PWD/etc/install_cinder.sh
-	log_info "/bin/bash $PWD/etc/install_cinder.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 7 ]
-then
-	/bin/bash $PWD/etc/install_neutron_two.sh
-	log_info "/bin/bash $PWD/etc/install_neutron_one.sh"
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 8 ]
-then
-	/bin/bash ${INSTALL_PATH}/etc/install_dashboard.sh
-	log_info "/bin/bash $PWD/etc/install_dashboard.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 9 ]
-then
-	/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
-	log_info "/bin/bash $PWD/etc/install_manila.sh."
-	fn_install_openstack_controller	
-elif  [ ${install_number}  -eq 10 ]
-then
-	/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
-	log_info "/bin/bash $PWD/etc/install_heat.sh."
-	fn_install_openstack_controller
-elif  [ ${install_number}  -eq 11 ]
-then
-	/bin/bash ${INSTALL_PATH}/etc/install_ceilometer.sh
-	log_info "/bin/bash $PWD/etc/install_ceilometer.sh."
-	fn_install_openstack_controller	
-elif  [ ${install_number}  -eq 0 ]
-then 
-    log_info "exit intalll."
-	fn_install_openstack
-else 
-     echo "please input one right number[0-3]"
-	 fn_install_openstack_controller
-fi
+case ${install_number} in
+	1)
+		/bin/bash $PWD/etc/presystem.sh
+		log_info "/bin/bash $PWD/etc/presystem.sh."
+		fn_install_openstack_controller
+	;;
+	2)
+		/bin/bash $PWD/etc/install_mariadb.sh
+		log_info "/bin/bash $PWD/etc/install_mariadb.sh."
+		fn_install_openstack_controller
+	;;
+	3)
+		/bin/bash $PWD/etc/config-keystone.sh
+		log_info "/bin/bash $PWD/etc/config-keystone.sh."
+		fn_install_openstack_controller
+	;;
+	4)
+		/bin/bash $PWD/etc/install_glance.sh
+		log_info "/bin/bash $PWD/etc/install_glance.sh."
+		fn_install_openstack_controller
+	;;
+	5)
+		/bin/bash $PWD/etc/install_nova.sh  
+		log_info "/bin/bash $PWD/etc/install_nova.sh."
+		fn_install_openstack_controller
+	;;
+	6)
+		/bin/bash $PWD/etc/install_cinder.sh
+		log_info "/bin/bash $PWD/etc/install_cinder.sh."
+		fn_install_openstack_controller
+	;;
+	7)
+		/bin/bash $PWD/etc/install_neutron_two.sh
+		log_info "/bin/bash $PWD/etc/install_neutron_one.sh"
+		fn_install_openstack_controller
+	;;
+	8)
+		/bin/bash ${INSTALL_PATH}/etc/install_dashboard.sh
+		log_info "/bin/bash $PWD/etc/install_dashboard.sh."
+		fn_install_openstack_controller
+	;;
+	9)
+		/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
+		log_info "/bin/bash $PWD/etc/install_manila.sh."
+		fn_install_openstack_controller	
+	;;
+	10)
+		/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
+		log_info "/bin/bash $PWD/etc/install_heat.sh."
+		fn_install_openstack_controller
+	;;
+	11)
+		/bin/bash ${INSTALL_PATH}/etc/install_ceilometer.sh
+		log_info "/bin/bash $PWD/etc/install_ceilometer.sh."
+		fn_install_openstack_controller
+	;;
+	0)
+		exit 1
+	;;
+	*)
+		echo -e "\033[41;37m please input one right number. \033[0m"
+		fn_install_openstack_controller
+	;;
+esac 
 }
 
 

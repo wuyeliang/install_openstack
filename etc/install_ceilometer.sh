@@ -44,45 +44,51 @@ fn_log "yum clean all && yum install mongodb-server mongodb -y"
 
 LOCAL_MANAGER_IP_ALL=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
 
-cat <<END >/etc/mongod.conf
-bind_ip = ${LOCAL_MANAGER_IP_ALL}
-fork = true
-pidfilepath = /var/run/mongodb/mongod.pid
-logpath = /var/log/mongodb/mongod.log
-unixSocketPrefix = /var/run/mongodb
-dbpath = /var/lib/mongodb
-smallfiles = true
-END
+rm -f /etc/mongod.conf
+fn_log " rm -f /etc/mongod.conf"
+cp -a  $PWD/lib/mongod.conf /etc/mongod.conf
+fn_log "cp -a  $PWD/lib/mongod.conf /etc/mongod.conf"
+sed -i "/^bind_ip/d" /etc/mongod.conf
+fn_log "sed -i "/^bind_ip/d" /etc/mongod.conf"
+sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf
+fn_log "sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf"
 
 systemctl enable mongod.service &&  systemctl restart mongod.service
 fn_log "systemctl enable mongod.service &&  systemctl start mongod.service"
 
 
 #create ceilometer databases 
-mongo --host ${HOSTNAME} >testceilometer 2>/dev/null <<EOF
-use admin ;
-db.system.users.find()
-exit
-EOF
+#mongo --host ${HOSTNAME} >testceilometer 2>/dev/null <<EOF
+#use admin ;
+#db.system.users.find()
+#exit
+#EOF
 
-if [ -e  testceilometer ]
-then
-	TEST_DB=`cat testceilometer  | grep ceilometer | wc -l `
-	fn_log "TEST_DB=`cat testceilometer`"
-	rm -f testceilometer
-	fn_log "rm -f testceilometer"
-fi
-if [ ${TEST_DB} -eq 1 ]
-then
-	log_info "celeilometer databases had created."
-else
-	mongo --host ${HOSTNAME} --eval '  db = db.getSiblingDB("ceilometer"); db.createUser({user: "ceilometer",  pwd: "${ALL_PASSWORD}",  roles: [ "readWrite", "dbAdmin" ]})'
-	fn_log "mongo --host ${HOSTNAME} --eval '  db = db.getSiblingDB("ceilometer"); db.createUser({user: "ceilometer",  pwd: "${ALL_PASSWORD}",  roles: [ "readWrite", "dbAdmin" ]})'"
-fi
- 
+cp -a  $PWD/lib/mongodb ./mongodb
+sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
+fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
+sed -i "s/mitaka/${HOSTNAME}/g" ./mongodb
+fn_log "sed -i "/mitaka/${HOSTNAME}" ./mongodb"
+#if [ -e  testceilometer ]
+#then
+#	TEST_DB=`cat testceilometer  | grep ceilometer | wc -l `
+#	fn_log "TEST_DB=`cat testceilometer`"
+#	rm -f testceilometer
+#	fn_log "rm -f testceilometer"
+#fi
+#if [ ${TEST_DB} -eq 1 ]
+#then
+#	log_info "celeilometer databases had created."
+#else
+#	bash -x  ./mongodb
+#	log_info "bash -x  ./mongodb"
+#	rm -f ./mongodb 
+#fi
 
 
-
+bash -x  ./mongodb
+log_info "bash -x  ./mongodb"
+rm -f ./mongodb 
 
 
 
@@ -213,7 +219,7 @@ then
 	fn_log "systemctl restart openstack-nova-compute.service"
 fi
 #for cinder
- openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_notifications driver  messagingv2
+openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_notifications driver  messagingv2
 fn_log "openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_notifications driver  messagingv2"
 systemctl restart openstack-cinder-api.service openstack-cinder-scheduler.service 
 
@@ -345,8 +351,69 @@ systemctl restart openstack-aodh-api.service   openstack-aodh-evaluator.service 
 fn_log "systemctl restart openstack-aodh-api.service   openstack-aodh-evaluator.service   openstack-aodh-notifier.service   openstack-aodh-listener.service"
 
 
+function fn_reinstall_mongodb () {
+LOCAL_MANAGER_IP_ALL=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
+rpm -qa | grep mongodb | xargs  rpm -e --nodeps 
+fn_log "rpm -qa | grep mongodb | xargs  rpm -e --nodeps"
+rm -rf /var/lib/mongodb/
+fn_log "rm -rf /var/lib/mongodb/"
+yum install mongodb-server mongodb -y
+fn_log "yum install mongodb-server mongodb -y"
+systemctl enable mongod.service &&  systemctl restart mongod.service
+rm -f /etc/mongod.conf
+fn_log " rm -f /etc/mongod.conf"
+cp -a  $PWD/lib/mongod.conf /etc/mongod.conf
+fn_log "cp -a  $PWD/lib/mongod.conf /etc/mongod.conf"
+sed -i "/^bind_ip/d" /etc/mongod.conf
+fn_log "sed -i "/^bind_ip/d" /etc/mongod.conf"
+sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf
+fn_log "sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf"
+cp -a  $PWD/lib/mongodb ./mongodb
+sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
+fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
+sed -i "s/mitaka/${HOSTNAME}/g" ./mongodb
+fn_log "sed -i "/mitaka/${HOSTNAME}" ./mongodb"
+cat ./mongodb
+bash -x  ./mongodb
+log_info "bash -x  ./mongodb"
+rm -f ./mongodb 
+fn_log "rm -f ./mongodb "
+}
 
+# fn_reinstall_mongodb
+rpm -qa | grep mongodb | xargs  rpm -e --nodeps 
+fn_log "rpm -qa | grep mongodb | xargs  rpm -e --nodeps "
+rm -rf /var/lib/mongodb/
+fn_log "rm -rf /var/lib/mongodb/"
+yum install mongodb-server mongodb -y
+fn_log "yum install mongodb-server mongodb -y"
+LOCAL_MANAGER_IP_ALL=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
+rm -rf  /etc/mongod.conf
+fn_log "rm -rf  /etc/mongod.conf"
+cp -a  $PWD/lib/mongod.conf /etc/mongod.conf
+fn_log "cp -a  $PWD/lib/mongod.conf /etc/mongod.conf"
+sed -i "/^bind_ip/d" /etc/mongod.conf
+fn_log "sed -i "/^bind_ip/d" /etc/mongod.conf"
+sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf
+fn_log "sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf"
+systemctl enable mongod.service &&  systemctl restart mongod.service
+fn_log "systemctl enable mongod.service &&  systemctl restart mongod.service"
+cp -a  $PWD/lib/mongodb ./mongodb
+fn_log "cp -a  $PWD/lib/mongodb ./mongodb"
+sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
+fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
+sed -i "s/mitaka/${HOSTNAME}/g" ./mongodb
+fn_log "sed -i "/mitaka/${HOSTNAME}" ./mongodb"
+cat ./mongodb
+fn_log "cat ./mongodb"
+bash -x  ./mongodb
+fn_log "bash -x  ./mongodb"
+rm -rf  ./mongodb
+fn_log "rm -rf  ./mongodb"
 source /root/admin-openrc.sh 
+fn_log "source /root/admin-openrc.sh "
+
+
 ceilometer meter-list
 fn_log "ceilometer meter-list "
 IMAGE_ID=$(glance image-list | grep 'cirros' | awk '{ print $2 }')

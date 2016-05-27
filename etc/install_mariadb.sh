@@ -62,8 +62,7 @@ fi
  fn_log " yum install python-openstackclient -y"
 yum clean all && yum install openstack-selinux -y
 fn_log "yum clean all && yum install openstack-selinux -y"
-FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
-FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
+FIRST_ETH_IP=${MANAGER_IP}
 
 
 function fn_install_mariadb () {

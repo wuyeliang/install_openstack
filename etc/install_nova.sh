@@ -191,8 +191,7 @@ yum clean all && yum install openstack-nova-compute -y
 fn_log "yum clean all && yum install openstack-nova-compute -y"
 
 unset http_proxy https_proxy ftp_proxy no_proxy 
-FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
-FIRST_ETH_IP=`ifconfig ${FIRST_ETH}  | grep netmask | awk -F " " '{print$2}'`
+FIRST_ETH_IP=${MANAGER_IP}
 
 
 #for computer node

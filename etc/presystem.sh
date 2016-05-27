@@ -30,16 +30,38 @@ then
 	exit 1
 fi
 
-OS_VERSION=`cat /etc/centos-release | awk -F " " '{print$4}' | awk -F "." '{print$3}'`
-if [  ${OS_VERSION} -eq 1511 ]
+function fn_check_os_version () {
+if [ -e /etc/system-release  ]
 then
-	log_info "the system is CentOS7.2."
+	OS_VERSION=`cat /etc/system-release | awk -F " " '{print$7}'`
+	fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$7}'`"
+	if [ -z  ${OS_VERSION} ]
+	then
+		OS_VERSION=`cat /etc/system-release | awk -F " " '{print$4}'`
+		fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$4}'`"
+	fi
 else
-	echo -e "\033[41;37m you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso. \033[0m"
-	log_error "you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso."
+	echo -e "\033[41;37m please run script on rhel7.2 or CentOS7.2 \033[0m"
+	log_error "please run script on rhel7.2 or CentOS7.2"
 	exit 1
 fi
+	
+if [  ${OS_VERSION}x  = 7.2x  ] 
+then
+	echo "system is rhel7.2"
+	fn_log "echo "system is rhel7.2""
+elif [ ${OS_VERSION}x = 7.2.1511x   ]
+then
+	echo "system is CentOS7.2"
+	fn_log "echo "system is CentOS7.2""	
+else
+	echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso"
+	log_error "echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso""
+	exit 1
+fi 
 
+}
+fn_check_os_version
 
 NAMEHOST=${HOST_NAME}
 FIRST_ETH_IP=${MANAGER_IP}

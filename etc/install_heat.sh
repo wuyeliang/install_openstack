@@ -67,7 +67,7 @@ else
 	fn_log "openstack role add --project service --user heat admin"
 fi
 
-SERVICE_IMAGE=`openstack service list | grep heat | awk -F "|" '{print$3}' | awk -F " " '{print$1}' | grep -v  heatv2`
+SERVICE_IMAGE=`openstack service list | grep heat | awk -F "|" '{print$3}' | awk -F " " '{print$1}' | grep -v   heat-cfn`
 if [  ${SERVICE_IMAGE}x = heatx ]
 then 
 	log_info "openstack service create heat."
@@ -76,7 +76,7 @@ else
 	fn_log "openstack service create --name heat --description "Orchestration" orchestration"
 fi
 SERVICE_IMAGEV2=`openstack service list | grep heat-cfn | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
-if [  ${SERVICE_IMAGEV2}x =  heat-cfn ]
+if [  ${SERVICE_IMAGEV2}x =  heat-cfnx ]
 then
 	log_info "openstack service create heat-cfn."
 else
@@ -108,7 +108,7 @@ fi
 
 
 
-DOMAIN_HEAT=`openstack domain  list | grep -v Name | awk -F " " '{print$4}' | grep -v ^$`
+DOMAIN_HEAT=`openstack domain  list | grep heat |  awk -F " " '{print$4}'`
 if [  ${DOMAIN_HEAT}x = heatx ]
 then
 	log_info "domain heat had created."
@@ -131,7 +131,7 @@ else
 fi
 
 HEAT_STACK_OWNER=`openstack role list | grep -v Name |grep heat_stack_owner  | awk -F " " '{print$4}' | grep -v ^$`
-if [ ${HEAT_STACK_OWNER}x = heat_stack_owner  ]
+if [ ${HEAT_STACK_OWNER}x = heat_stack_ownerx  ]
 then
 	log_info "heat_stack_owner had created."
 else
@@ -245,7 +245,8 @@ export OS_PASSWORD=${ALL_PASSWORD}
 export OS_AUTH_URL=http://${HOST_NAME}:5000/v3
 export OS_IDENTITY_API_VERSION=3
 END
-source /root/admin-openrc.sh 
+source /root/admin-openrc.sh
+sleep 30 
 openstack orchestration service list
 fn_log "openstack orchestration service list"
 

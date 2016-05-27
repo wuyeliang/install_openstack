@@ -30,7 +30,7 @@ then
 fi
 
 
-yum install -y lvm2  python-oslo-policy openstack-cinder targetcli python-keystonemiddleware* 
+yum install -y lvm2  python-openstackclient  python-oslo-policy openstack-cinder targetcli python-keystonemiddleware* 
 fn_log "yum install -y lvm2 openstack-cinder targetcli python-oslo-policy "
 
 
@@ -127,6 +127,32 @@ source /root/admin-openrc.sh
 fn_log "source /root/admin-openrc.sh"
 cinder service-list
 fn_log "cinder service-list"
+
+function fn_install_ceilometer () {
+openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_notifications driver  messagingv2
+fn_log "openstack-config --set /etc/cinder/cinder.conf  oslo_messaging_notifications driver  messagingv2"
+
+
+
+if [ -e /etc/systemd/system/multi-user.target.wants/openstack-cinder-api.service  ]
+then
+	systemctl restart openstack-cinder-volume.service
+	fn_log "systemctl restart openstack-cinder-volume.service"
+fi
+}
+
+
+source /root/admin-openrc.sh 
+fn_log "source /root/admin-openrc.sh "
+USER_ceilometer=`openstack user list | grep ceilometer | grep -v ceilometer_domain_admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+if [ ${USER_ceilometer}x = ceilometerx ]
+then
+	fn_install_ceilometer
+	fn_log "fn_install_ceilometer"
+else
+	log_info "ceilometer had not installed."
+fi
+
 
 
 

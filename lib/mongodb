@@ -1,0 +1,5 @@
+mongo --host mitaka --eval '
+  db = db.getSiblingDB("ceilometer");
+  db.createUser({user: "ceilometer",
+  pwd: "Changeme_123",
+  roles: [ "readWrite", "dbAdmin" ]})'

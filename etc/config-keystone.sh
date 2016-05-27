@@ -182,7 +182,7 @@ else
 fi
 
 
-USER_LIST=`openstack user list | grep  admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+USER_LIST=`openstack user list | grep  admin |grep -v  heat_domain_admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 
 if [ ${USER_LIST}x = adminx ]
 then
@@ -235,7 +235,7 @@ else
 	fn_log "openstack user create  demo  --password ${ALL_PASSWORD}"
 fi
 
-ROLE_LIST=`openstack role list | grep user  |awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+ROLE_LIST=`openstack role list | grep user  |awk -F "|" '{print$3}' | awk -F " " '{print$1}'  | grep -v  heat_stack_user`
 if [ ${ROLE_LIST}x = userx ]
 then
 	log_info "openstack role had  created user."

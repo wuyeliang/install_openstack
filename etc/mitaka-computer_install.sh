@@ -102,9 +102,9 @@ sleep 20
 openstack compute service list
 fn_log "openstack compute service list"
 
-yum install openstack-neutron-linuxbridge ebtables -y
-fn_log "yum install openstack-neutron-linuxbridge ebtables -y"
 
+yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y
+fn_log "yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y"
 
 [ -f  /etc/neutron/neutron.conf_bak ]  ||  cp -a /etc/neutron/neutron.conf /etc/neutron/neutron.conf_bak   && \
 sed -i '/^connection/d' /etc/neutron/neutron.conf  && \
@@ -153,10 +153,61 @@ fn_log "config /etc/nova/nova.conf"
 
 
 
+
+
 systemctl restart openstack-nova-compute.service 
 fn_log "systemctl restart openstack-nova-compute.service "
 systemctl enable neutron-linuxbridge-agent.service && systemctl start neutron-linuxbridge-agent.service
 fn_log "systemctl enable neutron-linuxbridge-agent.service && systemctl start neutron-linuxbridge-agent.service"
+
+#for ceilometer
+function fn_install_ceilometer () {
+yum clean all && yum install openstack-ceilometer-compute python-ceilometerclient python-pecan -y
+fn_log "yum clean all && yum install openstack-ceilometer-compute python-ceilometerclient python-pecan -y"
+[ -f /etc/ceilometer/ceilometer.conf_bak ] || cp -a /etc/ceilometer/ceilometer.conf /etc/ceilometer/ceilometer.conf_bak
+openstack-config --set  /etc/ceilometer/ceilometer.conf database connection  mongodb://ceilometer:${ALL_PASSWORD}@${HOSTNAME}:27017/ceilometer
+openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT  rpc_backend  rabbit
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_host  ${HOST_NAME}
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_userid  openstack
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD}
+openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT auth_strategy  keystone
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_uri  http://${HOST_NAME}:5000
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_url  http://${HOST_NAME}:35357
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken memcached_servers  ${HOST_NAME}:11211
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_type  password
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_domain_name  default
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken user_domain_name  default
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_name  service
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken username  ceilometer
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken  password  ${ALL_PASSWORD}
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_auth_url  http://${HOST_NAME}:5000/v2.0
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_username  ceilometer
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_tenant_name  service
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_password  ${ALL_PASSWORD}
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials interface  internalURL
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials region_name  RegionOne
+fn_log  "configure  /etc/ceilometer/ceilometer.conf"
+openstack-config --set  /etc/nova/nova.conf DEFAULT  instance_usage_audit  True && \
+openstack-config --set  /etc/nova/nova.conf DEFAULT  instance_usage_audit_period  hour && \
+openstack-config --set  /etc/nova/nova.conf DEFAULT notify_on_state_change  vm_and_task_state && \
+openstack-config --set  /etc/nova/nova.conf DEFAULT notification_driver  messagingv2
+fn_log  "configure  /etc/nova/nova.conf"
+systemctl enable openstack-ceilometer-compute.service && systemctl start openstack-ceilometer-compute.service
+fn_log "systemctl enable openstack-ceilometer-compute.service && systemctl start openstack-ceilometer-compute.service"
+}
+
+source /root/admin-openrc.sh 
+fn_log "source /root/admin-openrc.sh "
+
+
+USER_ceilometer=`openstack user list | grep ceilometer | grep -v ceilometer_domain_admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+if [ ${USER_ceilometer}x = ceilometerx ]
+then
+	fn_install_ceilometer
+	fn_log "fn_install_ceilometer"
+else
+	log_info "ceilometer had not installed."
+fi
 
 source /root/admin-openrc.sh
 fn_log "source /root/admin-openrc.sh"
