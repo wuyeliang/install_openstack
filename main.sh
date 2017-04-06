@@ -1,10 +1,10 @@
 #!/bin/bash
 INSTALL_PATH=$PWD
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e $PWD/lib/newton-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source $PWD/lib/newton-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/newton-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -37,11 +37,6 @@ cat << EOF
 6) Install Cinder.
 7) Install Neutron.
 8) Install Dashboard.
-9) Install Manila.
-10) Install Heat.
-11) Install Key Manager service.
-12) Install Trove.
-13) Install Magnum.
 0) Quit
 EOF
 
@@ -80,8 +75,8 @@ case ${install_number} in
 		fn_install_openstack_controller
 	;;
 	7)
-		/bin/bash $PWD/etc/install_neutron.sh
-		log_info "/bin/bash $PWD/etc/install_neutron.sh"
+		/bin/bash $PWD/etc/install_neutron_two.sh
+		log_info "/bin/bash $PWD/etc/install_neutron_one.sh"
 		fn_install_openstack_controller
 	;;
 	8)
@@ -89,31 +84,20 @@ case ${install_number} in
 		log_info "/bin/bash $PWD/etc/install_dashboard.sh."
 		fn_install_openstack_controller
 	;;
-	9)
-		/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
-		log_info "/bin/bash $PWD/etc/install_manila.sh."
-		fn_install_openstack_controller	
-	;;
-	10)
-		/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
-		log_info "/bin/bash $PWD/etc/install_heat.sh."
-		fn_install_openstack_controller
-	;;
-	11)
-		/bin/bash ${INSTALL_PATH}/etc/install_barbican.sh
-		log_info "/bin/bash $PWD/etc/install_barbican.sh."
-		fn_install_openstack_controller
-	;;
-	12)
-		/bin/bash ${INSTALL_PATH}/etc/install_trove.sh
-		log_info "/bin/bash $PWD/etc/install_trove.sh."
-		fn_install_openstack_controller
-	;;
-	13)
-		/bin/bash ${INSTALL_PATH}/etc/install_magnum.sh
-		log_info "/bin/bash $PWD/etc/install_magnum.sh."
-		fn_install_openstack_controller
-	;;
+##		/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
+#		log_info "/bin/bash $PWD/etc/install_manila.sh."
+#		fn_install_openstack_controller	
+#	;;
+#	10)
+#		/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
+#		log_info "/bin/bash $PWD/etc/install_heat.sh."
+#		fn_install_openstack_controller
+#	;;
+#	11)
+#		/bin/bash ${INSTALL_PATH}/etc/install_ceilometer.sh
+#		log_info "/bin/bash $PWD/etc/install_ceilometer.sh."
+#		fn_install_openstack_controller
+#	;;
 	0)
 		exit 1
 	;;
@@ -136,13 +120,13 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/usr/bin/bash ./etc/ocata-computer_system.sh
-		fn_log "/usr/bin/bash ./etc/ocata-computer_system.sh"
+		/usr/bin/bash ./etc/newton-computer_system.sh
+		fn_log "/usr/bin/bash ./etc/newton-computer_system.sh"
 		fn_install_openstack_computer
 	;;
 	2)
-		/usr/bin/bash ./etc/ocata-computer_install.sh
-		fn_log "/usr/bin/bash ./etc/ocata-computer_install.sh"
+		/usr/bin/bash ./etc/newton-computer_install.sh
+		fn_log "/usr/bin/bash ./etc/newton-computer_install.sh"
 		fn_install_openstack_computer
 	;;
 	0)
@@ -204,13 +188,13 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/usr/bin/bash ./etc/ocata-block_storage_system.sh
-		fn_log "/usr/bin/bash ./etc/ocata-block_storage_system.sh"
+		/usr/bin/bash ./etc/newton-block_storage_system.sh
+		fn_log "/usr/bin/bash ./etc/newton-block_storage_system.sh"
 		fn_install_openstack_block
 	;;
 	2)
-		/usr/bin/bash ./etc/ocata-block_install.sh
-		fn_log "/usr/bin/bash ./etc/ocata-block_install.sh"
+		/usr/bin/bash ./etc/newton-block_install.sh
+		fn_log "/usr/bin/bash ./etc/newton-block_install.sh"
 		fn_install_openstack_block
 	;;
 	0)

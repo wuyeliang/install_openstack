@@ -5,6 +5,7 @@ import os
 from django.utils.translation import ugettext_lazy as _
 
 
+from openstack_dashboard import exceptions
 from openstack_dashboard.settings import HORIZON_CONFIG
 
 DEBUG = False
@@ -25,7 +26,6 @@ WEBROOT = '/dashboard/'
 # with the list of host/domain names that the application can serve.
 # For more information see:
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-#ALLOWED_HOSTS = ['horizon.example.com', 'localhost']
 ALLOWED_HOSTS = ['*', ]
 
 # Set SSL proxy settings:
@@ -52,13 +52,18 @@ ALLOWED_HOSTS = ['*', ]
 # service API. For example, The identity service APIs have inconsistent
 # use of the decimal point, so valid options would be 2.0 or 3.
 # Minimum compute version to get the instance locked status is 2.9.
+#OPENSTACK_API_VERSIONS = {
 OPENSTACK_API_VERSIONS = {
-    "data-processing": 1.1,
     "identity": 3,
     "image": 2,
     "volume": 2,
-    "compute": 2,
 }
+#    "data-processing": 1.1,
+#    "identity": 3,
+#    "image": 2,
+#    "volume": 2,
+#    "compute": 2,
+#}
 
 # Set this to True if running on a multi-domain model. When this is enabled, it
 # will require the user to enter the Domain name in addition to the username
@@ -67,11 +72,11 @@ OPENSTACK_API_VERSIONS = {
 
 # Overrides the default domain used when running on single-domain model
 # with Keystone V3. All entities will be created in the default domain.
-# NOTE: This value must be the name of the default domain, NOT the ID.
+# NOTE: This value must be the ID of the default domain, NOT the name.
 # Also, you will most likely have a value in the keystone policy file like this
 #    "cloud_admin": "rule:admin_required and domain_id:<your domain id>"
-# This value must be the name of the domain whose ID is specified there.
-OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = 'Default'
+# This value must match the domain id specified there.
+OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = 'default'
 
 # Set this to True to enable panels that provide the ability for users to
 # manage Identity Providers (IdPs) and establish a set of rules to map
@@ -122,7 +127,7 @@ LOCAL_PATH = '/tmp'
 # (usually behind a load-balancer). Either you have to make sure that a session
 # gets all requests routed to the same dashboard instance or you set the same
 # SECRET_KEY for all of them.
-SECRET_KEY='1772ea2eee780ff9a634'
+SECRET_KEY='b33834f55a75361e80ef'
 
 # We recommend you use memcached for development; otherwise after every reload
 # of the django development server, you will have to login again. To use
@@ -134,11 +139,6 @@ SECRET_KEY='1772ea2eee780ff9a634'
 #    },
 #}
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#    },
-#}
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 CACHES = {
@@ -147,6 +147,9 @@ CACHES = {
          'LOCATION': 'controller:11211',
     }
 }
+
+
+
 
 # Send email to the console by default
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -166,7 +169,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 #]
 
 OPENSTACK_HOST = "controller"
-#OPENSTACK_KEYSTONE_URL = "http://%s:5000/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
 
@@ -203,14 +205,6 @@ OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
 #    "acme_oidc": ("acme", "oidc"),
 #    "acme_saml2": ("acme", "saml2"),
 #}
-
-# The Keystone Provider drop down uses Keystone to Keystone federation
-# to switch between Keystone service providers.
-# Set display name for Identity Provider (dropdown display name)
-#KEYSTONE_PROVIDER_IDP_NAME = "Local Keystone"
-# This id is used for only for comparison with the service provider IDs. This ID
-# should not match any service provider IDs.
-#KEYSTONE_PROVIDER_IDP_ID = "localkeystone"
 
 # Disable SSL certificate checks (useful for self-signed certificates):
 #OPENSTACK_SSL_NO_VERIFY = True
@@ -474,6 +468,7 @@ POLICY_FILES_PATH = '/etc/openstack-dashboard'
 #    'image': 'glance_policy.json',
 #    'orchestration': 'heat_policy.json',
 #    'network': 'neutron_policy.json',
+#    'telemetry': 'ceilometer_policy.json',
 #}
 
 # TODO: (david-lyle) remove when plugins support adding settings.
@@ -576,6 +571,11 @@ LOGGING = {
             'propagate': False,
         },
         'heatclient': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'ceilometerclient': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
@@ -763,8 +763,7 @@ SECURITY_GROUP_RULES = {
 # See: https://wiki.openstack.org/wiki/Horizon/RESTAPI
 REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
                               'LAUNCH_INSTANCE_DEFAULTS',
-                              'OPENSTACK_IMAGE_FORMATS',
-                              'OPENSTACK_KEYSTONE_DEFAULT_DOMAIN']
+                              'OPENSTACK_IMAGE_FORMATS']
 
 # Additional settings can be made available to the client side for
 # extensibility by specifying them in REST_API_ADDITIONAL_SETTINGS
@@ -816,11 +815,7 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
 #    'admin.images': False,
 #    'admin.networks': False,
 #    'admin.routers': False,
-#    'admin.volumes': False,
-#    'identity.users': False,
-#    'identity.projects': False,
-#    'identity.groups': False,
-#    'identity.roles': False
+#    'admin.volumes': False
 #}
 
 # Dict used to restrict user private subnet cidr range.

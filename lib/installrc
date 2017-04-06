@@ -1,10 +1,10 @@
 #controller system information
-HOST_NAME=cloud
+HOST_NAME=newton
 #controller manager IP
-MANAGER_IP=192.10.10.68
+MANAGER_IP=192.168.8.71
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
-NET_DEVICE_NAME=ens37
+NET_DEVICE_NAME=enp0s8
 #install openstack-nova-compute on controller
 CONTROLLER_COMPUTER=True
 
@@ -37,9 +37,3 @@ PRIVATE_NET_DNS="10.248.2.5"
 #please input disk or partition by blank to separate
 #MANILA_DISK='/dev/sdb'
 
-#for swift
-#SWIFT_DISK='sdc /sdd'
-#Number of Copies
-MUTIL_NUM=1
-#object node ip
-#OBJECT_MANAGE_IP="'172.16.8.68 sdc sdd' '172.16.8.69 sdc sdd' '172.16.8.70  sdc sdd'"

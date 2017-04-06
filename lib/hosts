@@ -1,3 +1,6 @@
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-192.10.10.68 cloud
+192.168.8.71 mitaka
+192.168.8.72 computer1
+192.168.8.73 computer2
+192.168.8.74 block1

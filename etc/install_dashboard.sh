@@ -1,11 +1,11 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e $PWD/lib/newton-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source $PWD/lib/newton-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/newton-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -17,32 +17,21 @@ else
 	exit 1
 fi
 
-#get config function 
-if [  -e $PWD/lib/source-function ]
-then	
-	source $PWD/lib/source-function
-else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
-	exit 1
-fi
-
-
-
-if [  -e /etc/openstack-ocata_tag/computer.tag  ]
+if [  -e /etc/openstack-newton_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-ocata_tag/install_neutron.tag ]
+if [ -f  /etc/openstack-newton_tag/install_neutron.tag ]
 then 
 	log_info "neutron have installed ."
 else
 	echo -e "\033[41;37m you should install neutron first. \033[0m"
 	exit
 fi
-if [ -f  /etc/openstack-ocata_tag/install_dashboard.tag ]
+if [ -f  /etc/openstack-newton_tag/install_dashboard.tag ]
 then 
 	echo -e "\033[41;37m you haved install dashboard \033[0m"
 	log_info "you haved install dashboard."	
@@ -71,15 +60,13 @@ fi
 yum clean all &&  yum install openstack-dashboard -y
 fn_log "yum clean all &&  yum install openstack-dashboard -y"
 KEY_DASHBOARD=`cat /etc/openstack-dashboard/local_settings | grep SECRET_KEY | grep "=" |awk -F "'" '{print$2}'`
-[ -f /etc/openstack-dashboard/local_settings_bak ]  || cp -a /etc/openstack-dashboard/local_settings /etc/openstack-dashboard/local_settings_bak
-fn_log "[ -f /etc/openstack-dashboard/local_settings_bak ]  || cp -a /etc/openstack-dashboard/local_settings /etc/openstack-dashboard/local_settings_bak"
 rm -rf /etc/openstack-dashboard/local_settings 
 cp -a    $PWD/lib/local_settings /etc/openstack-dashboard/local_settings 
 fn_log "cp -a $PWD/lib/local_settings /etc/openstack-dashboard/local_settings"
 unset http_proxy https_proxy ftp_proxy no_proxy  
 
 sed -i "s/b33834f55a75361e80ef/${KEY_DASHBOARD}/g" /etc/openstack-dashboard/local_settings 
-fn_log "sed -i "s/1772ea2eee780ff9a634/${KEY_DASHBOARD}/g" /etc/openstack-dashboard/local_settings"
+fn_log "sed -i "s/b33834f55a75361e80ef/${KEY_DASHBOARD}/g" /etc/openstack-dashboard/local_settings"
 sed -i  "s/controller/$HOSTNAME/g"  /etc/openstack-dashboard/local_settings
 fn_log "sed -i  "s/controller/$HOSTNAME/g"  /etc/openstack-dashboard/local_settings"
 
@@ -92,24 +79,15 @@ then
 	fn_log "systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl restart libvirtd.service openstack-nova-compute.service "
 fi
 
-systemctl | grep nova | grep running | grep -v  mount | awk -F " " '{print$1}' | xargs systemctl restart
-fn_log "systemctl | grep nova | grep running | grep -v  mount | awk -F " " '{print$1}' | xargs systemctl restart"
-
-systemctl | grep neutron| grep running  | awk -F " " '{print$1}' | xargs systemctl restart
-fn_log " systemctl | grep neutron| grep running  | awk -F " " '{print$1}' | xargs systemctl restart"
-
-
-systemctl | grep cinder | grep running  | awk -F " " '{print$1}' | xargs systemctl restart
-fn_log "systemctl | grep cinder | grep running  | awk -F " " '{print$1}' | xargs systemctl restart"
 echo -e "\033[32m ############################################################################# \033[0m"
 echo -e "\033[32m ###                     Install Openstack Dashboard                     ##### \033[0m"
 echo -e "\033[32m ###       You can login openstack by http://${MANAGER_IP}/dashboard/    ##### \033[0m"
 echo -e "\033[32m ############################################################################# \033[0m"
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack-newton_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack-newton_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_dashboard.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-newton_tag/install_dashboard.tag
 
 
 

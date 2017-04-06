@@ -1,11 +1,11 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e $PWD/lib/newton-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source $PWD/lib/newton-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/newton-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -16,23 +16,14 @@ else
 	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
 	exit 1
 fi
-#get config function 
-if [  -e $PWD/lib/source-function ]
-then	
-	source $PWD/lib/source-function
-else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
-	exit 1
-fi
-
-if [  -e /etc/openstack-ocata_tag/computer.tag  ]
+if [  -e /etc/openstack-newton_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-ocata_tag/install_glance.tag ]
+if [ -f  /etc/openstack-newton_tag/install_glance.tag ]
 then 
 	log_info "glance have installed ."
 else
@@ -41,7 +32,7 @@ else
 fi
 
 
-if [ -f  /etc/openstack-ocata_tag/install_nova.tag ]
+if [ -f  /etc/openstack-newton_tag/install_nova.tag ]
 then 
 	echo -e "\033[41;37m you haved install nova \033[0m"
 	log_info "you haved install nova."	
@@ -49,66 +40,60 @@ then
 fi
 unset http_proxy https_proxy ftp_proxy no_proxy 
 #create nova databases 
-fn_create_database nova_api ${ALL_PASSWORD}
-fn_create_database nova ${ALL_PASSWORD}
-mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost'  IDENTIFIED BY '${ALL_PASSWORD}';" 
-fn_log 'mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost'  IDENTIFIED BY '${ALL_PASSWORD}';" '
+function  fn_create_nova_database () {
+mysql -uroot -p${ALL_PASSWORD} -e "CREATE DATABASE nova;" &&  \
+mysql -uroot -p${ALL_PASSWORD} -e "CREATE DATABASE nova_api;" && \
+mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '${ALL_PASSWORD}';" && \
+mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY '${ALL_PASSWORD}';"  && \
+mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost'   IDENTIFIED BY '${ALL_PASSWORD}';" && \
 mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%'   IDENTIFIED BY '${ALL_PASSWORD}';" 
-fn_log 'mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%'   IDENTIFIED BY '${ALL_PASSWORD}';" '
+fn_log "create nova databases"
+}
+mysql -uroot -p${ALL_PASSWORD} -e "show databases ;" >test 
+DATABASENOVA=`cat test | grep nova_api`
+rm -rf test 
+if [ ${DATABASENOVA}x = nova_apix ]
+then
+	log_info "nova database had installed."
+else
+	fn_create_nova_database
+fi
 
 
-fn_create_database nova_placement ${ALL_PASSWORD}
-fn_log "fn_create_database nova_placement ${ALL_PASSWORD}"
-fn_create_database nova_cell0 ${ALL_PASSWORD}
-fn_log "fn_create_database nova_cell0 ${ALL_PASSWORD}"
-
-mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost'  IDENTIFIED BY '${ALL_PASSWORD}';" 
-fn_log 'mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost'  IDENTIFIED BY '${ALL_PASSWORD}';" '
-mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%'   IDENTIFIED BY '${ALL_PASSWORD}';" 
-fn_log 'mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%'   IDENTIFIED BY '${ALL_PASSWORD}';" '
-
-mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_placement.* TO 'nova'@'localhost'  IDENTIFIED BY '${ALL_PASSWORD}';" 
-fn_log 'mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_placement.* TO 'nova'@'localhost'  IDENTIFIED BY '${ALL_PASSWORD}';" '
-mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_placement.* TO 'nova'@'%'   IDENTIFIED BY '${ALL_PASSWORD}';" 
-fn_log 'mysql -uroot -p${ALL_PASSWORD} -e "GRANT ALL PRIVILEGES ON nova_placement.* TO 'nova'@'%'   IDENTIFIED BY '${ALL_PASSWORD}';" '
+source /root/admin-openrc.sh 
+USER_NOVA=`openstack user list | grep nova | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+if [ ${USER_NOVA}x = novax ]
+then
+	log_info "openstack user had created  nova"
+else
+	openstack user create --domain default   nova  --password ${ALL_PASSWORD}
+	fn_log "openstack user create --domain default   nova  --password ${ALL_PASSWORD}"
+	openstack role add --project service --user nova admin
+	fn_log "openstack role add --project service --user nova admin"
+fi
 
 
 
+SERVICE_NOVA=`openstack service list | grep nova | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
+if [  ${SERVICE_NOVA}x = novax ]
+then 
+	log_info "openstack service create nova."
+else
+	openstack service create --name nova --description "OpenStack Compute" compute
+	fn_log "openstack service create --name nova --description "OpenStack Compute" compute"
+fi
 
 
-
-
-
-
-
-fn_create_user nova ${ALL_PASSWORD}
-fn_log "fn_create_user nova ${ALL_PASSWORD}"
-
-openstack role add --project service --user nova admin
-fn_log "openstack role add --project service --user nova admin"
-
-fn_create_service nova "OpenStack Compute" compute
-fn_log "fn_create_service nova "OpenStack Compute" compute"
-
-fn_create_endpoint_version compute 8774 v2.1
-fn_log "fn_create_endpoint_version compute 8774 v2.1"
-
-
-#fix bug PlacementNotConfigured: This compute is not configured to talk to the placement service
-yum -y install openstack-nova-placement-api
-fn_log "yum -y install openstack-nova-placement-api"
-fn_create_service placement "OpenStack Placement" placement
-fn_log "fn_create_service placement "OpenStack Placement" placement"
-
-fn_create_user placement ${ALL_PASSWORD}
-fn_log "fn_create_user placement ${ALL_PASSWORD}"
-openstack role add --project service --user placement admin
-fn_log "openstack role add --project service --user placement admin"
-
-fn_create_endpoint placement 8778
-fn_log "fn_create_endpoint placement 8778"
-
-
+ENDPOINT_LIST_INTERNAL=`openstack endpoint list  | grep compute  |grep internal | wc -l`
+ENDPOINT_LIST_PUBLIC=`openstack endpoint list | grep compute   |grep public | wc -l`
+ENDPOINT_LIST_ADMIN=`openstack endpoint list | grep compute   |grep admin | wc -l`
+if [  ${ENDPOINT_LIST_INTERNAL}  -eq 1  ]  && [ ${ENDPOINT_LIST_PUBLIC}  -eq  1   ] &&  [ ${ENDPOINT_LIST_ADMIN} -eq 1  ]
+then
+	log_info "openstack endpoint create nova."
+else
+	openstack endpoint create --region RegionOne   compute public http://${HOSTNAME}:8774/v2.1/%\(tenant_id\)s && openstack endpoint create --region RegionOne   compute internal http://${HOSTNAME}:8774/v2.1/%\(tenant_id\)s && openstack endpoint create --region RegionOne   compute admin http://${HOSTNAME}:8774/v2.1/%\(tenant_id\)s
+	fn_log "openstack endpoint create --region RegionOne   compute public http://${HOSTNAME}:8774/v2.1/%\(tenant_id\)s && openstack endpoint create --region RegionOne   compute internal http://${HOSTNAME}:8774/v2.1/%\(tenant_id\)s && openstack endpoint create --region RegionOne   compute admin http://${HOSTNAME}:8774/v2.1/%\(tenant_id\)s"
+fi
 
 
 
@@ -134,79 +119,47 @@ else
 	fn_test_network
 fi
 
-				    
+				 
 yum clean all && yum -y install openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler
 fn_log  "yum clean all && yum -y install openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler"
 unset http_proxy https_proxy ftp_proxy no_proxy 
 FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
 FIRST_ETH_IP=${MANAGER_IP}
-
-
-cat <<END >/tmp/tmp
-DEFAULT enabled_apis   osapi_compute,metadata
-api_database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_api
-database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova
-DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${HOSTNAME}
-api auth_strategy   keystone
-keystone_authtoken auth_uri   http://${HOSTNAME}:5000
-keystone_authtoken auth_url   http://${HOSTNAME}:35357
-keystone_authtoken memcached_servers   ${HOSTNAME}:11211
-keystone_authtoken auth_type   password
-keystone_authtoken project_domain_name   default
-keystone_authtoken user_domain_name   default
-keystone_authtoken project_name   service
-keystone_authtoken username   nova
-keystone_authtoken password   ${ALL_PASSWORD}
-DEFAULT my_ip   ${FIRST_ETH_IP}
-DEFAULT use_neutron   True
-DEFAULT firewall_driver   nova.virt.firewall.NoopFirewallDriver
-vnc enabled   true
-vnc  vncserver_listen   \$my_ip
-vnc  vncserver_proxyclient_address   \$my_ip
-glance api_servers   http://${HOSTNAME}:9292
-oslo_concurrency lock_path   /var/lib/nova/tmp
-scheduler discover_hosts_in_cells_interval   -1
-END
-fn_log "create /tmp/tmp "
-
-fn_set_conf /etc/nova/nova.conf
-fn_log "fn_set_conf /etc/nova/nova.conf"
-
-
+[ -f /etc/nova/nova.conf_bak ]  || cp -a /etc/nova/nova.conf /etc/nova/nova.conf_bak
+openstack-config --set  /etc/nova/nova.conf DEFAULT enabled_apis  osapi_compute,metadata && \
+openstack-config --set  /etc/nova/nova.conf database connection  mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova && \
+openstack-config --set  /etc/nova/nova.conf api_database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_api && \
+openstack-config --set  /etc/nova/nova.conf DEFAULT rpc_backend  rabbit &&  \
+openstack-config --set  /etc/nova/nova.conf oslo_messaging_rabbit rabbit_host  ${HOSTNAME}&& \
+openstack-config --set  /etc/nova/nova.conf oslo_messaging_rabbit rabbit_userid  openstack   && \
+openstack-config --set  /etc/nova/nova.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/nova/nova.conf DEFAULT auth_strategy  keystone && \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 &&  \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 &&   \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken memcached_servers   ${HOSTNAME}:11211 &&   \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken auth_type   password &&   \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken project_domain_name   default &&   \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken user_domain_name   default &&    \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken project_name  service &&   \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken username  nova &&   \
+openstack-config --set  /etc/nova/nova.conf keystone_authtoken password  ${ALL_PASSWORD} &&   \
+openstack-config --set  /etc/nova/nova.conf DEFAULT my_ip ${FIRST_ETH_IP} &&   \
+openstack-config --set  /etc/nova/nova.conf DEFAULT use_neutron True  &&   \
+openstack-config --set  /etc/nova/nova.conf DEFAULT firewall_driver  nova.virt.firewall.NoopFirewallDriver &&   \
+openstack-config --set  /etc/nova/nova.conf vnc vncserver_listen  ${FIRST_ETH_IP}  &&   \
+openstack-config --set  /etc/nova/nova.conf vnc vncserver_proxyclient_address   ${FIRST_ETH_IP} &&   \
+openstack-config --set  /etc/nova/nova.conf glance api_servers  http://${HOSTNAME}:9292 &&   \
+openstack-config --set  /etc/nova/nova.conf oslo_concurrency lock_path  /var/lib/nova/tmp 
+fn_log "config /etc/nova/nova.conf "
 
 
 su -s /bin/sh -c "nova-manage api_db sync" nova
 fn_log "su -s /bin/sh -c "nova-manage api_db sync" nova"
-
 su -s /bin/sh -c "nova-manage db sync" nova
 fn_log "su -s /bin/sh -c "nova-manage db sync" nova"
 
-su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0 --database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_cell0"
-fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0 --database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_cell0""
 
 
-function fn_sync_create_cell () {
-su -s /bin/bash nova -c "nova-manage cell_v2 create_cell --name cell1 \
---database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova \
---transport-url rabbit://openstack:${ALL_PASSWORD}@${HOSTNAME}:5672"
-
-fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 create_cell --name cell1 \
---database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova \
---transport-url rabbit://openstack:${ALL_PASSWORD}@${HOSTNAME}:5672""
-}
-
-nova-manage cell_v2 list_cells --verbose  | grep -v UUID | grep -v  none  | grep mysql+pymysql  >/dev/null
-if [ $? -eq 0 ]
-then
-    log_info "cell1 have been sync."
-else
-    fn_sync_create_cell
-fi
-
-
-
- su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts"
- fn_log " su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts""
 
 
 systemctl enable openstack-nova-api.service   openstack-nova-consoleauth.service openstack-nova-scheduler.service   openstack-nova-conductor.service openstack-nova-novncproxy.service
@@ -256,65 +209,14 @@ else
 	log_info  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu sucessed."
 fi
 
-cat <<END >/tmp/tmp
-DEFAULT enabled_apis   osapi_compute,metadata
-DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${HOSTNAME}
-api auth_strategy   keystone
-keystone_authtoken auth_uri   http://${HOST_NAME}:5000
-keystone_authtoken auth_url   http://${HOST_NAME}:35357
-keystone_authtoken memcached_servers   ${HOST_NAME}:11211
-keystone_authtoken auth_type   password
-keystone_authtoken project_domain_name   default
-keystone_authtoken user_domain_name   default
-keystone_authtoken project_name   service
-keystone_authtoken username   nova
-keystone_authtoken password   ${ALL_PASSWORD}
-DEFAULT my_ip   ${FIRST_ETH_IP}
-DEFAULT use_neutron   True
-DEFAULT firewall_driver   nova.virt.firewall.NoopFirewallDriver
-vnc enabled   True
-vnc vncserver_listen   0.0.0.0
-vnc vncserver_proxyclient_address   \$my_ip
-vnc novncproxy_base_url   http://${HOST_NAME}:6080/vnc_auto.html
-glance api_servers   http://${HOST_NAME}:9292
-oslo_concurrency lock_path   /var/lib/nova/tmp
-END
-fn_log "create /tmp/tmp "
 
-fn_set_conf /etc/nova/nova.conf
-fn_log "fn_set_conf /etc/nova/nova.conf"
-
-#fix bug PlacementNotConfigured: This compute is not configured to talk to the placement service
-
-cat <<END >/tmp/tmp
-placement auth_uri  http://${MANAGER_IP}:5000
-placement auth_url  http://${MANAGER_IP}:35357
-placement memcached_servers  ${MANAGER_IP}:11211
-placement auth_type  password
-placement project_domain_name  default
-placement user_domain_name  default
-placement project_name  service
-placement username  placement
-placement password  ${ALL_PASSWORD}
-placement os_region_name  RegionOne
-placement_database connection  mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_placement
-wsgi api_paste_config  /etc/nova/api-paste.ini
-END
-fn_log "create /tmp/tmp "
-
-fn_set_conf /etc/nova/nova.conf
-fn_log "fn_set_conf /etc/nova/nova.conf"
-
-cat $PWD/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf
-fn_log "cat $PWD/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf"
-systemctl restart openstack-nova-compute.service
-
-
+openstack-config --set  /etc/nova/nova.conf vnc vncserver_listen  0.0.0.0  &&   \
+openstack-config --set  /etc/nova/nova.conf vnc enabled  True  &&   \
+openstack-config --set  /etc/nova/nova.conf vnc novncproxy_base_url  http://${FIRST_ETH_IP}:6080/vnc_auto.html  
+fn_log "config /etc/nova/nova.conf "
 
 systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service 
 fn_log "systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service "
-su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts"
-fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts""
 }
 
 if [  ${CONTROLLER_COMPUTER}  = True   ]
@@ -330,40 +232,21 @@ else
 fi
 
 
-su -s /bin/sh -c "nova-manage api_db sync" nova
-fn_log "su -s /bin/sh -c "nova-manage api_db sync" nova"
-
-su -s /bin/sh -c "nova-manage db sync" nova
-fn_log "su -s /bin/sh -c "nova-manage db sync" nova"
-
-su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0 --database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_cell0"
-fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0 --database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_cell0""
-
-su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts"
-fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts""
-
-
-
 source /root/admin-openrc.sh
 openstack compute service list
 fn_log "openstack compute service list"
 
-openstack catalog list
-fn_log "openstack catalog list"
 
-
-openstack image list
-fn_log "openstack image list"
 
 
 echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###         Install Nova Sucessed           #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack-newton_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack-newton_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_nova.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-newton_tag/install_nova.tag
 
 
 
