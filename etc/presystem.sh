@@ -1,10 +1,10 @@
-#！/bin/bash
+#!/bin/bash
 #log function
-if [  -e $PWD/lib/mitaka-log.sh ]
+if [  -e $PWD/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/mitaka-log.sh
+	source $PWD/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -15,7 +15,7 @@ else
 	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-mitaka_tag/presystem-computer.tag  ]
+if [  -e /etc/openstack-ocata_tag/presystem-computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
@@ -30,16 +30,38 @@ then
 	exit 1
 fi
 
-OS_VERSION=`cat /etc/centos-release | awk -F " " '{print$4}' | awk -F "." '{print$3}'`
-if [  ${OS_VERSION} -eq 1511 ]
+function fn_check_os_version () {
+if [ -e /etc/system-release  ]
 then
-	log_info "the system is CentOS7.2."
+	OS_VERSION=`cat /etc/system-release | awk -F " " '{print$7}'`
+	fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$7}'`"
+	if [ -z  ${OS_VERSION} ]
+	then
+		OS_VERSION=`cat /etc/system-release | awk -F " " '{print$4}'`
+		fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$4}'`"
+	fi
 else
-	echo -e "\033[41;37m you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso. \033[0m"
-	log_error "you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso."
+	echo -e "\033[41;37m please run script on rhel7.3 or CentOS7.3 \033[0m"
+	log_error "please run script on rhel7.3 or CentOS7.3"
 	exit 1
 fi
+	
+if [  ${OS_VERSION}x  = 7.2x  ] 
+then
+	echo "system is rhel7.3"
+	fn_log "echo "system is rhel7.3""
+elif [ ${OS_VERSION}x = 7.2.1511x   ]
+then
+	echo "system is CentOS7.3"
+	fn_log "echo "system is CentOS7.3""	
+else
+	echo "please install system by CentOS-7-x86_64-Minimal-1503.iso"
+	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1503.iso""
+	exit 1
+fi 
 
+}
+fn_check_os_version
 
 NAMEHOST=${HOST_NAME}
 FIRST_ETH_IP=${MANAGER_IP}
@@ -51,7 +73,7 @@ then
 	exit 1
 fi
 
-if [ -f  /etc/openstack-mitaka_tag/presystem.tag ]
+if [ -f  /etc/openstack-ocata_tag/presystem.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
@@ -59,9 +81,9 @@ then
 fi
 
 
-if  [ ! -d /etc/openstack-mitaka_tag ]
+if  [ ! -d /etc/openstack-ocata_tag ]
 then 
-	mkdir -p /etc/openstack-mitaka_tag  
+	mkdir -p /etc/openstack-ocata_tag  
 fi
 
 
@@ -102,6 +124,10 @@ fn_log "cat $PWD/lib/hosts >/etc/hosts"
 
 
 #stop firewall
+yum -y install ntp vim  net-tools 
+fn_log "yum -y install ntp vim  net-tools "
+yum install firewalld -y
+fn_log "yum install firewalld -y"
 service firewalld stop 
 fn_log "stop firewall"
 chkconfig firewalld off 
@@ -134,10 +160,10 @@ chkconfig chronyd off
 
 sleep 10
 ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_ntp.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-mitaka_tag/install_ntp.tag ]
+if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
 then
 	log_info "ntp had installed."
 else
@@ -180,10 +206,10 @@ fi
 
 
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/presystem.tag
-echo -e "\033[32m ################################# \033[0m"
-echo -e "\033[32m ##   Configure  System Sucessed.#### \033[0m"
-echo -e "\033[32m ################################# \033[0m"
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/presystem.tag
+echo -e "\033[32m ##################################### \033[0m"
+echo -e "\033[32m ##   Configure System Sucessed. ##### \033[0m"
+echo -e "\033[32m ##################################### \033[0m"
 
 echo -e "\033[41;37m begin to reboot system to enforce kernel \033[0m"
 log_info "begin to reboot system to enforce kernel."

@@ -1,11 +1,11 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/mitaka-log.sh ]
+if [  -e $PWD/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/mitaka-log.sh
+	source $PWD/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -17,14 +17,25 @@ else
 	exit 1
 fi
 
-if [  -e /etc/openstack-mitaka_tag/computer.tag  ]
+#get config function 
+if [  -e $PWD/lib/source-function ]
+then	
+	source $PWD/lib/source-function
+else
+	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	exit 1
+fi
+
+
+
+if [  -e /etc/openstack-ocata_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-mitaka_tag/config_keystone.tag ]
+if [ -f  /etc/openstack-ocata_tag/config_keystone.tag ]
 then 
 	log_info "mkeystone have installed ."
 else
@@ -32,7 +43,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-mitaka_tag/install_ceilometer.tag ]
+if [ -f  /etc/openstack-ocata_tag/install_ceilometer.tag ]
 then 
 	echo -e "\033[41;37m you haved install ceilometer \033[0m"
 	log_info "you haved install ceilometer."	
@@ -57,38 +68,18 @@ systemctl enable mongod.service &&  systemctl restart mongod.service
 fn_log "systemctl enable mongod.service &&  systemctl start mongod.service"
 
 
-#create ceilometer databases 
-#mongo --host ${HOSTNAME} >testceilometer 2>/dev/null <<EOF
-#use admin ;
-#db.system.users.find()
-#exit
-#EOF
 
 cp -a  $PWD/lib/mongodb ./mongodb
 sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
 fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
-sed -i "s/mitaka/${HOSTNAME}/g" ./mongodb
-fn_log "sed -i "/mitaka/${HOSTNAME}" ./mongodb"
-#if [ -e  testceilometer ]
-#then
-#	TEST_DB=`cat testceilometer  | grep ceilometer | wc -l `
-#	fn_log "TEST_DB=`cat testceilometer`"
-#	rm -f testceilometer
-#	fn_log "rm -f testceilometer"
-#fi
-#if [ ${TEST_DB} -eq 1 ]
-#then
-#	log_info "celeilometer databases had created."
-#else
-#	bash -x  ./mongodb
-#	log_info "bash -x  ./mongodb"
-#	rm -f ./mongodb 
-#fi
-
+sed -i "s/ocata/${HOSTNAME}/g" ./mongodb
+fn_log "sed -i "/ocata/${HOSTNAME}" ./mongodb"
 
 bash -x  ./mongodb
 log_info "bash -x  ./mongodb"
 rm -f ./mongodb 
+fn_log "rm -f ./mongodb "
+
 
 
 
@@ -97,16 +88,18 @@ rm -f ./mongodb
 
 unset http_proxy https_proxy ftp_proxy no_proxy 
 source /root/admin-openrc.sh 
-USER_ceilometer=`openstack user list | grep ceilometer | grep -v ceilometer_domain_admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
-if [ ${USER_ceilometer}x = ceilometerx ]
-then
-	log_info "openstack user had created  ceilometer"
-else
-	openstack user create  --domain default ceilometer  --password ${ALL_PASSWORD}
-	fn_log "openstack user create --domain default ceilometer  --password ${ALL_PASSWORD}"
-	openstack role add --project service --user ceilometer admin
-	fn_log "openstack role add --project service --user ceilometer admin"
-fi
+
+fn_create_user ceilometer ${ALL_PASSWORD}
+fn_log "fn_create_user ceilometer ${ALL_PASSWORD}"
+
+openstack role add --project service --user ceilometer admin
+fn_log "openstack role add --project service --user ceilometer admin"
+	
+
+fn_create_service cinder "OpenStack Block Storage" volume
+fn_log "fn_create_service cinder "OpenStack Block Storage" volume"
+
+
 
 SERVICE_IMAGE=`openstack service list | grep ceilometer | awk -F "|" '{print$3}' | awk -F " " '{print$1}' | grep -v  ceilometerv2`
 if [  ${SERVICE_IMAGE}x = ceilometerx ]
@@ -138,34 +131,54 @@ fn_log "yum clean all &&  yum install openstack-ceilometer-api   openstack-ceilo
 unset http_proxy https_proxy ftp_proxy no_proxy 
 
 [ -f /etc/ceilometer/ceilometer.conf_bak ] || cp -a /etc/ceilometer/ceilometer.conf /etc/ceilometer/ceilometer.conf_bak
-openstack-config --set  /etc/ceilometer/ceilometer.conf database connection  mongodb://ceilometer:${ALL_PASSWORD}@${HOSTNAME}:27017/ceilometer
-openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT  rpc_backend  rabbit
-openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_host  ${HOST_NAME}
-openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_userid  openstack
-openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD}
-openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT auth_strategy  keystone
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_uri  http://${HOST_NAME}:5000
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_url  http://${HOST_NAME}:35357
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken memcached_servers  ${HOST_NAME}:11211
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_type  password
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_domain_name  default
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken user_domain_name  default
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_name  service
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken username  ceilometer
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken  password  ${ALL_PASSWORD}
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_auth_url  http://${HOST_NAME}:5000/v2.0
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_username  ceilometer
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_tenant_name  service
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_password  ${ALL_PASSWORD}
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials interface  internalURL
+openstack-config --set  /etc/ceilometer/ceilometer.conf database connection  mongodb://ceilometer:${ALL_PASSWORD}@${HOST_NAME}:27017/ceilometer && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT  rpc_backend  rabbit && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_host  ${HOST_NAME} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_userid  openstack && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT auth_strategy  keystone && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken memcached_servers  ${HOST_NAME}:11211 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_type  password && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken user_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_name  service && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken username  ceilometer && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken  password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials auth_type  password && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials auth_url  http://${HOSTNAME}:5000/v3 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials project_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials user_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials project_name  service && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials username  ceilometer && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials interface  internalURL && \
 openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials region_name  RegionOne
 fn_log  "configure  /etc/ceilometer/ceilometer.conf"
 
 
-systemctl enable openstack-ceilometer-api.service   openstack-ceilometer-notification.service   openstack-ceilometer-central.service   openstack-ceilometer-collector.service
-fn_log "systemctl enable openstack-ceilometer-api.service   openstack-ceilometer-notification.service   openstack-ceilometer-central.service   openstack-ceilometer-collector.service"
-systemctl restart openstack-ceilometer-api.service   openstack-ceilometer-notification.service   openstack-ceilometer-central.service   openstack-ceilometer-collector.service
-fn_log "systemctl restart openstack-ceilometer-api.service   openstack-ceilometer-notification.service   openstack-ceilometer-central.service   openstack-ceilometer-collector.service"
+
+
+cat <<END >/etc/httpd/conf.d/wsgi-ceilometer.conf  
+Listen 8777
+
+<VirtualHost *:8777>
+    WSGIDaemonProcess ceilometer-api processes=2 threads=10 user=ceilometer group=ceilometer display-name=%{GROUP}
+    WSGIProcessGroup ceilometer-api
+    WSGIScriptAlias / "/var/www/cgi-bin/ceilometer/app"
+    WSGIApplicationGroup %{GLOBAL}
+    ErrorLog /var/log/httpd/ceilometer_error.log
+    CustomLog /var/log/httpd/ceilometer_access.log combined
+</VirtualHost>
+
+WSGISocketPrefix /var/run/httpd
+END
+
+systemctl reload httpd.service
+fn_log "systemctl reload httpd.service"
+systemctl enable openstack-ceilometer-notification.service   openstack-ceilometer-central.service openstack-ceilometer-collector.service && systemctl restart openstack-ceilometer-notification.service   openstack-ceilometer-central.service openstack-ceilometer-collector.service 
+fn_log "systemctl enable openstack-ceilometer-notification.service   openstack-ceilometer-central.service openstack-ceilometer-collector.service && systemctl restart openstack-ceilometer-notification.service   openstack-ceilometer-central.service openstack-ceilometer-collector.service "
 
 #for glance 
 
@@ -181,26 +194,29 @@ fn_log "systemctl restart openstack-glance-api.service openstack-glance-registry
 yum clean all && yum install openstack-ceilometer-compute python-ceilometerclient python-pecan -y
 fn_log "yum clean all && yum install openstack-ceilometer-compute python-ceilometerclient python-pecan -y"
 [ -f /etc/ceilometer/ceilometer.conf_bak ] || cp -a /etc/ceilometer/ceilometer.conf /etc/ceilometer/ceilometer.conf_bak
-openstack-config --set  /etc/ceilometer/ceilometer.conf database connection  mongodb://ceilometer:${ALL_PASSWORD}@${HOSTNAME}:27017/ceilometer
-openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT  rpc_backend  rabbit
-openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_host  ${HOST_NAME}
-openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_userid  openstack
-openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD}
-openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT auth_strategy  keystone
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_uri  http://${HOST_NAME}:5000
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_url  http://${HOST_NAME}:35357
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken memcached_servers  ${HOST_NAME}:11211
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_type  password
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_domain_name  default
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken user_domain_name  default
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_name  service
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken username  ceilometer
-openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken  password  ${ALL_PASSWORD}
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_auth_url  http://${HOST_NAME}:5000/v2.0
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_username  ceilometer
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_tenant_name  service
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials os_password  ${ALL_PASSWORD}
-openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials interface  internalURL
+[ -f /etc/ceilometer/ceilometer.conf_bak ] || cp -a /etc/ceilometer/ceilometer.conf /etc/ceilometer/ceilometer.conf_bak && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT  rpc_backend  rabbit && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_host  ${HOST_NAME} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_userid  openstack && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf oslo_messaging_rabbit rabbit_password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf DEFAULT auth_strategy  keystone && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_uri  http://${HOSTNAME}:5000 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_url  http://${HOSTNAME}:35357 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken memcached_servers  ${HOST_NAME}:11211 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken auth_type  password && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken user_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken project_name  service && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken username  ceilometer && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf keystone_authtoken  password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials auth_type  password && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials auth_url  http://${HOSTNAME}:5000/v3 && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials project_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials user_domain_name  default && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials project_name  service && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials username  ceilometer && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials password  ${ALL_PASSWORD} && \
+openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials interface  internalURL && \
 openstack-config --set  /etc/ceilometer/ceilometer.conf service_credentials region_name  RegionOne
 fn_log  "configure  /etc/ceilometer/ceilometer.conf"
 openstack-config --set  /etc/nova/nova.conf DEFAULT  instance_usage_audit  True && \
@@ -313,10 +329,9 @@ else
 	fn_test_network
 fi
 #for controller
-
-
-yum clean all &&  yum install openstack-aodh-api   openstack-aodh-evaluator openstack-aodh-notifier   openstack-aodh-listener openstack-aodh-expirer   python-ceilometerclient -y
-fn_log "yum clean all &&  yum install openstack-aodh-api   openstack-aodh-evaluator openstack-aodh-notifier   openstack-aodh-listener openstack-aodh-expirer   python-ceilometerclient -y"
+				  
+yum clean all &&  yum install openstack-aodh-api   openstack-aodh-evaluator openstack-aodh-notifier   openstack-aodh-listener openstack-aodh-expirer   python-aodhclient -y
+fn_log "yum clean all &&  yum install openstack-aodh-api   openstack-aodh-evaluator openstack-aodh-notifier   openstack-aodh-listener openstack-aodh-expirer   python-aodhclient -y"
 unset http_proxy https_proxy ftp_proxy no_proxy 
 
 [ -f /etc/aodh/aodh.conf_bak ] || cp -a /etc/aodh/aodh.conf /etc/aodh/aodh.conf_bak
@@ -335,12 +350,14 @@ openstack-config --set  /etc/aodh/aodh.conf keystone_authtoken user_domain_name 
 openstack-config --set  /etc/aodh/aodh.conf keystone_authtoken project_name  service &&  \
 openstack-config --set  /etc/aodh/aodh.conf keystone_authtoken username  aodh &&  \
 openstack-config --set  /etc/aodh/aodh.conf keystone_authtoken  password  ${ALL_PASSWORD}   &&  \
-openstack-config --set  /etc/aodh/aodh.conf service_credentials os_auth_url  http://${HOSTNAME}:5000/v2.0 &&  \
-openstack-config --set  /etc/aodh/aodh.conf service_credentials os_username  aodh &&  \
-openstack-config --set  /etc/aodh/aodh.conf service_credentials os_tenant_name  service &&  \
-openstack-config --set  /etc/aodh/aodh.conf service_credentials os_password  ${ALL_PASSWORD}  &&  \
-openstack-config --set  /etc/aodh/aodh.conf service_credentials interface  internalURL &&  \
-openstack-config --set  /etc/aodh/aodh.conf service_credentials region_name  RegionOne
+openstack-config --set  /etc/aodh/aodh.conf service_credentials auth_type  password   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials auth_url  http://${HOSTNAME}:5000/v3   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials project_domain_name  default   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials user_domain_name  default   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials project_name  service   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials username  aodh   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials password  ${ALL_PASSWORD}   &&  \
+openstack-config --set  /etc/aodh/aodh.conf service_credentials interface  internalURL
 fn_log   "configure /etc/aodh/aodh.conf"
 
 
@@ -371,8 +388,8 @@ fn_log "sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf"
 cp -a  $PWD/lib/mongodb ./mongodb
 sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
 fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
-sed -i "s/mitaka/${HOSTNAME}/g" ./mongodb
-fn_log "sed -i "/mitaka/${HOSTNAME}" ./mongodb"
+sed -i "s/ocata/${HOSTNAME}/g" ./mongodb
+fn_log "sed -i "/ocata/${HOSTNAME}" ./mongodb"
 cat ./mongodb
 bash -x  ./mongodb
 log_info "bash -x  ./mongodb"
@@ -402,8 +419,8 @@ cp -a  $PWD/lib/mongodb ./mongodb
 fn_log "cp -a  $PWD/lib/mongodb ./mongodb"
 sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
 fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
-sed -i "s/mitaka/${HOSTNAME}/g" ./mongodb
-fn_log "sed -i "/mitaka/${HOSTNAME}" ./mongodb"
+sed -i "s/ocata/${HOSTNAME}/g" ./mongodb
+fn_log "sed -i "/ocata/${HOSTNAME}" ./mongodb"
 cat ./mongodb
 fn_log "cat ./mongodb"
 bash -x  ./mongodb
@@ -432,8 +449,8 @@ echo -e "\033[32m ###        Install Ceilometer Sucessed          #### \033[0m"
 echo -e "\033[32m #################################################### \033[0m"
 
 
-if  [ ! -d /etc/openstack-mitaka_tag ]
+if  [ ! -d /etc/openstack-ocata_tag ]
 then 
-	mkdir -p /etc/openstack-mitaka_tag  
+	mkdir -p /etc/openstack-ocata_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_ceilometer.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ceilometer.tag
