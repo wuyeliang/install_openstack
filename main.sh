@@ -1,18 +1,20 @@
 #!/bin/bash
-INSTALL_PATH=$PWD
-if [  -e $PWD/lib/mitaka-log.sh ]
+TOPDIR=$(cd $(dirname "$0") && pwd)
+export TOPDIR
+INSTALL_PATH=${TOPDIR}
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/mitaka-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 USER_N=`whoami`
@@ -39,7 +41,9 @@ cat << EOF
 8) Install Dashboard.
 9) Install Manila.
 10) Install Heat.
-11) Install Ceilometer
+11) Install Key Manager service.
+12) Install Trove.
+13) Install Magnum.
 0) Quit
 EOF
 
@@ -48,58 +52,68 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/bin/bash $PWD/etc/presystem.sh
-		log_info "/bin/bash $PWD/etc/presystem.sh."
+		/bin/bash ${TOPDIR}/etc/presystem.sh
+		log_info "/bin/bash ${TOPDIR}/etc/presystem.sh."
 		fn_install_openstack_controller
 	;;
 	2)
-		/bin/bash $PWD/etc/install_mariadb.sh
-		log_info "/bin/bash $PWD/etc/install_mariadb.sh."
+		/bin/bash ${TOPDIR}/etc/install_mariadb.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_mariadb.sh."
 		fn_install_openstack_controller
 	;;
 	3)
-		/bin/bash $PWD/etc/config-keystone.sh
-		log_info "/bin/bash $PWD/etc/config-keystone.sh."
+		/bin/bash ${TOPDIR}/etc/config-keystone.sh
+		log_info "/bin/bash ${TOPDIR}/etc/config-keystone.sh."
 		fn_install_openstack_controller
 	;;
 	4)
-		/bin/bash $PWD/etc/install_glance.sh
-		log_info "/bin/bash $PWD/etc/install_glance.sh."
+		/bin/bash ${TOPDIR}/etc/install_glance.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_glance.sh."
 		fn_install_openstack_controller
 	;;
 	5)
-		/bin/bash $PWD/etc/install_nova.sh  
-		log_info "/bin/bash $PWD/etc/install_nova.sh."
+		/bin/bash ${TOPDIR}/etc/install_nova.sh  
+		log_info "/bin/bash ${TOPDIR}/etc/install_nova.sh."
 		fn_install_openstack_controller
 	;;
 	6)
-		/bin/bash $PWD/etc/install_cinder.sh
-		log_info "/bin/bash $PWD/etc/install_cinder.sh."
+		/bin/bash ${TOPDIR}/etc/install_cinder.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_cinder.sh."
 		fn_install_openstack_controller
 	;;
 	7)
-		/bin/bash $PWD/etc/install_neutron_two.sh
-		log_info "/bin/bash $PWD/etc/install_neutron_one.sh"
+		/bin/bash ${TOPDIR}/etc/neutron-ovs-controller.sh
+		log_info "/bin/bash ${TOPDIR}/etc/neutron-ovs-controller.sh"
 		fn_install_openstack_controller
 	;;
 	8)
 		/bin/bash ${INSTALL_PATH}/etc/install_dashboard.sh
-		log_info "/bin/bash $PWD/etc/install_dashboard.sh."
+		log_info "/bin/bash ${TOPDIR}/etc/install_dashboard.sh."
 		fn_install_openstack_controller
 	;;
 	9)
 		/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
-		log_info "/bin/bash $PWD/etc/install_manila.sh."
+		log_info "/bin/bash ${TOPDIR}/etc/install_manila.sh."
 		fn_install_openstack_controller	
 	;;
 	10)
 		/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
-		log_info "/bin/bash $PWD/etc/install_heat.sh."
+		log_info "/bin/bash ${TOPDIR}/etc/install_heat.sh."
 		fn_install_openstack_controller
 	;;
 	11)
-		/bin/bash ${INSTALL_PATH}/etc/install_ceilometer.sh
-		log_info "/bin/bash $PWD/etc/install_ceilometer.sh."
+		/bin/bash ${INSTALL_PATH}/etc/install_barbican.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_barbican.sh."
+		fn_install_openstack_controller
+	;;
+	12)
+		/bin/bash ${INSTALL_PATH}/etc/install_trove.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_trove.sh."
+		fn_install_openstack_controller
+	;;
+	13)
+		/bin/bash ${INSTALL_PATH}/etc/install_magnum.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_magnum.sh."
 		fn_install_openstack_controller
 	;;
 	0)
@@ -124,13 +138,13 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/usr/bin/bash ./etc/mitaka-computer_system.sh
-		fn_log "/usr/bin/bash ./etc/mitaka-computer_system.sh"
+		/usr/bin/bash ./etc/ocata-computer_system.sh
+		fn_log "/usr/bin/bash ./etc/ocata-computer_system.sh"
 		fn_install_openstack_computer
 	;;
 	2)
-		/usr/bin/bash ./etc/mitaka-computer_install.sh
-		fn_log "/usr/bin/bash ./etc/mitaka-computer_install.sh"
+		/usr/bin/bash ./etc/ocata-computer_install.sh
+		fn_log "/usr/bin/bash ./etc/ocata-computer_install.sh"
 		fn_install_openstack_computer
 	;;
 	0)
@@ -172,9 +186,9 @@ case ${install_number} in
 		fn_install_openstack_block
 	;;
 	4)
-		fn_install_openstack_network
-		fn_log "fn_install_openstack_network"
-		fn_install_openstack_network
+		fn_install_openstack_neutron
+		fn_log "fn_install_openstack_neutron"
+		fn_install_openstack_neutron
 	;;
 	0)
 		exit 1
@@ -182,36 +196,6 @@ case ${install_number} in
 	*)
 		echo -e "\033[41;37m please input one number. \033[0m"
 		fn_install_openstack
-	;;
-esac 
-
-}
-
-function  fn_install_openstack_network () {
-
-cat << EOF
-1) Configure System Environment.
-2) Install Neutron Service.
-0) Quit
-EOF
-read -p "please input one number for install :" install_number
-case ${install_number} in
-	1)
-		/usr/bin/bash ./etc/mitaka-network_system.sh
-		fn_log "/usr/bin/bash ./etc/mitaka-network_system.sh"
-		fn_install_openstack_network
-	;;
-	2)
-		/usr/bin/bash ./etc/mitaka-network-neutron.sh
-		fn_log "/usr/bin/bash ./etc/mitaka-network-neutron.sh"
-		fn_install_openstack_network
-	;;
-	0)
-		fn_install_openstack
-	;;
-	*)
-		echo -e "\033[41;37m please input one number. \033[0m"
-		fn_install_openstack_network
 	;;
 esac 
 
@@ -228,13 +212,13 @@ EOF
 read -p "please input one number for install :" install_number
 case ${install_number} in
 	1)
-		/usr/bin/bash ./etc/mitaka-block_storage_system.sh
-		fn_log "/usr/bin/bash ./etc/mitaka-block_storage_system.sh"
+		/usr/bin/bash ./etc/ocata-block_storage_system.sh
+		fn_log "/usr/bin/bash ./etc/ocata-block_storage_system.sh"
 		fn_install_openstack_block
 	;;
 	2)
-		/usr/bin/bash ./etc/mitaka-block_install.sh
-		fn_log "/usr/bin/bash ./etc/mitaka-block_install.sh"
+		/usr/bin/bash ./etc/ocata-block_install.sh
+		fn_log "/usr/bin/bash ./etc/ocata-block_install.sh"
 		fn_install_openstack_block
 	;;
 	0)
@@ -248,6 +232,35 @@ esac
 
 }
 
+
+function fn_install_openstack_neutron () {
+cat << EOF
+1) Configure System Environment.
+2) Install Neutron Service.
+0) Quit
+EOF
+read -p "please input one number for install :" install_number
+case ${install_number} in
+	1)
+		/usr/bin/bash ./etc/ocata-block_storage_system.sh
+		fn_log "/usr/bin/bash ./etc/ocata-block_storage_system.sh"
+		fn_install_openstack_neutron
+	;;
+	2)
+		/usr/bin/bash  ./etc/neutron-ovs-network.sh
+		fn_log "/usr/bin/bash  ./etc/neutron-ovs-network.sh"
+		fn_install_openstack_neutron
+	;;
+	0)
+		fn_install_openstack
+	;;
+	*)
+		echo -e "\033[41;37m please input one number. \033[0m"
+		fn_install_openstack_neutron
+	;;
+esac 
+
+}
 
 
 

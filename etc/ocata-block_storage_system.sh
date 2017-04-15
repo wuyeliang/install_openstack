@@ -1,51 +1,76 @@
 #!/bin/bash
 #log function
-if [  -e $PWD/lib/mitaka-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/mitaka-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 
 
-if [ -f  /etc/openstack-mitaka_tag/presystem.tag ]
+if [ -f  /etc/openstack-ocata_tag/presystem.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
 	exit
 fi
-if [  -e /etc/openstack-mitaka_tag/config_keystone.tag  ]
+if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
 	exit 1
 fi
-OS_VERSION=`cat /etc/centos-release | awk -F " " '{print$4}' | awk -F "." '{print$3}'`
-if [  ${OS_VERSION} -eq 1511 ]
+function fn_check_os_version () {
+if [ -e /etc/system-release  ]
 then
-	log_info "the system is CentOS7.2."
+	OS_VERSION=`cat /etc/system-release | awk -F " " '{print$7}'`
+	fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$7}'`"
+	if [ -z  ${OS_VERSION} ]
+	then
+		OS_VERSION=`cat /etc/system-release | awk -F " " '{print$4}'`
+		fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$4}'`"
+	fi
 else
-	echo -e "\033[41;37m you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso. \033[0m"
-	log_error "you should install OS system by CentOS-7-x86_64-DVD-1511-01.iso."
+	echo -e "\033[41;37m please run script on rhel7.2 or CentOS7.2 \033[0m"
+	log_error "please run script on rhel7.2 or CentOS7.2"
 	exit 1
 fi
+	
+if [  ${OS_VERSION}x  = 7.2x  ] 
+then
+	echo "system is rhel7.2"
+	fn_log "echo "system is rhel7.2""
+elif [ ${OS_VERSION}x = 7.2.1511x   ]
+then
+	echo "system is CentOS7.2"
+	fn_log "echo "system is CentOS7.2""	
+else
+	echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso"
+	log_error "echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso""
+	exit 1
+fi 
 
-if [  -e /etc/openstack-mitaka_tag/config_keystone.tag  ]
+}
+fn_check_os_version
+
+if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
 fi
 
 #stop firewall
+yum -y install ntp vim  firewalld  net-tools 
+fn_log "yum -y install ntp vim  firewalld net-tools "
 service firewalld stop 
 fn_log "stop firewall"
 chkconfig firewalld off 
@@ -64,8 +89,8 @@ else
 	log_info "selinux is disabled."
 fi
 
-cat $PWD/lib/hosts >/etc/hosts
-fn_log "cat $PWD/lib/hosts >/etc/hosts"
+cat ${TOPDIR}/lib/hosts >/etc/hosts
+fn_log "cat ${TOPDIR}/lib/hosts >/etc/hosts"
 
 #get ip and hostname 
 
@@ -111,10 +136,10 @@ chkconfig chronyd off
 service chronyd stop
 sleep 10
 ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_ntp.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-mitaka_tag/install_ntp.tag ]
+if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
 then
 	log_info "ntp had installed."
 else
@@ -137,12 +162,12 @@ then
 	cd /etc/yum.repos.d/ &&  rm -rf CentOS-*
 	fn_log "cd /etc/yum.repos.d/ &&  rm -rf CentOS-*"
 fi
-if  [ ! -d /etc/openstack-mitaka_tag ]
+if  [ ! -d /etc/openstack-ocata_tag ]
 then
-	mkdir  /etc/openstack-mitaka_tag
+	mkdir  /etc/openstack-ocata_tag
 fi
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/presystem.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/presystem.tag
 echo -e "\033[32m #################################### \033[0m"
 echo -e "\033[32m ##   Configure  Systen Sucessed.#### \033[0m"
 echo -e "\033[32m #################################### \033[0m"

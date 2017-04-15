@@ -1,0 +1,291 @@
+#!/bin/bash
+#vlan config
+#controller node
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+then	
+	source ${TOPDIR}/lib/ocata-log.sh
+else
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	exit 1
+fi
+#input variable
+if [  -e ${TOPDIR}/lib/installrc ]
+then	
+	source ${TOPDIR}/lib/installrc 
+else
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
+	exit 1
+fi
+
+
+#get config function 
+if [  -e ${TOPDIR}/lib/source-function ]
+then	
+	source ${TOPDIR}/lib/source-function
+else
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
+	exit 1
+fi
+
+function fn_config_controller () {
+cat <<END >/tmp/tmp
+ml2 type_drivers  flat,vlan,gre,vxlan
+ml2 tenant_network_types  vlan
+ml2_type_vlan network_vlan_ranges  physnet1:1000:2999
+END
+fn_log "create /tmp/tmp "
+
+
+fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini"
+
+systemctl restart neutron-server 
+fn_log "systemctl restart neutron-server"
+
+}
+
+
+#netwok and computer node 
+function fn_config_computer_network () {
+NET_INT=`ip add | grep br-vlan `
+if [ $? -ne 0  ] 
+then
+	ovs-vsctl add-br br-vlan 
+	fn_log "ovs-vsctl add-br br-int"
+	ovs-vsctl add-port br-vlan $1 
+	fn_log "ovs-vsctl add-port br-vlan $1 "
+fi
+
+cat <<END >/tmp/tmp
+ml2 type_drivers  flat,vlan,gre,vxlan
+ml2 tenant_network_types  vlan
+ml2_type_vlan network_vlan_ranges  physnet1:1000:2999
+END
+fn_log "create /tmp/tmp "
+
+
+fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini"
+
+cat <<END >/tmp/tmp
+ml2 type_drivers  flat,vlan,gre,vxlan
+ml2 tenant_network_types  vlan
+ml2_type_vlan network_vlan_ranges  physnet1:1000:2999
+END
+fn_log "create /tmp/tmp "
+
+
+fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini"
+
+
+
+cat <<END >/tmp/tmp
+ovs bridge_mappings  physnet1:br-vlan
+END
+fn_log "create /tmp/tmp "
+fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini"
+
+systemctl restart neutron-openvswitch-agent 
+fn_log "systemctl restart neutron-openvswitch-agent "
+
+}
+
+#network node
+function fn_config_network () {
+NET_INT=`ip add | grep br-ext  `
+if [ $? -ne 0  ] 
+then
+	ovs-vsctl add-br br-ext 
+	fn_log "ovs-vsctl add-br br-int"
+
+fi
+
+ovs-vsctl  show | grep Interface | grep $1
+if [ $? -ne 0   ]
+then	
+	log_info " ${NET_DEVICE_NAME} have been added."
+else
+	ovs-vsctl add-port br-ext $1
+	fn_log "ovs-vsctl add-port br-ext $1 "
+fi
+
+
+cat <<END >/tmp/tmp
+DEFAULT  external_network_bridge  br-ext
+END
+fn_log "create /tmp/tmp "
+fn_set_conf /etc/neutron/l3_agent.ini
+fn_log "fn_set_conf /etc/neutron/l3_agent.ini"
+
+
+
+systemctl restart neutron-l3-agent 
+fn_log "systemctl restart neutron-l3-agent "
+
+}
+
+function fn_config_vlan_main () {
+if [ -e /etc/openstack-ocata_tag/controller_neutron.tag ]
+then
+	fn_config_controller
+fi
+
+
+
+if  [ -e /etc/openstack-ocata_tag/network_neutron.tag ] 
+then 
+	fn_config_computer_network ${NET_DEVICE_NAME}
+	fn_log "fn_config_computer_network ${NET_DEVICE_NAME}"
+	fn_config_network ${EXT_NET_DEVICE}
+	fn_log "fn_config_network ${EXT_NET_DEVICE} "
+fi 
+
+
+if  [ -e /etc/openstack-ocata_tag/computer_neutron.tag ] 
+then 
+	fn_config_computer_network ${DEV_NETWORK}
+	fn_log "fn_config_computer_network ${DEV_NETWORK} "
+fi 
+}
+
+fn_config_vlan_main
+
+
+
+
+
+#config vxlan
+
+
+
+
+#----------------------------------------------------
+function fn_config_controller_vxlan () {
+cat <<END >/tmp/tmp
+ml2 type_drivers   flat,vlan,gre,vxlan
+ml2 tenant_network_types   vxlan
+ml2_type_flat flat_networks   physnet1
+ml2_type_vxlan vni_ranges   1:1000
+END
+fn_log "create /tmp/tmp "
+
+
+fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini"
+
+systemctl restart neutron-server 
+fn_log "systemctl restart neutron-server"
+
+}
+
+
+#netwok and computer node 
+function fn_config_computer_network_vxlan () {
+cat <<END >/tmp/tmp
+ml2 type_drivers   flat,vlan,gre,vxlan
+ml2 tenant_network_types   vxlan
+ml2_type_flat flat_networks   physnet1
+ml2_type_vxlan vni_ranges   1:1000
+securitygroup firewall_driver   iptables_hybrid
+END
+fn_log "create /tmp/tmp "
+
+
+fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini"
+
+
+LOCAL_IP=`grep $HOSTNAME /etc/hosts | awk -F " " '{print$1}'`
+cat <<END >/tmp/tmp
+oagent tunnel_types   vxlan
+agent l2_population   True
+agent prevent_arp_spoofing   True
+ovs local_ip   ${LOCAL_IP}
+END
+fn_log "create /tmp/tmp "
+fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini"
+
+systemctl restart neutron-openvswitch-agent 
+fn_log "systemctl restart neutron-openvswitch-agent "
+
+}
+
+#network node
+function fn_config_network_vxlan () {
+NET_INT=`ip add | grep br-ext  `
+if [ $? -ne 0  ] 
+then
+	ovs-vsctl add-br br-ext 
+	fn_log "ovs-vsctl add-br br-int"
+
+fi
+
+ovs-vsctl  show | grep Interface | grep $1
+if [ $? -ne 0   ]
+then	
+	log_info " ${NET_DEVICE_NAME} have been added."
+else
+	ovs-vsctl add-port br-ext $1
+	fn_log "ovs-vsctl add-port br-ext $1 "
+fi
+
+
+cat <<END >/tmp/tmp
+ml2 type_drivers   flat,vlan,gre,vxlan
+ml2 tenant_network_types   vxlan
+ml2_type_flat flat_networks   physnet1
+ml2_type_vxlan vni_ranges   1:1000
+securitygroup firewall_driver   iptables_hybrid
+END
+fn_log "create /tmp/tmp "
+fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/ml2_conf.ini"
+
+LOCAL_IP=`grep $HOSTNAME /etc/hosts | awk -F " " '{print$1}'`
+
+cat <<END >/tmp/tmp
+agent tunnel_types   vxlan
+agent l2_population   True
+agent prevent_arp_spoofing   True
+ovs local_ip   ${LOCAL_IP}
+ovs bridge_mappings   physnet1:br-eth1
+END
+fn_log "create /tmp/tmp "
+fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini"
+
+for service in dhcp-agent l3-agent metadata-agent openvswitch-agent
+do
+	systemctl restart neutron-$service
+	fn_log "systemctl restart neutron-$service"
+done
+
+}
+
+function fn_config_vxlan_main () {
+if [ -e /etc/openstack-ocata_tag/controller_neutron.tag ]
+then
+	fn_config_controller_vxlan
+fi
+
+
+
+if  [ -e /etc/openstack-ocata_tag/network_neutron.tag ] 
+then 
+	fn_config_network_vxlan ${EXT_NET_DEVICE}
+	fn_log "fn_config_network_vxlan ${EXT_NET_DEVICE} "
+fi 
+
+
+if  [ -e /etc/openstack-ocata_tag/computer_neutron.tag ] 
+then 
+	fn_config_computer_network_vxlan
+	fn_log "fn_config_computer_network_vxlan  "
+fi 
+}
+
+fn_config_vxlan_main
+#-----------------------------------

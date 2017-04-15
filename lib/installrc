@@ -1,11 +1,11 @@
 #controller system information
-HOST_NAME=mitaka
+HOST_NAME=ocata
 #controller manager IP
-MANAGER_IP=192.168.8.71
+MANAGER_IP=172.16.8.75
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
-NET_DEVICE_NAME=enp0s8
-#install openstack-nova-compute on controller,please give it True or  False.
+NET_DEVICE_NAME=eno33554992
+#install openstack-nova-compute on controller
 CONTROLLER_COMPUTER=True
 
 #For neutron information
@@ -15,13 +15,18 @@ PUBLIC_NET_GW="10.168.10.1"
 PUBLIC_NET_START="10.168.10.10"
 PUBLIC_NET_END="10.168.10.240"
 SECOND_NET="10.168.10.253/24"
-NEUTRON_DNS="10.248.2.5"
+NEUTRON_DNS="8.8.8.8"
 
 
 #[DEMO_NET_ADDR]
 NEUTRON_PRIVATE_NET="10.168.124.0/24"
 PRIVATE_NET_GW="10.168.124.1"
-PRIVATE_NET_DNS="10.248.2.5"
+PRIVATE_NET_DNS="8.8.8.8"
+
+
+#[NETWORK node]
+EXT_NET_DEVICE=ens39
+
 
 #For cinder
 #please input disk or partition by blank to separate
@@ -37,3 +42,8 @@ PRIVATE_NET_DNS="10.248.2.5"
 #please input disk or partition by blank to separate
 #MANILA_DISK='/dev/sdb'
 
+#for swift
+#SWIFT_DISK='sdc /sdd'
+#Number of Copies
+#object node ip
+#OBJECT_MANAGE_IP="'172.16.8.68 sdc sdd' '172.16.8.69 sdc sdd' '172.16.8.70  sdc sdd'"

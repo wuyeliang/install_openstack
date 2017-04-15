@@ -1,29 +1,29 @@
 #！/bin/bash
 #log function
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/mitaka-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/mitaka-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/mitaka-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-mitaka_tag/computer.tag  ]
+if [  -e /etc/openstack-ocata_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-mitaka_tag/presystem.tag ]
+if [ -f  /etc/openstack-ocata_tag/presystem.tag ]
 then 
 	log_info "config system have installed ."
 else
@@ -31,7 +31,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-mitaka_tag/install_mariadb.tag ]
+if [ -f  /etc/openstack-ocata_tag/install_mariadb.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you had install mariadb."	
@@ -40,9 +40,9 @@ fi
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null "
@@ -58,8 +58,8 @@ else
 fi
 
 
- yum install python-openstackclient -y
- fn_log " yum install python-openstackclient -y"
+yum install python-openstackclient -y
+fn_log " yum install python-openstackclient -y"
 yum clean all && yum install openstack-selinux -y
 fn_log "yum clean all && yum install openstack-selinux -y"
 FIRST_ETH_IP=${MANAGER_IP}
@@ -68,8 +68,8 @@ FIRST_ETH_IP=${MANAGER_IP}
 function fn_install_mariadb () {
 yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y
 fn_log "yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y"
-rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
-fn_log "cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
+rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a ${TOPDIR}/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
+fn_log "cp -a ${TOPDIR}/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
 echo " " >>/etc/my.cnf.d/openstack.cnf
 echo "bind-address = ${FIRST_ETH_IP}" >>/etc/my.cnf.d/openstack.cnf
 
@@ -135,8 +135,8 @@ fn_log "systemctl enable memcached.service && systemctl restart memcached.servic
 echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###   Install Mariadb and Rabbitmq Sucessed.#### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
-if  [ ! -d /etc/openstack-mitaka_tag ]
+if  [ ! -d /etc/openstack-ocata_tag ]
 then 
-	mkdir -p /etc/openstack-mitaka_tag  
+	mkdir -p /etc/openstack-ocata_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-mitaka_tag/install_mariadb.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_mariadb.tag
