@@ -172,68 +172,56 @@ else
 fi
 source /root/admin-openrc.sh
 
-PUBLIC_NET=`neutron net-list | grep provider |wc -l`
-if [ ${PUBLIC_NET}  -eq 0 ]
+openstack router show router01 >/dev/null
+if [ $? -ne  0 ]
 then
-	neutron net-create --shared --provider:physical_network provider   --provider:network_type flat provider
-	fn_log "neutron net-create --shared --provider:physical_network provider   --provider:network_type flat provider"
-else
-	log_info "provider net is exist."
+	openstack router create router01
+	fn_log "openstack router create router01"
 fi
 
-SUB_PUBLIC_NET=`neutron subnet-list | grep provider |wc -l `
-if [ ${SUB_PUBLIC_NET}  -eq 0 ]
+openstack network show int_net >/dev/null
+if [ $? -ne  0 ]
 then
-	neutron subnet-create --name provider   --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END}   --dns-nameserver ${NEUTRON_DNS} --gateway ${PUBLIC_NET_GW}    provider ${NEUTRON_PUBLIC_NET}
-	fn_log "neutron subnet-create --name provider   --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END}   --dns-nameserver ${NEUTRON_DNS} --gateway ${PUBLIC_NET_GW}    provider ${NEUTRON_PUBLIC_NET}"
-else
-	log_info "sub_public is exist."
+	 openstack network create int_net
+	fn_log " openstack network create int_net"
 fi
-source /root/demo-openrc.sh
-PRIVATE_NET=`neutron net-list | grep selfservice |wc -l`
-if [ ${PRIVATE_NET}  -eq 0 ]
+
+openstack subnet  list | grep subnet1 >/dev/null
+if [ $? -ne  0 ]
 then
-	neutron net-create selfservice
-	fn_log "neutron net-create selfservice"
-else
-	log_info "selfservice net is exist."
+	openstack subnet create subnet1 --network int_net --subnet-range ${NEUTRON_PRIVATE_NET} --gateway ${PRIVATE_NET_GW}  --dns-nameserver ${PRIVATE_NET_DNS} 
+	fn_log "openstack subnet create subnet1 --network int_net --subnet-range ${NEUTRON_PRIVATE_NET} --gateway ${PRIVATE_NET_GW}  --dns-nameserver ${PRIVATE_NET_DNS}"
 fi
-SUB_PRIVATE_NET=`neutron subnet-list | grep selfservice |wc -l`
-if [ ${SUB_PRIVATE_NET}  -eq 0 ]
+
+
+openstack port list | grep `openstack subnet list |grep subnet1 | awk -F " " '{print$2}'`
+if [ $? -ne  0 ]
 then
-	neutron subnet-create --name selfservice   --dns-nameserver ${PRIVATE_NET_DNS} --gateway ${PRIVATE_NET_GW}  selfservice ${NEUTRON_PRIVATE_NET}
-	fn_log "neutron subnet-create --name selfservice   --dns-nameserver ${PRIVATE_NET_DNS}--gateway ${PRIVATE_NET_GW}  selfservice ${NEUTRON_PRIVATE_NET}"
-else
-	log_info "selfservice subnet is exist."
+	openstack router add subnet router01 subnet1 >/dev/null
+	fn_log "openstack router add subnet router01 subnet1"
 fi
-source /root/admin-openrc.sh
-ROUTE_VALUE=`neutron net-show provider | grep router:external | awk -F " "  '{print$4}'`
-if [ ${ROUTE_VALUE}x  = Truex  ]
+
+
+openstack network show ext_net >/dev/null
+if [ $? -ne  0  ]
 then
-	log_info "the value had changed."
-else
-	neutron net-update provider --router:external
-	fn_log "neutron net-update provider --router:external"
+	openstack network create --external ext_net
+	fn_log "openstack network create --external ext_net"
 fi
-source /root/demo-openrc.sh
-ROUTE_NU=`neutron router-list | grep router | wc -l`
-if [ ${ROUTE_NU}  -eq 0 ]
+
+
+
+openstack subnet  list | grep subnet2 >/dev/null
+if [ $? -ne  0 ]
 then
-	neutron router-create router
-	fn_log "neutron router-create router"
-	neutron router-interface-add router selfservice
-	fn_log "neutron router-interface-add router selfservice"
-	neutron router-gateway-set router provider
-	fn_log "neutron router-gateway-set router provider"
-else
-	log_info "router had created."
+	openstack subnet create subnet2 --network ext_net --subnet-range ${NEUTRON_PUBLIC_NET} --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END} --gateway ${PUBLIC_NET_GW}   --dns-nameserver ${NEUTRON_DNS}   
+	fn_log "openstack subnet create subnet2 --network ext_net --subnet-range ${NEUTRON_PUBLIC_NET} --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END} --gateway ${PUBLIC_NET_GW}   --dns-nameserver ${NEUTRON_DNS}  "
 fi
+
 
 source /root/admin-openrc.sh
 ip netns
 fn_log "ip netns"
-neutron router-port-list router
-fn_log "neutron router-port-list router"
 FLAVOR_NANO=`openstack flavor list | grep m1.nano | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${FLAVOR_NANO}x = m1.nanox ]
 then
