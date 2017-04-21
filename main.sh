@@ -166,6 +166,7 @@ cat << EOF
 2) Install Computer Node Service.
 3) Install Block Node Service (Cinder).
 4) Install Network Node Service.
+5）Config Network
 0) Quit
 EOF
 read -p "please input one number for install :" install_number
@@ -189,6 +190,11 @@ case ${install_number} in
 		fn_install_openstack_neutron
 		fn_log "fn_install_openstack_neutron"
 		fn_install_openstack_neutron
+	;;
+	5)
+		/usr/bin/bash ./etc/config-network
+		fn_log "/usr/bin/bash ./etc/config-network"
+		fn_install_openstack
 	;;
 	0)
 		exit 1

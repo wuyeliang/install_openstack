@@ -4,11 +4,12 @@ HOST_NAME=ocata
 MANAGER_IP=172.16.8.75
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
-NET_DEVICE_NAME=eno33554992
+
 #install openstack-nova-compute on controller
 CONTROLLER_COMPUTER=True
 
 #For neutron information
+
 #[FLOATING_METWORK_ADDR]
 NEUTRON_PUBLIC_NET="10.168.10.0/24"
 PUBLIC_NET_GW="10.168.10.1"
@@ -25,6 +26,8 @@ PRIVATE_NET_DNS="8.8.8.8"
 
 
 #[NETWORK node]
+NETWORK_TYPE=vlan
+IN_DEVICE_NAME=eno33554992
 EXT_NET_DEVICE=ens39
 
 
