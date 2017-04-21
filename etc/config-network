@@ -181,6 +181,7 @@ else
 	log_info "provider net is exist."
 fi
 
+
 SUB_PUBLIC_NET=`neutron subnet-list | grep provider |wc -l `
 if [ ${SUB_PUBLIC_NET}  -eq 0 ]
 then
