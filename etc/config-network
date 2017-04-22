@@ -28,6 +28,8 @@ fi
 
 #controller node
 function fn_config_controller () {
+yum  install -y openvswitch 
+fn_log "yum  install -y openvswitch "
 cat <<END >/tmp/tmp
 ml2 type_drivers  flat,vlan,gre,vxlan
 ml2 tenant_network_types  vlan
@@ -136,11 +138,6 @@ fn_log "systemctl restart neutron-l3-agent "
 function fn_create_net () {
 
 yum install -y python-openstackclient 
-source /root/admin-openrc.sh
-neutron ext-list
-fn_log "neutron ext-list"
-neutron agent-list
-fn_log "neutron agent-list"
 source /root/demo-openrc.sh
 
 if [ -e /root/.ssh ]
@@ -267,6 +264,8 @@ fi
 #config vxlan
 #----------------------------------------------------
 function fn_config_controller_vxlan () {
+yum  install -y openvswitch 
+fn_log "yum  install -y openvswitch "
 cat <<END >/tmp/tmp
 ml2 type_drivers   flat,vlan,gre,vxlan
 ml2 tenant_network_types   vxlan

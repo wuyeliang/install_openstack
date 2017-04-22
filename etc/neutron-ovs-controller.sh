@@ -162,8 +162,23 @@ fn_log "systemctl enable neutron-server"
 systemctl restart openstack-nova-api
 fn_log "systemctl restart openstack-nova-api" 
 
-/usr/bin/bash ${TOPDIR}/etc/config-network
-fn_log "/usr/bin/bash ${TOPDIR}/etc/config-network"
+
+
+if [  ${CONTROLLER_COMPUTER}  = True   ]
+then
+	/usr/bin/bash ${TOPDIR}/etc/ocata-computer_install.sh
+	fn_log "/usr/bin/bash ${TOPDIR}/etc/ocata-computer_install.sh"
+elif [ ${CONTROLLER_COMPUTER}  = False ]
+then
+	log_info "Do not install openstack-nova-compute on controller. "
+else
+	echo -e "\033[41;37m please check  CONTROLLER_COMPUTER option in installrc . \033[0m"
+	exit 1
+fi
+
+
+
+
 
 if  [ ! -d /etc/openstack-ocata_tag ]
 then 

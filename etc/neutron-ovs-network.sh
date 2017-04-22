@@ -129,10 +129,6 @@ fi
 
 
 
-/usr/bin/bash -x  ${TOPDIR}/etc/config-network
-fn_log "/usr/bin/bash -x  ${TOPDIR}/etc/config-network"
-
-
 
 for service in dhcp-agent l3-agent metadata-agent openvswitch-agent
 do
@@ -141,6 +137,30 @@ do
 	systemctl enable neutron-$service
 	fn_log "systemctl enable neutron-$service"
 done 
+
+
+cat <<END >/root/admin-openrc.sh 
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=${ALL_PASSWORD}
+export OS_AUTH_URL=http://${MANAGER_IP}:35357/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+END
+
+cat <<END >/root/demo-openrc.sh  
+export OS_PROJECT_DOMAIN_NAME=default
+export OS_USER_DOMAIN_NAME=default
+export OS_PROJECT_NAME=demo
+export OS_USERNAME=demo
+export OS_PASSWORD=${ALL_PASSWORD}
+export OS_AUTH_URL=http://${MANAGER_IP}:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+END
+
 
 
 

@@ -29,24 +29,13 @@ fi
 
 
 
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
-then
-	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
-	log_error "Oh no ! you can't execute this script oncontroller. "
-	exit 1
-fi
-if [ -f  /etc/openstack-ocata_tag/computer.tag ]
+if [ -f  /etc/openstack-ocata_tag/computer_neutron.tag ]
 then 
 	echo -e "\033[41;37m you had installed computer \033[0m"
 	log_info "you had installed computer."	
 	exit
 fi
-read -p "please input the local host network interface name [eg:eth2]:" DEV_NETWORK
-if [ -z  ${DEV_NETWORK}   ]
-then
-	echo -e "\033[41;37m please input the local host network interface name [eg:eth2]. \033[0m"
-	exit 1
-fi
+
 
 yum clean all && yum install openstack-selinux python-openstackclient yum-plugin-priorities -y 
 fn_log "yum clean all && yum install openstack-selinux -y "
@@ -202,12 +191,12 @@ fn_log "chgrp neutron /etc/neutron/neutron.conf "
 
 
 cat <<END >/tmp/tmp
-ml2 type_drivers = flat,vlan,gre,vxlan
-ml2 tenant_network_types =
-ml2 mechanism_drivers = openvswitch,l2population
-ml2 extension_drivers = port_security
-securitygroup enable_security_group = True
-securitygroup  firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+ml2 type_drivers  flat,vlan,gre,vxlan
+ml2 tenant_network_types 
+ml2 mechanism_drivers  openvswitch,l2population
+ml2 extension_drivers  port_security
+securitygroup enable_security_group  True
+securitygroup  firewall_driver  neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 END
 fn_log "create /tmp/tmp "
 
@@ -233,7 +222,7 @@ neutron project_name   service
 neutron username   neutron
 neutron password    ${ALL_PASSWORD}
 neutron service_metadata_proxy   True
-neutron  metadata_proxy_shared_secret   metadata_secret
+neutron  metadata_proxy_shared_secret   ${ALL_PASSWORD}
 END
 fn_log "create /tmp/tmp "
 fn_set_conf  /etc/nova/nova.conf
@@ -334,18 +323,10 @@ else
 fi
 
 
-/usr/bin/bash ${TOPDIR}/etc/config-network
-fn_log "/usr/bin/bash ${TOPDIR}/etc/config-network"
 
 
 source /root/admin-openrc.sh
 fn_log "source /root/admin-openrc.sh"
-sleep 20
-neutron ext-list
-fn_log "neutron ext-list"
-neutron agent-list
-fn_log "neutron agent-list"
-
 
 echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###       Install Computer Sucessed         #### \033[0m"
@@ -355,7 +336,8 @@ if  [ ! -d /etc/openstack-ocata_tag ]
 then 
 	mkdir -p /etc/openstack-ocata_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/computer.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/computer_neutron.tag
+
     
 	
 	

@@ -321,6 +321,7 @@ if [  ${CONTROLLER_COMPUTER}  = True   ]
 then
 	fn_computer_service 
 	fn_log "fn_computer_service "
+	echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/computer_neutron.tag
 elif [ ${CONTROLLER_COMPUTER}  = False ]
 then
 	log_info "Do not install openstack-nova-compute on controller. "
