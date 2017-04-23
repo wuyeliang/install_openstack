@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-network" afterPath="$PROJECT_DIR$/etc/config-network" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_dashboard.sh" afterPath="$PROJECT_DIR$/etc/install_dashboard.sh" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -15,16 +15,6 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="install_manila.sh" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/etc/install_manila.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="201">
-              <caret line="223" column="29" lean-forward="false" selection-start-line="223" selection-start-column="29" selection-end-line="223" selection-end-column="29" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="install_mariadb.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/etc/install_mariadb.sh">
           <provider selected="true" editor-type-id="text-editor">
@@ -105,11 +95,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="presystem.sh" pinned="false" current-in-tab="true">
+      <file leaf-file-name="presystem.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/etc/presystem.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1743">
               <caret line="216" column="0" lean-forward="true" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="install_dashboard.sh" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/etc/install_dashboard.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="608">
+              <caret line="71" column="67" lean-forward="false" selection-start-line="71" selection-start-column="67" selection-end-line="71" selection-end-column="67" />
               <folding />
             </state>
           </provider>
@@ -158,6 +158,7 @@
         <option value="$PROJECT_DIR$/etc/ocata-computer_install.sh" />
         <option value="$PROJECT_DIR$/etc/ocata-computer_system.sh" />
         <option value="$PROJECT_DIR$/etc/presystem.sh" />
+        <option value="$PROJECT_DIR$/etc/install_dashboard.sh" />
       </list>
     </option>
   </component>
@@ -370,7 +371,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492918228510</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="fix  ovs vxlan bug">
+      <created>1492923050837</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1492923050837</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -405,7 +413,8 @@
     <MESSAGE value="add ovs create network" />
     <MESSAGE value="fix bug" />
     <MESSAGE value="fix create instance bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix create instance bug" />
+    <MESSAGE value="fix  ovs vxlan bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix  ovs vxlan bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -632,6 +641,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1743">
           <caret line="216" column="0" lean-forward="true" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_dashboard.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="71" column="67" lean-forward="false" selection-start-line="71" selection-start-column="67" selection-end-line="71" selection-end-column="67" />
           <folding />
         </state>
       </provider>

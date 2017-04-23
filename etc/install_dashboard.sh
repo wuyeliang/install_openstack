@@ -68,8 +68,8 @@ else
 	fn_test_network
 fi
 
-yum clean all &&  yum install openstack-dashboard -y
-fn_log "yum clean all &&  yum install openstack-dashboard -y"
+yum clean all &&  yum install openstack-dashboard  mod_ssl -y
+fn_log "yum clean all &&  yum install openstack-dashboard  mod_ssl  -y"
 KEY_DASHBOARD=`cat /etc/openstack-dashboard/local_settings | grep SECRET_KEY | grep "=" |awk -F "'" '{print$2}'`
 [ -f /etc/openstack-dashboard/local_settings_bak ]  || cp -a /etc/openstack-dashboard/local_settings /etc/openstack-dashboard/local_settings_bak
 fn_log "[ -f /etc/openstack-dashboard/local_settings_bak ]  || cp -a /etc/openstack-dashboard/local_settings /etc/openstack-dashboard/local_settings_bak"
