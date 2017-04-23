@@ -35,8 +35,8 @@ then
 fi
 if [ -f  /etc/openstack-ocata_tag/swift.tag ]
 then 
-	echo -e "\033[41;37m you had installed swift service. \033[0m"
-	log_info "you had installed swift service."	
+	echo -e "\033[41;37m you have  been  installed swift service. \033[0m"
+	log_info "you have  been  installed swift service."
 	exit
 fi
 

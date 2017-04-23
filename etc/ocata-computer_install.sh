@@ -31,8 +31,8 @@ fi
 
 if [ -f  /etc/openstack-ocata_tag/computer_neutron.tag ]
 then 
-	echo -e "\033[41;37m you had installed computer \033[0m"
-	log_info "you had installed computer."	
+	echo -e "\033[41;37m you have  been  installed computer \033[0m"
+	log_info "you have  been  installed computer."
 	exit
 fi
 
@@ -330,7 +330,7 @@ then
 	fn_install_ceilometer
 	fn_log "fn_install_ceilometer"
 else
-	log_info "ceilometer had not installed."
+	log_info "ceilometer have  been  not installed."
 fi
 
 

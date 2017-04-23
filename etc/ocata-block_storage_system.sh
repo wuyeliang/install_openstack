@@ -141,7 +141,7 @@ echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
 
 if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
 then
-	log_info "ntp had installed."
+	log_info "ntp have  been  installed."
 else
 	fn_install_ntp
 fi

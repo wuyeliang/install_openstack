@@ -35,8 +35,8 @@ then
 fi
 if [ -f  /etc/openstack-ocata_tag/cinder.tag ]
 then 
-	echo -e "\033[41;37m you had installed cinder service. \033[0m"
-	log_info "you had installed cinder service."	
+	echo -e "\033[41;37m you have  been  installed cinder service. \033[0m"
+	log_info "you have  been  installed cinder service."
 	exit
 fi
 
@@ -67,7 +67,7 @@ fi
 VOLUNE_NAME=`vgs | grep cinder-volumes | awk -F " " '{print$1}'`
 if [ ${VOLUNE_NAME}x = cinder-volumesx ]
 then
-	log_info "cinder-volumes had created."
+	log_info "cinder-volumes have  been  created."
 else
 	fn_create_cinder_volumes
 fi
@@ -160,7 +160,7 @@ then
 	fn_install_ceilometer
 	fn_log "fn_install_ceilometer"
 else
-	log_info "ceilometer had not installed."
+	log_info "ceilometer have  been  not installed."
 fi
 
 

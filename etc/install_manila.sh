@@ -221,7 +221,7 @@ fn_log "systemctl enable lvm2-lvmetad.service && systemctl start lvm2-lvmetad.se
 VOLUNE_NAME=`vgs | grep manila-volumes | awk -F " " '{print$1}'`
 if [ ${VOLUNE_NAME}x = manila-volumesx ]
 then
-	log_info "manila-volumes had created."
+	log_info "manila-volumes have  been  created."
 else
 	pvcreate ${MANILA_DISK}  && vgcreate manila-volumes ${MANILA_DISK}
 	fn_log "pvcreate ${MANILA_DISK}  && vgcreate manila-volumes ${MANILA_DISK}"

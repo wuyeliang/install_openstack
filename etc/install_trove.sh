@@ -25,8 +25,8 @@ fi
 
 if [ -f  /etc/openstack-ocata_tag/install_trove.tag ]
 then 
-	echo -e "\033[41;37m you had install trove \033[0m"
-	log_info "you had install trove."	
+	echo -e "\033[41;37m you have  been  install trove \033[0m"
+	log_info "you have  been  install trove."
 	exit
 fi
 

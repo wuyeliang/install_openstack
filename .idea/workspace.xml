@@ -3,9 +3,24 @@
   <component name="ChangeListManager">
     <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-keystone.sh" afterPath="$PROJECT_DIR$/etc/config-keystone.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-network" afterPath="$PROJECT_DIR$/etc/config-network" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_nova.sh" afterPath="$PROJECT_DIR$/etc/install_nova.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_ceilometer.sh" afterPath="$PROJECT_DIR$/etc/install_ceilometer.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_cinder.sh" afterPath="$PROJECT_DIR$/etc/install_cinder.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_designate.sh" afterPath="$PROJECT_DIR$/etc/install_designate.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_glance.sh" afterPath="$PROJECT_DIR$/etc/install_glance.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_heat.sh" afterPath="$PROJECT_DIR$/etc/install_heat.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_magnum.sh" afterPath="$PROJECT_DIR$/etc/install_magnum.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_manila.sh" afterPath="$PROJECT_DIR$/etc/install_manila.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_mariadb.sh" afterPath="$PROJECT_DIR$/etc/install_mariadb.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_neutron.sh" afterPath="$PROJECT_DIR$/etc/install_neutron.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_trove.sh" afterPath="$PROJECT_DIR$/etc/install_trove.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/node-swift.sh" afterPath="$PROJECT_DIR$/etc/node-swift.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-block_install.sh" afterPath="$PROJECT_DIR$/etc/ocata-block_install.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-block_storage_system.sh" afterPath="$PROJECT_DIR$/etc/ocata-block_storage_system.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-computer_install.sh" afterPath="$PROJECT_DIR$/etc/ocata-computer_install.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-computer_system.sh" afterPath="$PROJECT_DIR$/etc/ocata-computer_system.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/presystem.sh" afterPath="$PROJECT_DIR$/etc/presystem.sh" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,27 +32,119 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="config-network" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/etc/config-network">
+      <file leaf-file-name="install_manila.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/install_manila.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19">
-              <caret line="198" column="2" lean-forward="false" selection-start-line="198" selection-start-column="2" selection-end-line="198" selection-end-column="2" />
+            <state relative-caret-position="201">
+              <caret line="223" column="29" lean-forward="false" selection-start-line="223" selection-start-column="29" selection-end-line="223" selection-end-column="29" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.sh" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.sh">
+      <file leaf-file-name="install_mariadb.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/install_mariadb.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3724">
-              <caret line="196" column="6" lean-forward="false" selection-start-line="196" selection-start-column="6" selection-end-line="196" selection-end-column="6" />
+            <state relative-caret-position="192">
+              <caret line="124" column="21" lean-forward="false" selection-start-line="124" selection-start-column="21" selection-end-line="124" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="install_neutron.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/install_neutron.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="335" column="24" lean-forward="false" selection-start-line="335" selection-start-column="24" selection-end-line="335" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="install_trove.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/install_trove.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="28" column="18" lean-forward="false" selection-start-line="28" selection-start-column="18" selection-end-line="28" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="node-swift.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/node-swift.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="38" column="18" lean-forward="false" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ocata-block_install.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/ocata-block_install.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="162" column="25" lean-forward="false" selection-start-line="162" selection-start-column="25" selection-end-line="162" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ocata-block_storage_system.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/ocata-block_storage_system.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="201">
+              <caret line="143" column="18" lean-forward="false" selection-start-line="143" selection-start-column="18" selection-end-line="143" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ocata-computer_install.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/ocata-computer_install.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="192">
+              <caret line="332" column="25" lean-forward="false" selection-start-line="332" selection-start-column="25" selection-end-line="332" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ocata-computer_system.sh" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/etc/ocata-computer_system.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="201">
+              <caret line="143" column="18" lean-forward="false" selection-start-line="143" selection-start-column="18" selection-end-line="143" selection-end-column="18" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="presystem.sh" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/etc/presystem.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-81">
+              <caret line="180" column="17" lean-forward="true" selection-start-line="180" selection-start-column="17" selection-end-line="180" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>had</find>
+    </findStrings>
+    <replaceStrings>
+      <replace />
+      <replace>have  been</replace>
+    </replaceStrings>
+    <dirStrings>
+      <dir>D:\code\install_openstack</dir>
+    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -50,7 +157,24 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/etc/config-keystone.sh" />
         <option value="$PROJECT_DIR$/etc/config-network" />
+        <option value="$PROJECT_DIR$/etc/install_ceilometer.sh" />
+        <option value="$PROJECT_DIR$/etc/install_cinder.sh" />
+        <option value="$PROJECT_DIR$/etc/install_designate.sh" />
+        <option value="$PROJECT_DIR$/etc/install_glance.sh" />
+        <option value="$PROJECT_DIR$/etc/install_heat.sh" />
+        <option value="$PROJECT_DIR$/etc/install_magnum.sh" />
+        <option value="$PROJECT_DIR$/etc/install_manila.sh" />
+        <option value="$PROJECT_DIR$/etc/install_mariadb.sh" />
+        <option value="$PROJECT_DIR$/etc/install_neutron.sh" />
+        <option value="$PROJECT_DIR$/etc/install_trove.sh" />
+        <option value="$PROJECT_DIR$/etc/node-swift.sh" />
+        <option value="$PROJECT_DIR$/etc/ocata-block_install.sh" />
+        <option value="$PROJECT_DIR$/etc/ocata-block_storage_system.sh" />
+        <option value="$PROJECT_DIR$/etc/ocata-computer_install.sh" />
+        <option value="$PROJECT_DIR$/etc/ocata-computer_system.sh" />
+        <option value="$PROJECT_DIR$/etc/presystem.sh" />
       </list>
     </option>
   </component>
@@ -249,7 +373,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492828660204</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fix create instance bug">
+      <created>1492917995696</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1492917995696</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -259,8 +390,9 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18020834" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32910052" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32910052" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32910052" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -272,7 +404,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -283,7 +414,8 @@
     <MESSAGE value="add ovs" />
     <MESSAGE value="add ovs create network" />
     <MESSAGE value="fix bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix bug" />
+    <MESSAGE value="fix create instance bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix create instance bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -370,10 +502,146 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/etc/config-keystone.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="56" column="18" lean-forward="false" selection-start-line="56" selection-start-column="18" selection-end-line="56" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/etc/config-network">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="19">
-          <caret line="198" column="2" lean-forward="false" selection-start-line="198" selection-start-column="2" selection-end-line="198" selection-end-column="2" />
+        <state relative-caret-position="192">
+          <caret line="224" column="24" lean-forward="false" selection-start-line="224" selection-start-column="24" selection-end-line="224" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_ceilometer.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="280" column="29" lean-forward="false" selection-start-line="280" selection-start-column="29" selection-end-line="280" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_cinder.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="220" column="29" lean-forward="false" selection-start-line="220" selection-start-column="29" selection-end-line="220" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_designate.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="45" column="18" lean-forward="false" selection-start-line="45" selection-start-column="18" selection-end-line="45" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_glance.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="206">
+          <caret line="171" column="47" lean-forward="false" selection-start-line="171" selection-start-column="47" selection-end-line="171" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_heat.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="103" column="38" lean-forward="false" selection-start-line="103" selection-start-column="38" selection-end-line="103" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_magnum.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="74" column="29" lean-forward="false" selection-start-line="74" selection-start-column="29" selection-end-line="74" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_manila.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="223" column="29" lean-forward="false" selection-start-line="223" selection-start-column="29" selection-end-line="223" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_mariadb.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="124" column="21" lean-forward="false" selection-start-line="124" selection-start-column="21" selection-end-line="124" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_neutron.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="335" column="24" lean-forward="false" selection-start-line="335" selection-start-column="24" selection-end-line="335" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_trove.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="28" column="18" lean-forward="false" selection-start-line="28" selection-start-column="18" selection-end-line="28" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/node-swift.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="38" column="18" lean-forward="false" selection-start-line="38" selection-start-column="18" selection-end-line="38" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/ocata-block_install.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="162" column="25" lean-forward="false" selection-start-line="162" selection-start-column="25" selection-end-line="162" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/ocata-block_storage_system.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="143" column="18" lean-forward="false" selection-start-line="143" selection-start-column="18" selection-end-line="143" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/ocata-computer_install.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="332" column="25" lean-forward="false" selection-start-line="332" selection-start-column="25" selection-end-line="332" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/ocata-computer_system.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="143" column="18" lean-forward="false" selection-start-line="143" selection-start-column="18" selection-end-line="143" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/presystem.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-81">
+          <caret line="180" column="17" lean-forward="true" selection-start-line="180" selection-start-column="17" selection-end-line="180" selection-end-column="17" />
           <folding />
         </state>
       </provider>

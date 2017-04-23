@@ -169,7 +169,7 @@ fn_log "openstack image list"
 GLANCE_ID=`openstack image list | grep cirros  | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${GLANCE_ID}x = cirrosx ]
 then
-	log_info "glance image cirros-0.3.4-x86_64 had create."
+	log_info "glance image cirros-0.3.4-x86_64 have  been  create."
 else
 	fn_create_image
 fi

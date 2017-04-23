@@ -42,8 +42,8 @@ fi
 
 if [ -f  /etc/openstack-ocata_tag/install_designate.tag ]
 then 
-	echo -e "\033[41;37m you had install designate \033[0m"
-	log_info "you had install designate."	
+	echo -e "\033[41;37m you have  been  install designate \033[0m"
+	log_info "you have  been  install designate."
 	exit
 fi
 

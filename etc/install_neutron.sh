@@ -248,7 +248,7 @@ fi
 KEYPAIR=`nova keypair-list | grep  mykey | awk -F " " '{print$2}'`
 if [  ${KEYPAIR}x = mykeyx ]
 then
-	log_info "keypair had added."
+	log_info "keypair have  been  added."
 else
 	ssh-keygen -t dsa -f ~/.ssh/id_dsa -N ""
 	fn_log "ssh-keygen -t dsa -f ~/.ssh/id_dsa -N """
@@ -259,7 +259,7 @@ fi
 SECRULE=`nova secgroup-list-rules  default | grep 22 | awk -F " " '{print$4}'`
 if [ x${SECRULE} = x22 ]
 then 
-	log_info "port 22 and icmp had add to secgroup."
+	log_info "port 22 and icmp have  been  add to secgroup."
 else
 	openstack security group rule create --proto icmp default
 	fn_log "openstack security group rule create --proto icmp default "
@@ -306,7 +306,7 @@ source /root/admin-openrc.sh
 ROUTE_VALUE=`neutron net-show provider | grep router:external | awk -F " "  '{print$4}'`
 if [ ${ROUTE_VALUE}x  = Truex  ]
 then
-	log_info "the value had changed."
+	log_info "the value have  been  changed."
 else
 	neutron net-update provider --router:external
 	fn_log "neutron net-update provider --router:external"
@@ -322,7 +322,7 @@ then
 	neutron router-gateway-set router provider
 	fn_log "neutron router-gateway-set router provider"
 else
-	log_info "router had created."
+	log_info "router have  been  created."
 fi
 
 source /root/admin-openrc.sh
@@ -333,7 +333,7 @@ fn_log "neutron router-port-list router"
 FLAVOR_NANO=`openstack flavor list | grep m1.nano | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${FLAVOR_NANO}x = m1.nanox ]
 then
-    log_info  "m1.nanox had created."
+    log_info  "m1.nanox have  been  created."
 else
      openstack flavor create --id 0 --vcpus 1 --ram 512 --disk 1 m1.nano
      fn_log "openstack flavor create --id 0 --vcpus 1 --ram 512 --disk 1 m1.nano"

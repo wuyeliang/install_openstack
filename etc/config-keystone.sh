@@ -54,7 +54,7 @@ fi
 if [ -f  /etc/openstack-ocata_tag/config_keystone.tag ]
 then 
 	echo -e "\033[41;37m etc/openstack-ocata_tag/config_keystone.tag \033[0m"
-	log_info "you had install keystone."	
+	log_info "you have  been  install keystone."
 	exit
 fi
 

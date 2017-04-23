@@ -101,7 +101,7 @@ fn_log "fn_create_domain heat  "Stack projects and users""
 HEAT_DOMAIN_ADMIN=`openstack user list | grep -v Name |grep heat_domain_admin | awk -F " " '{print$4}' | grep -v ^$`
 if [  ${HEAT_DOMAIN_ADMIN}x = heat_domain_adminx ]
 then
-	log_info "user  heat_domain_admin had created."
+	log_info "user  heat_domain_admin have  been  created."
 else
 	openstack user create  --domain  heat  heat_domain_admin  --password ${ALL_PASSWORD}
 	fn_log "openstack user create  --domain  heat  heat_domain_admin  --password ${ALL_PASSWORD}"

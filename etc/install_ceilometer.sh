@@ -268,7 +268,7 @@ DATABASEaodh=`cat test | grep aodh`
 rm -rf test 
 if [ ${DATABASEaodh}x = aodhx ]
 then
-	log_info "aodh database had installed."
+	log_info "aodh database have  been  installed."
 else
 	fn_create_aodh_database
 fi
@@ -278,7 +278,7 @@ source /root/admin-openrc.sh
 USER_aodh=`openstack user list | grep aodh | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${USER_aodh}x = aodhx ]
 then
-	log_info "openstack user had created  aodh"
+	log_info "openstack user have  been  created  aodh"
 else
 	openstack user create  --domain default aodh  --password ${ALL_PASSWORD}
 	fn_log "openstack user create --domain default aodh  --password ${ALL_PASSWORD}"

@@ -34,7 +34,7 @@ fi
 if [ -f  /etc/openstack-ocata_tag/install_mariadb.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
-	log_info "you had install mariadb."	
+	log_info "you have  been  install mariadb."
 	exit
 fi
 
@@ -91,7 +91,7 @@ fn_log "mysql_secure_installation"
 MARIADB_STATUS=`service mariadb status | grep Active | awk -F "("  '{print$2}' | awk -F ")"  '{print$1}'`
 if [ "${MARIADB_STATUS}"  = running ]
 then
-	log_info "mairadb had installl."
+	log_info "mairadb have  been  installl."
 else
 	fn_install_mariadb
 fi
@@ -115,14 +115,14 @@ function fn_test_rabbit () {
 RABBIT_STATUS=`rabbitmqctl list_users | grep openstack | awk -F " " '{print$1}'`
 if [ ${RABBIT_STATUS}x  = openstackx ]
 then 
-	log_info "rabbit had installed."
+	log_info "rabbit have  been  installed."
 else
 	fn_install_rabbit
 fi
 }
 if [ -f /usr/sbin/rabbitmqctl  ]
 then
-	log_info "rabbit had installed."
+	log_info "rabbit have  been  installed."
 else
 	fn_test_rabbit
 fi
