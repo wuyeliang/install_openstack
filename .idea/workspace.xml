@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_dashboard.sh" afterPath="$PROJECT_DIR$/etc/install_dashboard.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-network" afterPath="$PROJECT_DIR$/etc/config-network" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -378,7 +378,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492923050837</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="enable dashboard ssl">
+      <created>1492923159414</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1492923159414</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -414,7 +421,8 @@
     <MESSAGE value="fix bug" />
     <MESSAGE value="fix create instance bug" />
     <MESSAGE value="fix  ovs vxlan bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix  ovs vxlan bug" />
+    <MESSAGE value="enable dashboard ssl" />
+    <option name="LAST_COMMIT_MESSAGE" value="enable dashboard ssl" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />

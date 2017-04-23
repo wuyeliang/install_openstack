@@ -357,7 +357,7 @@ agent tunnel_types   vxlan
 agent l2_population   True
 agent prevent_arp_spoofing   True
 ovs local_ip   ${LOCAL_IP}
-ovs bridge_mappings   physnet1:br-eth1
+ovs bridge_mappings   physnet1:br-ex
 END
 fn_log "create /tmp/tmp "
 fn_set_conf /etc/neutron/plugins/ml2/openvswitch_agent.ini
