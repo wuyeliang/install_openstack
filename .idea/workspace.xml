@@ -3,24 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-keystone.sh" afterPath="$PROJECT_DIR$/etc/config-keystone.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-network" afterPath="$PROJECT_DIR$/etc/config-network" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_ceilometer.sh" afterPath="$PROJECT_DIR$/etc/install_ceilometer.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_cinder.sh" afterPath="$PROJECT_DIR$/etc/install_cinder.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_designate.sh" afterPath="$PROJECT_DIR$/etc/install_designate.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_glance.sh" afterPath="$PROJECT_DIR$/etc/install_glance.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_heat.sh" afterPath="$PROJECT_DIR$/etc/install_heat.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_magnum.sh" afterPath="$PROJECT_DIR$/etc/install_magnum.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_manila.sh" afterPath="$PROJECT_DIR$/etc/install_manila.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_mariadb.sh" afterPath="$PROJECT_DIR$/etc/install_mariadb.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_neutron.sh" afterPath="$PROJECT_DIR$/etc/install_neutron.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_trove.sh" afterPath="$PROJECT_DIR$/etc/install_trove.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/node-swift.sh" afterPath="$PROJECT_DIR$/etc/node-swift.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-block_install.sh" afterPath="$PROJECT_DIR$/etc/ocata-block_install.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-block_storage_system.sh" afterPath="$PROJECT_DIR$/etc/ocata-block_storage_system.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-computer_install.sh" afterPath="$PROJECT_DIR$/etc/ocata-computer_install.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-computer_system.sh" afterPath="$PROJECT_DIR$/etc/ocata-computer_system.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/presystem.sh" afterPath="$PROJECT_DIR$/etc/presystem.sh" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -125,8 +108,8 @@
       <file leaf-file-name="presystem.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/etc/presystem.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-81">
-              <caret line="180" column="17" lean-forward="true" selection-start-line="180" selection-start-column="17" selection-end-line="180" selection-end-column="17" />
+            <state relative-caret-position="1743">
+              <caret line="216" column="0" lean-forward="true" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -380,7 +363,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492917995696</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="fix create instance bug">
+      <created>1492918228510</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1492918228510</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -640,8 +630,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/etc/presystem.sh">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-81">
-          <caret line="180" column="17" lean-forward="true" selection-start-line="180" selection-start-column="17" selection-end-line="180" selection-end-column="17" />
+        <state relative-caret-position="1743">
+          <caret line="216" column="0" lean-forward="true" selection-start-line="216" selection-start-column="0" selection-end-line="216" selection-end-column="0" />
           <folding />
         </state>
       </provider>
