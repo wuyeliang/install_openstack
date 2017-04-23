@@ -165,7 +165,7 @@ vnc  vncserver_listen   \$my_ip
 vnc  vncserver_proxyclient_address   \$my_ip
 glance api_servers   http://${HOSTNAME}:9292
 oslo_concurrency lock_path   /var/lib/nova/tmp
-scheduler discover_hosts_in_cells_interval   -1
+scheduler discover_hosts_in_cells_interval   30
 END
 fn_log "create /tmp/tmp "
 
@@ -278,6 +278,7 @@ vnc vncserver_proxyclient_address   \$my_ip
 vnc novncproxy_base_url   http://${HOST_NAME}:6080/vnc_auto.html
 glance api_servers   http://${HOST_NAME}:9292
 oslo_concurrency lock_path   /var/lib/nova/tmp
+libvirt cpu_mode  none
 END
 fn_log "create /tmp/tmp "
 

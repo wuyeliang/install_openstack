@@ -169,21 +169,21 @@ else
 fi
 source /root/admin-openrc.sh
 
-openstack router show router01 >/dev/null
+openstack router show router01 >/dev/null 2>/dev/null
 if [ $? -ne  0 ]
 then
 	openstack router create router01
 	fn_log "openstack router create router01"
 fi
 
-openstack network show int_net >/dev/null
+openstack network show int_net >/dev/null  2>/dev/null
 if [ $? -ne  0 ]
 then
 	 openstack network create int_net
 	fn_log " openstack network create int_net"
 fi
 
-openstack subnet  list | grep subnet1 >/dev/null
+openstack subnet  list | grep subnet1 >/dev/null 2>/dev/null
 if [ $? -ne  0 ]
 then
 	openstack subnet create subnet1 --network int_net --subnet-range ${NEUTRON_PRIVATE_NET} --gateway ${PRIVATE_NET_GW}  --dns-nameserver ${PRIVATE_NET_DNS} 
@@ -194,12 +194,12 @@ fi
 openstack port list | grep `openstack subnet list |grep subnet1 | awk -F " " '{print$2}'`
 if [ $? -ne  0 ]
 then
-	openstack router add subnet router01 subnet1 >/dev/null
+	openstack router add subnet router01 subnet1 >/dev/null 2>/dev/null
 	fn_log "openstack router add subnet router01 subnet1"
 fi
 
 
-openstack network show ext_net >/dev/null
+openstack network show ext_net >/dev/null 2>/dev/null
 if [ $? -ne  0  ]
 then
 	openstack network create --external ext_net
@@ -208,7 +208,7 @@ fi
 
 
 
-openstack subnet  list | grep subnet2 >/dev/null
+openstack subnet  list | grep subnet2 >/dev/null 2>/dev/null
 if [ $? -ne  0 ]
 then
 	openstack subnet create subnet2 --network ext_net --subnet-range ${NEUTRON_PUBLIC_NET} --allocation-pool start=${PUBLIC_NET_START},end=${PUBLIC_NET_END} --gateway ${PUBLIC_NET_GW}   --dns-nameserver ${NEUTRON_DNS}   

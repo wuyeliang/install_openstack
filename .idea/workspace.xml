@@ -5,10 +5,7 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/config-network" afterPath="$PROJECT_DIR$/etc/config-network" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/install_nova.sh" afterPath="$PROJECT_DIR$/etc/install_nova.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/neutron-ovs-controller.sh" afterPath="$PROJECT_DIR$/etc/neutron-ovs-controller.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/neutron-ovs-network.sh" afterPath="$PROJECT_DIR$/etc/neutron-ovs-network.sh" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/etc/ocata-computer_install.sh" afterPath="$PROJECT_DIR$/etc/ocata-computer_install.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.sh" afterPath="$PROJECT_DIR$/main.sh" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,8 +20,8 @@
       <file leaf-file-name="config-network" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/etc/config-network">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-19">
-              <caret line="198" column="2" lean-forward="true" selection-start-line="198" selection-start-column="2" selection-end-line="198" selection-end-column="2" />
+            <state relative-caret-position="19">
+              <caret line="198" column="2" lean-forward="false" selection-start-line="198" selection-start-column="2" selection-end-line="198" selection-end-column="2" />
               <folding />
             </state>
           </provider>
@@ -245,7 +242,14 @@
       <option name="project" value="LOCAL" />
       <updated>1492787900108</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="fix bug">
+      <created>1492828660204</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1492828660204</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -278,13 +282,30 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="add ovs" />
     <MESSAGE value="add ovs create network" />
-    <option name="LAST_COMMIT_MESSAGE" value="add ovs create network" />
+    <MESSAGE value="fix bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/etc/config-network">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3724">
+          <caret line="196" column="6" lean-forward="false" selection-start-line="196" selection-start-column="6" selection-end-line="196" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/etc/config-network">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -351,8 +372,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/etc/config-network">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-19">
-          <caret line="198" column="2" lean-forward="true" selection-start-line="198" selection-start-column="2" selection-end-line="198" selection-end-column="2" />
+        <state relative-caret-position="19">
+          <caret line="198" column="2" lean-forward="false" selection-start-line="198" selection-start-column="2" selection-end-line="198" selection-end-column="2" />
           <folding />
         </state>
       </provider>

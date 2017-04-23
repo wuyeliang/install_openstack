@@ -79,12 +79,22 @@ vnc vncserver_proxyclient_address   \$my_ip
 vnc novncproxy_base_url   http://${MANAGER_IP}:6080/vnc_auto.html
 glance api_servers   http://${MANAGER_IP}:9292
 oslo_concurrency lock_path   /var/lib/nova/tmp
+libvirt cpu_mode  none
 END
 fn_log "create /tmp/tmp "
 
 fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
 
+HARDWARE=`egrep -c '(vmx|svm)' /proc/cpuinfo`
+if [ ${HARDWARE}  -eq 0 ]
+then 
+	openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu 
+	log_info  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu sucessed."
+else
+	openstack-config --set  /etc/nova/nova.conf libvirt virt_type  kvm
+	log_info  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu sucessed."
+fi
 
 #fix bug PlacementNotConfigured: This compute is not configured to talk to the placement service
 
@@ -227,6 +237,7 @@ END
 fn_log "create /tmp/tmp "
 fn_set_conf  /etc/nova/nova.conf
 fn_log "fn_set_conf  /etc/nova/nova.conf"
+
 
 
 
