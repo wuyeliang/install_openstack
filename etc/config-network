@@ -1,5 +1,6 @@
 #!/bin/bash
-#vlan config
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	

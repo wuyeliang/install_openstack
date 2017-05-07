@@ -1,4 +1,6 @@
 #!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 TOPDIR=$(cd $(dirname "$0") && pwd)
 export TOPDIR
 INSTALL_PATH=${TOPDIR}
@@ -44,6 +46,7 @@ cat << EOF
 11) Install Key Manager service.
 12) Install Trove.
 13) Install Magnum.
+14) Install Swift.
 0) Quit
 EOF
 
@@ -118,6 +121,11 @@ case ${install_number} in
 		log_info "/bin/bash ${TOPDIR}/etc/install_magnum.sh."
 		fn_install_openstack_controller
 	;;
+	14)
+		/bin/bash ${INSTALL_PATH}/etc/install_swift.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_swift.sh."
+		fn_install_openstack_controller
+	;;	
 	0)
 		exit 1
 	;;
@@ -163,6 +171,44 @@ esac
 }
 
 
+
+
+function fn_install_openstack_swift () {
+cat << EOF
+1) Configure System Environment.(swift node)
+2) Install siwft Service.(swift node)
+3) Initial rings(controller node)
+0) Quit
+EOF
+read -p "please input one number for install :" install_number
+case ${install_number} in
+	1)
+		/usr/bin/bash ./etc/ocata-block_storage_system.sh
+		fn_log "/usr/bin/bash ./etc/ocata-block_storage_system.sh"
+		fn_install_openstack_swift
+	;;
+	2)
+		/usr/bin/bash ./etc/node-swift.sh
+		fn_log "/usr/bin/bash ./etc/node-swift.sh"
+		fn_install_openstack_swift
+	;;
+	3)
+		/usr/bin/bash ./etc/create-initial-rings.sh
+		fn_log "/usr/bin/bash ./etc/create-initial-rings.sh"
+		fn_install_openstack_swift
+	;;
+	0)
+		fn_install_openstack
+	;;
+	*)
+		echo -e "\033[41;37m please input one number. \033[0m"
+		fn_install_openstack_swift
+	;;
+esac 
+
+}
+
+
 function fn_install_openstack ()
 {
 cat << EOF
@@ -170,6 +216,7 @@ cat << EOF
 2) Install Computer Node Service.
 3) Install Block Node Service (Cinder).
 4) Install Network Node Service.
+5) Install Storage Node Service.
 0) Quit
 EOF
 read -p "please input one number for install :" install_number
@@ -193,6 +240,11 @@ case ${install_number} in
 		fn_install_openstack_neutron
 		fn_log "fn_install_openstack_neutron"
 		fn_install_openstack_neutron
+	;;
+	5)
+		fn_install_openstack_swift
+		fn_log "fn_install_openstack_swift"
+		fn_install_openstack_swift
 	;;
 	0)
 		exit 1

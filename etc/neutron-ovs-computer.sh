@@ -1,3 +1,7 @@
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+
 yum clean all && yum install  -y install  openstack-utils openstack-neutron openstack-neutron-ml2 openstack-neutron-openvswitch
 fn_log "yum clean all && yum install  -y install openstack-neutron openstack-neutron-ml2 openstack-neutron-openvswitch"
 

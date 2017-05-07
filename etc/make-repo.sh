@@ -1,4 +1,6 @@
-
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 yum -y  install chrony ntp vim unzip wget  firewalld  createrepo
 yum -y  install centos-release-openstack-ocata
 yum -y  upgrade

@@ -1,5 +1,6 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
 if [  -e $PWD/lib/ocata-log.sh ]
 then	

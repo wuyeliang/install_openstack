@@ -1,3 +1,6 @@
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 #controller system information
 HOST_NAME=ocata
 #controller manager IP
@@ -46,7 +49,3 @@ EXT_NET_DEVICE=ens39
 #MANILA_DISK='/dev/sdb'
 
 #for swift
-#SWIFT_DISK='sdc /sdd'
-#Number of Copies
-#object node ip
-#OBJECT_MANAGE_IP="'172.16.8.68 sdc sdd' '172.16.8.69 sdc sdd' '172.16.8.70  sdc sdd'"
