@@ -103,8 +103,8 @@ fn_log "keystone-manage fernet_setup --keystone-user keystone --keystone-group k
 keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 fn_log "keystone-manage credential_setup --keystone-user keystone --keystone-group keystone"
 
-keystone-manage bootstrap --bootstrap-password ${ALL_PASSWORD}   --bootstrap-admin-url http://$HOSTNAME:35357/v3/   --bootstrap-internal-url http://$HOSTNAME:35357/v3/   --bootstrap-public-url http://$HOSTNAME:5000/v3/   --bootstrap-region-id RegionOne
-fn_log "keystone-manage bootstrap --bootstrap-password ${ALL_PASSWORD}   --bootstrap-admin-url http://$HOSTNAME:35357/v3/   --bootstrap-internal-url http://$HOSTNAME:35357/v3/   --bootstrap-public-url http://$HOSTNAME:5000/v3/   --bootstrap-region-id RegionOne"
+keystone-manage bootstrap --bootstrap-password ${ALL_PASSWORD}   --bootstrap-admin-url http://${MANAGER_IP}:35357/v3/   --bootstrap-internal-url http://${MANAGER_IP}:35357/v3/   --bootstrap-public-url http://${MANAGER_IP}:5000/v3/   --bootstrap-region-id RegionOne
+fn_log "keystone-manage bootstrap --bootstrap-password ${ALL_PASSWORD}   --bootstrap-admin-url http://${MANAGER_IP}:35357/v3/   --bootstrap-internal-url http://${MANAGER_IP}:35357/v3/   --bootstrap-public-url http://${MANAGER_IP}:5000/v3/   --bootstrap-region-id RegionOne"
 
 [ -f /etc/httpd/conf/httpd.conf_bak  ] || cp -a /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf_bak
 fn_log "[ -f /etc/httpd/conf/httpd.conf_bak  ] || cp -a /etc/httpd/conf/httpd.conf /etc/httpd/conf/httpd.conf_bak"
@@ -133,7 +133,7 @@ export OS_PASSWORD=${ALL_PASSWORD}
 export OS_PROJECT_NAME=admin
 export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
-export OS_AUTH_URL=http://$HOSTNAME:35357/v3
+export OS_AUTH_URL=http://${MANAGER_IP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
 sleep 10 
 
@@ -151,11 +151,11 @@ fn_log "openstack role add --project demo --user demo user"
 unset OS_AUTH_URL OS_PASSWORD
 fn_log "unset OS_AUTH_URL OS_PASSWORD"
 
-openstack --os-auth-url http://$HOSTNAME:35357/v3  --os-project-domain-name default --os-user-domain-name default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}
-fn_log "openstack --os-auth-url http://$HOSTNAME:35357/v3  --os-project-domain-name default --os-user-domain-name default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}"
+openstack --os-auth-url http://${MANAGER_IP}:35357/v3  --os-project-domain-name default --os-user-domain-name default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}
+fn_log "openstack --os-auth-url http://${MANAGER_IP}:35357/v3  --os-project-domain-name default --os-user-domain-name default   --os-project-name admin --os-username admin token issue --os-password ${ALL_PASSWORD}"
 
-openstack --os-auth-url http://$HOSTNAME:5000/v3   --os-project-domain-name default --os-user-domain-name default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}
-fn_log "openstack --os-auth-url http://$HOSTNAME:5000/v3   --os-project-domain-name default --os-user-domain-name default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}"
+openstack --os-auth-url http://${MANAGER_IP}:5000/v3   --os-project-domain-name default --os-user-domain-name default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}
+fn_log "openstack --os-auth-url http://${MANAGER_IP}:5000/v3   --os-project-domain-name default --os-user-domain-name default   --os-project-name demo --os-username demo token issue --os-password ${ALL_PASSWORD}"
 
 cat <<END >/root/admin-openrc.sh 
 export OS_PROJECT_DOMAIN_NAME=default
