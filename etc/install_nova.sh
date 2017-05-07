@@ -1,27 +1,28 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 #get config function 
-if [  -e $PWD/lib/source-function ]
+if [  -e ${TOPDIR}/lib/source-function ]
 then	
-	source $PWD/lib/source-function
+	source ${TOPDIR}/lib/source-function
 else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
 	exit 1
 fi
 
@@ -117,9 +118,9 @@ fn_log "fn_create_endpoint placement 8778"
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null"
@@ -165,7 +166,7 @@ vnc  vncserver_listen   \$my_ip
 vnc  vncserver_proxyclient_address   \$my_ip
 glance api_servers   http://${HOSTNAME}:9292
 oslo_concurrency lock_path   /var/lib/nova/tmp
-scheduler discover_hosts_in_cells_interval   -1
+scheduler discover_hosts_in_cells_interval   30
 END
 fn_log "create /tmp/tmp "
 
@@ -220,9 +221,9 @@ fn_log "systemctl start openstack-nova-api.service   openstack-nova-consoleauth.
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null"
@@ -275,9 +276,10 @@ DEFAULT firewall_driver   nova.virt.firewall.NoopFirewallDriver
 vnc enabled   True
 vnc vncserver_listen   0.0.0.0
 vnc vncserver_proxyclient_address   \$my_ip
-vnc novncproxy_base_url   http://${HOST_NAME}:6080/vnc_auto.html
+vnc novncproxy_base_url   http://${MANAGER_IP}:6080/vnc_auto.html
 glance api_servers   http://${HOST_NAME}:9292
 oslo_concurrency lock_path   /var/lib/nova/tmp
+libvirt cpu_mode  none
 END
 fn_log "create /tmp/tmp "
 
@@ -305,8 +307,8 @@ fn_log "create /tmp/tmp "
 fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
 
-cat $PWD/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf
-fn_log "cat $PWD/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf"
+cat ${TOPDIR}/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf
+fn_log "cat ${TOPDIR}/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf"
 systemctl restart openstack-nova-compute.service
 
 
@@ -321,6 +323,7 @@ if [  ${CONTROLLER_COMPUTER}  = True   ]
 then
 	fn_computer_service 
 	fn_log "fn_computer_service "
+	echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/computer_neutron.tag
 elif [ ${CONTROLLER_COMPUTER}  = False ]
 then
 	log_info "Do not install openstack-nova-compute on controller. "

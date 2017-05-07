@@ -1,28 +1,29 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 
 #get config function 
-if [  -e $PWD/lib/source-function ]
+if [  -e ${TOPDIR}/lib/source-function ]
 then	
-	source $PWD/lib/source-function
+	source ${TOPDIR}/lib/source-function
 else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
 	exit 1
 fi
 
@@ -57,8 +58,8 @@ LOCAL_MANAGER_IP_ALL=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | aw
 
 rm -f /etc/mongod.conf
 fn_log " rm -f /etc/mongod.conf"
-cp -a  $PWD/lib/mongod.conf /etc/mongod.conf
-fn_log "cp -a  $PWD/lib/mongod.conf /etc/mongod.conf"
+cp -a  ${TOPDIR}/lib/mongod.conf /etc/mongod.conf
+fn_log "cp -a  ${TOPDIR}/lib/mongod.conf /etc/mongod.conf"
 sed -i "/^bind_ip/d" /etc/mongod.conf
 fn_log "sed -i "/^bind_ip/d" /etc/mongod.conf"
 sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf
@@ -69,7 +70,7 @@ fn_log "systemctl enable mongod.service &&  systemctl start mongod.service"
 
 
 
-cp -a  $PWD/lib/mongodb ./mongodb
+cp -a  ${TOPDIR}/lib/mongodb ./mongodb
 sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
 fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
 sed -i "s/ocata/${HOSTNAME}/g" ./mongodb
@@ -268,7 +269,7 @@ DATABASEaodh=`cat test | grep aodh`
 rm -rf test 
 if [ ${DATABASEaodh}x = aodhx ]
 then
-	log_info "aodh database had installed."
+	log_info "aodh database have  been  installed."
 else
 	fn_create_aodh_database
 fi
@@ -278,7 +279,7 @@ source /root/admin-openrc.sh
 USER_aodh=`openstack user list | grep aodh | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${USER_aodh}x = aodhx ]
 then
-	log_info "openstack user had created  aodh"
+	log_info "openstack user have  been  created  aodh"
 else
 	openstack user create  --domain default aodh  --password ${ALL_PASSWORD}
 	fn_log "openstack user create --domain default aodh  --password ${ALL_PASSWORD}"
@@ -312,9 +313,9 @@ fi
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null"
@@ -379,13 +380,13 @@ fn_log "yum install mongodb-server mongodb -y"
 systemctl enable mongod.service &&  systemctl restart mongod.service
 rm -f /etc/mongod.conf
 fn_log " rm -f /etc/mongod.conf"
-cp -a  $PWD/lib/mongod.conf /etc/mongod.conf
-fn_log "cp -a  $PWD/lib/mongod.conf /etc/mongod.conf"
+cp -a  ${TOPDIR}/lib/mongod.conf /etc/mongod.conf
+fn_log "cp -a  ${TOPDIR}/lib/mongod.conf /etc/mongod.conf"
 sed -i "/^bind_ip/d" /etc/mongod.conf
 fn_log "sed -i "/^bind_ip/d" /etc/mongod.conf"
 sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf
 fn_log "sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf"
-cp -a  $PWD/lib/mongodb ./mongodb
+cp -a  ${TOPDIR}/lib/mongodb ./mongodb
 sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
 fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
 sed -i "s/ocata/${HOSTNAME}/g" ./mongodb
@@ -407,16 +408,16 @@ fn_log "yum install mongodb-server mongodb -y"
 LOCAL_MANAGER_IP_ALL=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
 rm -rf  /etc/mongod.conf
 fn_log "rm -rf  /etc/mongod.conf"
-cp -a  $PWD/lib/mongod.conf /etc/mongod.conf
-fn_log "cp -a  $PWD/lib/mongod.conf /etc/mongod.conf"
+cp -a  ${TOPDIR}/lib/mongod.conf /etc/mongod.conf
+fn_log "cp -a  ${TOPDIR}/lib/mongod.conf /etc/mongod.conf"
 sed -i "/^bind_ip/d" /etc/mongod.conf
 fn_log "sed -i "/^bind_ip/d" /etc/mongod.conf"
 sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf
 fn_log "sed -i "/^fork/a bind_ip\ =\ ${LOCAL_MANAGER_IP_ALL}" /etc/mongod.conf"
 systemctl enable mongod.service &&  systemctl restart mongod.service
 fn_log "systemctl enable mongod.service &&  systemctl restart mongod.service"
-cp -a  $PWD/lib/mongodb ./mongodb
-fn_log "cp -a  $PWD/lib/mongodb ./mongodb"
+cp -a  ${TOPDIR}/lib/mongodb ./mongodb
+fn_log "cp -a  ${TOPDIR}/lib/mongodb ./mongodb"
 sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb
 fn_log "sed -i "s/Changeme_123/${ALL_PASSWORD}/g" ./mongodb"
 sed -i "s/ocata/${HOSTNAME}/g" ./mongodb

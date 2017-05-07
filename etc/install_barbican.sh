@@ -1,29 +1,30 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 
 #get config function 
-if [  -e $PWD/lib/source-function ]
+if [  -e ${TOPDIR}/lib/source-function ]
 then	
-	source $PWD/lib/source-function
+	source ${TOPDIR}/lib/source-function
 else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
 	exit 1
 fi
 

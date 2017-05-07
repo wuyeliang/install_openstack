@@ -1,31 +1,32 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 
 
 
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 
 #get config function 
-if [  -e $PWD/lib/source-function ]
+if [  -e ${TOPDIR}/lib/source-function ]
 then	
-	source $PWD/lib/source-function
+	source ${TOPDIR}/lib/source-function
 else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
 	exit 1
 fi
 
@@ -75,9 +76,9 @@ fn_log "fn_create_endpoint image 9292"
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null"
@@ -159,7 +160,7 @@ sleep 20
 
 function fn_create_image () {
 source /root/admin-openrc.sh  && \
-cp -a $PWD/lib/cirros-0.3.4-x86_64-disk.img /tmp/  && \
+cp -a ${TOPDIR}/lib/cirros-0.3.4-x86_64-disk.img /tmp/  && \
 openstack image create "cirros"   --file /tmp/cirros-0.3.4-x86_64-disk.img   --disk-format qcow2 --container-format bare   --public
 fn_log "create image"
 
@@ -169,7 +170,7 @@ fn_log "openstack image list"
 GLANCE_ID=`openstack image list | grep cirros  | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${GLANCE_ID}x = cirrosx ]
 then
-	log_info "glance image cirros-0.3.4-x86_64 had create."
+	log_info "glance image cirros-0.3.4-x86_64 have  been  create."
 else
 	fn_create_image
 fi

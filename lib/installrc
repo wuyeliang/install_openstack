@@ -1,10 +1,10 @@
 #controller system information
-HOST_NAME=cloud
+HOST_NAME=ocata
 #controller manager IP
-MANAGER_IP=192.10.10.68
+MANAGER_IP=172.16.8.75
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
-NET_DEVICE_NAME=ens37
+NET_DEVICE_NAME=eno33554992
 #install openstack-nova-compute on controller
 CONTROLLER_COMPUTER=True
 
@@ -28,9 +28,9 @@ PRIVATE_NET_DNS="10.248.2.5"
 #eg1:CINDER_DISK='/dev/vdb /dev/vdc'
 #eg2:CINDER_DISK='/dev/vdb1 /dev/vdc1'
 #controller disk for cinder 
-#CINDER_DISK='/dev/sdb' 
+CINDER_DISK='/dev/sdb' 
 #block node disk for cinder
-#BLOCK_CINDER_DISK='/dev/sdb'
+BLOCK_CINDER_DISK='/dev/sdb'
 
 
 #for manila
@@ -40,6 +40,6 @@ PRIVATE_NET_DNS="10.248.2.5"
 #for swift
 #SWIFT_DISK='sdc /sdd'
 #Number of Copies
-MUTIL_NUM=1
+#MUTIL_NUM=1
 #object node ip
 #OBJECT_MANAGE_IP="'172.16.8.68 sdc sdd' '172.16.8.69 sdc sdd' '172.16.8.70  sdc sdd'"

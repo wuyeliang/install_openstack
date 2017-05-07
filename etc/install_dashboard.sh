@@ -1,28 +1,29 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 
 #get config function 
-if [  -e $PWD/lib/source-function ]
+if [  -e ${TOPDIR}/lib/source-function ]
 then	
-	source $PWD/lib/source-function
+	source ${TOPDIR}/lib/source-function
 else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
 	exit 1
 fi
 
@@ -51,9 +52,9 @@ fi
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null"
@@ -68,14 +69,14 @@ else
 	fn_test_network
 fi
 
-yum clean all &&  yum install openstack-dashboard -y
-fn_log "yum clean all &&  yum install openstack-dashboard -y"
+yum clean all &&  yum install openstack-dashboard  mod_ssl -y
+fn_log "yum clean all &&  yum install openstack-dashboard  mod_ssl  -y"
 KEY_DASHBOARD=`cat /etc/openstack-dashboard/local_settings | grep SECRET_KEY | grep "=" |awk -F "'" '{print$2}'`
 [ -f /etc/openstack-dashboard/local_settings_bak ]  || cp -a /etc/openstack-dashboard/local_settings /etc/openstack-dashboard/local_settings_bak
 fn_log "[ -f /etc/openstack-dashboard/local_settings_bak ]  || cp -a /etc/openstack-dashboard/local_settings /etc/openstack-dashboard/local_settings_bak"
 rm -rf /etc/openstack-dashboard/local_settings 
-cp -a    $PWD/lib/local_settings /etc/openstack-dashboard/local_settings 
-fn_log "cp -a $PWD/lib/local_settings /etc/openstack-dashboard/local_settings"
+cp -a    ${TOPDIR}/lib/local_settings /etc/openstack-dashboard/local_settings 
+fn_log "cp -a ${TOPDIR}/lib/local_settings /etc/openstack-dashboard/local_settings"
 unset http_proxy https_proxy ftp_proxy no_proxy  
 
 sed -i "s/b33834f55a75361e80ef/${KEY_DASHBOARD}/g" /etc/openstack-dashboard/local_settings 

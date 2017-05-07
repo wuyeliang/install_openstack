@@ -1,28 +1,29 @@
 #!/bin/bash
-#log function
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 
 #get config function 
-if [  -e $PWD/lib/source-function ]
+if [  -e ${TOPDIR}/lib/source-function ]
 then	
-	source $PWD/lib/source-function
+	source ${TOPDIR}/lib/source-function
 else
-	echo -e "\033[41;37m $PWD/source-function is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/source-function is not exist. \033[0m"
 	exit 1
 fi
 
@@ -36,8 +37,8 @@ fi
 
 if [ -f  /etc/openstack-ocata_tag/install_magnum.tag ]
 then 
-	echo -e "\033[41;37m you had install magnum \033[0m"
-	log_info "you had install magnum."	
+	echo -e "\033[41;37m you have  been  install magnum \033[0m"
+	log_info "you have  been  install magnum."
 	exit
 fi
 
@@ -72,7 +73,7 @@ fn_log "fn_create_domain magnum "Owns users and projects   created by magnum""
 USER_magnum=`openstack user list | grep magnum_domain_admin | awk -F "|" '{print$3}' | awk -F " " '{print$1}'`
 if [ ${USER_magnum}x = magnum_domain_adminx ]
 then
-	log_info "openstack user had created  magnum"
+	log_info "openstack user have  been  created  magnum"
 else
 	openstack user create --domain magnum    magnum_domain_admin --password ${ALL_PASSWORD} 
 	fn_log "openstack user create magnum --password ${ALL_PASSWORD}"

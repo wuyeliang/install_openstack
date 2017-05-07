@@ -1,19 +1,20 @@
-#！/bin/bash
-#log function
+#!/bin/bash
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 if [  -e /etc/openstack-ocata_tag/computer.tag  ]
@@ -34,15 +35,15 @@ fi
 if [ -f  /etc/openstack-ocata_tag/install_mariadb.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
-	log_info "you had install mariadb."	
+	log_info "you have  been  install mariadb."
 	exit
 fi
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com >/dev/null "
@@ -68,8 +69,8 @@ FIRST_ETH_IP=${MANAGER_IP}
 function fn_install_mariadb () {
 yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y
 fn_log "yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y"
-rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
-fn_log "cp -a $PWD/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
+rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a ${TOPDIR}/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
+fn_log "cp -a ${TOPDIR}/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
 echo " " >>/etc/my.cnf.d/openstack.cnf
 echo "bind-address = ${FIRST_ETH_IP}" >>/etc/my.cnf.d/openstack.cnf
 
@@ -91,7 +92,7 @@ fn_log "mysql_secure_installation"
 MARIADB_STATUS=`service mariadb status | grep Active | awk -F "("  '{print$2}' | awk -F ")"  '{print$1}'`
 if [ "${MARIADB_STATUS}"  = running ]
 then
-	log_info "mairadb had installl."
+	log_info "mairadb have  been  installl."
 else
 	fn_install_mariadb
 fi
@@ -115,14 +116,14 @@ function fn_test_rabbit () {
 RABBIT_STATUS=`rabbitmqctl list_users | grep openstack | awk -F " " '{print$1}'`
 if [ ${RABBIT_STATUS}x  = openstackx ]
 then 
-	log_info "rabbit had installed."
+	log_info "rabbit have  been  installed."
 else
 	fn_install_rabbit
 fi
 }
 if [ -f /usr/sbin/rabbitmqctl  ]
 then
-	log_info "rabbit had installed."
+	log_info "rabbit have  been  installed."
 else
 	fn_test_rabbit
 fi

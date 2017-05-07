@@ -1,18 +1,19 @@
 #!/bin/bash
-#log function
-if [  -e $PWD/lib/ocata-log.sh ]
+# -*- coding: utf-8 -*-
+# vim: tabstop=4 shiftwidth=4 softtabstop=4
+if [  -e ${TOPDIR}/lib/ocata-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source ${TOPDIR}/lib/ocata-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
-if [  -e $PWD/lib/installrc ]
+if [  -e ${TOPDIR}/lib/installrc ]
 then	
-	source $PWD/lib/installrc 
+	source ${TOPDIR}/lib/installrc 
 else
-	echo -e "\033[41;37m $PWD/lib/installr is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
 if [  -e /etc/openstack-ocata_tag/presystem-computer.tag  ]
@@ -26,7 +27,7 @@ fi
 
 if [   ${HOST_NAME}x = x  -o ${MANAGER_IP}x = x -o ${ALL_PASSWORD}x  = x  -o ${NET_DEVICE_NAME}x = x ]
 then
-	echo -e "\033[41;37m please check $PWD/lib/installr . \033[0m"
+	echo -e "\033[41;37m please check ${TOPDIR}/lib/installr . \033[0m"
 	exit 1
 fi
 
@@ -94,9 +95,9 @@ fi
 
 #test network
 function fn_test_network () {
-if [ -f $PWD/lib/proxy.sh ]
+if [ -f ${TOPDIR}/lib/proxy.sh ]
 then 
-	source  $PWD/lib/proxy.sh
+	source  ${TOPDIR}/lib/proxy.sh
 fi
 curl www.baidu.com >/dev/null   
 fn_log "curl www.baidu.com"
@@ -115,8 +116,8 @@ fi
 
 hostnamectl set-hostname ${NAMEHOST}
 fn_log "hostnamectl set-hostname ${NAMEHOST}"
-cat $PWD/lib/hosts >/etc/hosts
-fn_log "cat $PWD/lib/hosts >/etc/hosts"
+cat ${TOPDIR}/lib/hosts >/etc/hosts
+fn_log "cat ${TOPDIR}/lib/hosts >/etc/hosts"
 
 
 
@@ -165,7 +166,7 @@ echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
 
 if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
 then
-	log_info "ntp had installed."
+	log_info "ntp have  been  installed."
 else
 	fn_install_ntp
 fi

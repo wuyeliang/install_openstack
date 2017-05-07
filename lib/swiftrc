@@ -1,8 +1,11 @@
-[ocata]
-sdc sdd
+[storge1]
+172.16.8.79 sdb1
+172.16.8.79 sdb2
 
-[object1]
-sdc sdd
+[storge2]
+172.16.8.80 sdb1
+172.16.8.80 sdb2
 
-[object2]  
-sdc sdd
+[storge3]
+172.16.8.81 sdb1
+172.16.8.81 sdb2

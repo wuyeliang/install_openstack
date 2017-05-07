@@ -1,3 +1,8 @@
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-192.10.10.68 cloud
+172.16.8.75 ocata
+172.16.8.77 computer
+172.16.8.78 block
+172.16.8.79 storage1
+172.16.8.80 storage2
+172.16.8.81 storage3

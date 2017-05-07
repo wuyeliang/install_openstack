@@ -110,12 +110,15 @@ placement password  ${ALL_PASSWORD}
 placement os_region_name  RegionOne
 placement_database connection  mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova_placement
 wsgi api_paste_config  /etc/nova/api-paste.ini
+libvirt cpu_mode none
 END
 fn_log "create /tmp/tmp "
 
 fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
 systemctl restart openstack-nova-compute.service
+
+
 
 
 HARDWARE=`egrep -c '(vmx|svm)' /proc/cpuinfo`
