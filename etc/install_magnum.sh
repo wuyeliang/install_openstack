@@ -91,7 +91,7 @@ unset http_proxy https_proxy ftp_proxy no_proxy
 
 cat <<END >/tmp/tmp
 api host   ${MANAGER_IP}
-certificates cert_manager_type   barbican
+certificates cert_manager_type   x509keypair
 cinder_client region_name   RegionOne
 database connection   mysql+pymysql://magnum:${ALL_PASSWORD}@${MANAGER_IP}/magnum
 keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
