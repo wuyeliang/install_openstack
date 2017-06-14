@@ -186,6 +186,8 @@ su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0 --database_connection mys
 fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0 --database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova_cell0""
 
 
+
+
 function fn_sync_create_cell () {
 su -s /bin/bash nova -c "nova-manage cell_v2 create_cell --name cell1 \
 --database_connection mysql+pymysql://nova:${ALL_PASSWORD}@${HOSTNAME}/nova \
@@ -311,6 +313,49 @@ cat ${TOPDIR}/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placem
 fn_log "cat ${TOPDIR}/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nova-placement-api.conf"
 systemctl restart openstack-nova-compute.service
 
+cat <<"END" >/tmp/tmp
+DEFAULT resize_confirm_window  1
+DEFAULT allow_resize_to_same_host True
+DEFAULT scheduler_default_filters RetryFilter,AvailabilityZoneFilter,RamFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter
+libvirt live_migration_flag   VIR_MIGRATE_UNDEFINE_SOURCE, VIR_MIGRATE_PEER2PEER, VIR_MIGRATE_LIVE, VIR_MIGRATE_TUNNELLED,VIR_MIGRATE_UNSAFE
+END
+fn_log "create /tmp/tmp "
+
+fn_set_conf /etc/nova/nova.conf
+fn_log "fn_set_conf /etc/nova/nova.conf"
+
+
+
+cat <<"END" >/etc/libvirt/qemu.conf
+vnc_listen = "0.0.0.0"
+user = "root"
+group = "root"
+dynamic_ownership = 1
+END
+
+fn_log "/etc/libvirt/qemu.conf"
+
+cat <<"END" > /etc/libvirt/libvirtd.conf
+listen_tls = 0
+auth_tcp="none"
+listen_tcp = 1
+tcp_port = "16509"
+listen_addr = "0.0.0.0"
+END
+
+fn_log "/etc/libvirt/libvirtd.conf"
+cat <<"END" > /etc/sysconfig/libvirtd
+LIBVIRTD_CONFIG=/etc/libvirt/libvirtd.conf
+LIBVIRTD_ARGS="--listen"
+END
+
+fn_log "/etc/sysconfig/libvirtd"
+
+service openstack-nova-computer restart
+fn_log "service openstack-nova-computer restart"
+
+service libvirtd restart
+fn_log "service libvirtd restart"
 
 
 systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service 

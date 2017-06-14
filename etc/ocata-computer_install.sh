@@ -118,6 +118,47 @@ fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
 systemctl restart openstack-nova-compute.service
 
+cat <<END >/tmp/tmp
+DEFAULT resize_confirm_window  1
+DEFAULT allow_resize_to_same_host True
+DEFAULT scheduler_default_filters RetryFilter,AvailabilityZoneFilter,RamFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter
+libvirt live_migration_flag   VIR_MIGRATE_UNDEFINE_SOURCE, VIR_MIGRATE_PEER2PEER, VIR_MIGRATE_LIVE, VIR_MIGRATE_TUNNELLED,VIR_MIGRATE_UNSAFE
+END
+fn_log "create /tmp/tmp "
+
+fn_set_conf /etc/nova/nova.conf
+fn_log "fn_set_conf /etc/nova/nova.conf"
+
+
+
+cat <<"END" >/etc/libvirt/qemu.conf
+vnc_listen = "0.0.0.0"
+user = "root"
+group = "root"
+dynamic_ownership = 1
+END
+
+fn_log "/etc/libvirt/qemu.conf"
+
+cat <<"END" > /etc/libvirt/libvirtd.conf
+listen_tls = 0
+auth_tcp="none"
+listen_tcp = 1
+tcp_port = "16509"
+listen_addr = "0.0.0.0"
+END
+
+fn_log "/etc/libvirt/libvirtd.conf"
+cat <<"END" > /etc/sysconfig/libvirtd
+LIBVIRTD_CONFIG=/etc/libvirt/libvirtd.conf
+LIBVIRTD_ARGS="--listen"
+END
+
+fn_log "/etc/sysconfig/libvirtd"
+
+
+
+
 
 
 
@@ -132,8 +173,8 @@ else
 	fn_log  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu ."
 fi
 
-systemctl enable libvirtd.service openstack-nova-compute.service  && systemctl start libvirtd.service openstack-nova-compute.service
-fn_log "systemctl enable libvirtd.service openstack-nova-compute.service  && systemctl start libvirtd.service openstack-nova-compute.service"
+systemctl enable libvirtd.service openstack-nova-compute.service  && systemctl restart libvirtd.service openstack-nova-compute.service
+fn_log "systemctl enable libvirtd.service openstack-nova-compute.service  && systemctl restart libvirtd.service openstack-nova-compute.service"
 
 #su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts"
 # fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts""
