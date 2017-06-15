@@ -351,8 +351,8 @@ END
 
 fn_log "/etc/sysconfig/libvirtd"
 
-service openstack-nova-computer restart
-fn_log "service openstack-nova-computer restart"
+systemctl restart  openstack-nova-compute.service
+fn_log "systemctl restart  openstack-nova-compute.service"
 
 service libvirtd restart
 fn_log "service libvirtd restart"
