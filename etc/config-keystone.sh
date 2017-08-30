@@ -60,6 +60,7 @@ then
 fi
 
 
+
 #create databases
 fn_create_database keystone ${ALL_PASSWORD}
 fn_log "fn_create_database keystone ${ALL_PASSWORD}"
