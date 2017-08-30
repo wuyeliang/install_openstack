@@ -75,7 +75,7 @@ fn_log "fn_create_endpoint network 9696"
 yum clean all && yum install openstack-neutron openstack-neutron-ml2   openstack-neutron-linuxbridge ebtables -y
 fn_log "yum clean all && yum install openstack-neutron openstack-neutron-ml2   openstack-neutron-linuxbridge ebtables -y"
 cat <<END >/tmp/tmp
-connection   mysql+pymysql://neutron:${ALL_PASSWORD}@${MANAGER_IP}/neutron
+database connection   mysql+pymysql://neutron:${ALL_PASSWORD}@${MANAGER_IP}/neutron
 DEFAULT core_plugin   ml2
 DEFAULT service_plugins   router
 DEFAULT allow_overlapping_ips   true
