@@ -41,22 +41,22 @@ then
 		fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$4}'`"
 	fi
 else
-	echo -e "\033[41;37m please run script on rhel7.2 or CentOS7.2 \033[0m"
-	log_error "please run script on rhel7.2 or CentOS7.2"
+	echo -e "\033[41;37m please run script on rhel7.3 or CentOS7.3 \033[0m"
+	log_error "please run script on rhel7.3 or CentOS7.3"
 	exit 1
 fi
 	
-if [  ${OS_VERSION}x  = 7.2x  ] 
+if [  ${OS_VERSION}x  = 7.3x  ] 
 then
-	echo "system is rhel7.2"
-	fn_log "echo "system is rhel7.2""
-elif [ ${OS_VERSION}x = 7.2.1511x   ]
+	echo "system is rhel7.3"
+	fn_log "echo "system is rhel7.3""
+elif [ ${OS_VERSION}x = 7.3.1611x   ]
 then
-	echo "system is CentOS7.2"
-	fn_log "echo "system is CentOS7.2""	
+	echo "system is CentOS7.3"
+	fn_log "echo "system is CentOS7.3""	
 else
-	echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso"
-	log_error "echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso""
+	echo "please install system by CentOS-7-x86_64-Minimal-1611.iso"
+	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1611.iso""
 	exit 1
 fi 
 
