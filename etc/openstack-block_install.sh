@@ -89,7 +89,7 @@ keystone_authtoken user_domain_name   default
 keystone_authtoken project_name   service
 keystone_authtoken username   cinder
 keystone_authtoken password   ${ALL_PASSWORD}
-DEFAULT my_ip   MANAGEMENT_INTERFACE_IP_ADDRESS
+DEFAULT my_ip    ${BLOCK_MANAGER_IP}
 lvm volume_driver   cinder.volume.drivers.lvm.LVMVolumeDriver
 lvm volume_group   cinder-volumes
 lvm iscsi_protocol   iscsi
