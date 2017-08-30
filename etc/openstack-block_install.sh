@@ -1,11 +1,11 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -28,13 +28,13 @@ fi
 
 
 
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
+if [  -e /etc/openstack_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on controller.  \033[0m"
 	log_error "Oh no ! you can't execute this script on controller. "
 	exit 1
 fi
-if [ -f  /etc/openstack-ocata_tag/cinder.tag ]
+if [ -f  /etc/openstack_tag/cinder.tag ]
 then 
 	echo -e "\033[41;37m you have  been  installed cinder service. \033[0m"
 	log_info "you have  been  installed cinder service."
@@ -46,6 +46,7 @@ fn_log "yum clean all && yum install -y openstack-utils"
 
 yum install -y lvm2  openstack-cinder targetcli python-keystone 
 fn_log "yum install -y lvm2  openstack-cinder targetcli python-keystone "
+
 
 
 
@@ -88,16 +89,16 @@ keystone_authtoken user_domain_name   default
 keystone_authtoken project_name   service
 keystone_authtoken username   cinder
 keystone_authtoken password   ${ALL_PASSWORD}
-DEFAULT my_ip   ${BLOCK_MANAGER_IP}
+DEFAULT my_ip   MANAGEMENT_INTERFACE_IP_ADDRESS
 lvm volume_driver   cinder.volume.drivers.lvm.LVMVolumeDriver
 lvm volume_group   cinder-volumes
 lvm iscsi_protocol   iscsi
 lvm iscsi_helper   lioadm
-DEFAULT enabled_backends   lvm
-DEFAULT glance_api_servers   http://${MANAGER_IP}:9292
-oslo_concurrency lock_path   /var/lib/cinder/tmp
 END
 fn_log "create /tmp/tmp "
+
+
+
 
 fn_set_conf /etc/cinder/cinder.conf
 fn_log "fn_set_conf /etc/cinder/cinder.conf" 
@@ -176,11 +177,11 @@ echo -e "\033[32m ####################################################### \033[0
 echo -e "\033[32m ###       Install Cinder Service  Sucessed         #### \033[0m"
 echo -e "\033[32m ####################################################### \033[0m"
 
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/cinder.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/cinder.tag
     
 	
 	

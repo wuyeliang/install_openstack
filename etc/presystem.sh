@@ -1,11 +1,11 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -16,7 +16,7 @@ else
 	echo -e "\033[41;37m ${TOPDIR}/lib/installr is not exist. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-ocata_tag/presystem-computer.tag  ]
+if [  -e /etc/openstack_tag/presystem-computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
@@ -47,17 +47,17 @@ else
 	exit 1
 fi
 	
-if [  ${OS_VERSION}x  = 7.2x  ] 
+if [  ${OS_VERSION}x  = 7.3x  ] 
 then
 	echo "system is rhel7.3"
 	fn_log "echo "system is rhel7.3""
-elif [ ${OS_VERSION}x = 7.2.1511x   ]
+elif [ ${OS_VERSION}x = 7.3.1611x   ]
 then
 	echo "system is CentOS7.3"
 	fn_log "echo "system is CentOS7.3""	
 else
-	echo "please install system by CentOS-7-x86_64-Minimal-1503.iso"
-	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1503.iso""
+	echo "please install system by CentOS-7-x86_64-Minimal-1611.iso"
+	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1611.iso""
 	exit 1
 fi 
 
@@ -74,7 +74,7 @@ then
 	exit 1
 fi
 
-if [ -f  /etc/openstack-ocata_tag/presystem.tag ]
+if [ -f  /etc/openstack_tag/presystem.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
@@ -82,9 +82,9 @@ then
 fi
 
 
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
 
 
@@ -161,17 +161,17 @@ chkconfig chronyd off
 
 sleep 10
 ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
+if  [ -f /etc/openstack_tag/install_ntp.tag ]
 then
 	log_info "ntp have  been  installed."
 else
 	fn_install_ntp
 fi
 #disabile selinux
-function fn_set_selinx () {
+function fn_set_selinux () {
 cp -a /etc/selinux/config /etc/selinux/config_bak
 sed -i  "s/^SELINUX=enforcing/SELINUX=disabled/g"  /etc/selinux/config
 fn_log "sed -i  "s/^SELINUX=enforcing/SELINUX=disabled/g"  /etc/selinux/config"
@@ -179,7 +179,7 @@ fn_log "sed -i  "s/^SELINUX=enforcing/SELINUX=disabled/g"  /etc/selinux/config"
 STATUS_SELINUX=`cat /etc/selinux/config | grep ^SELINUX= | awk -F "=" '{print$2}'`
 if [  ${STATUS_SELINUX} = enforcing ]
 then 
-	fn_set_selinx
+	fn_set_selinux
 else 
 	log_info "selinux is disabled."
 fi
@@ -194,8 +194,14 @@ else
 fi
 
 yum clean all && yum update -y 
+fn_log "yum clean all && yum update -y " 
 
-fn_log "yum clean all && yum update -y " && cd /etc/yum.repos.d/ &&  rm -rf CentOS-*
+
+yum clean all && yum install openstack-selinux -y
+fn_log "yum clean all && yum install openstack-selinux -y"
+
+rm -rf /etc/yum.repos.d/CentOS-*
+fn_log "rm -rf /etc/yum.repos.d/CentOS-*"
 
 if  [ -f /etc/yum.repos.d/repo.repo ]
 then
@@ -207,7 +213,7 @@ fi
 
 
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/presystem.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/presystem.tag
 echo -e "\033[32m ##################################### \033[0m"
 echo -e "\033[32m ##   Configure System Sucessed. ##### \033[0m"
 echo -e "\033[32m ##################################### \033[0m"

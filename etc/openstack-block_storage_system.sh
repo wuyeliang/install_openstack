@@ -1,11 +1,11 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -18,13 +18,13 @@ else
 fi
 
 
-if [ -f  /etc/openstack-ocata_tag/presystem.tag ]
+if [ -f  /etc/openstack_tag/presystem.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
 	exit
 fi
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
+if [  -e /etc/openstack_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
@@ -63,7 +63,7 @@ fi
 }
 fn_check_os_version
 
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
+if [  -e /etc/openstack_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
@@ -137,10 +137,10 @@ chkconfig chronyd off
 service chronyd stop
 sleep 10
 ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
+if  [ -f /etc/openstack_tag/install_ntp.tag ]
 then
 	log_info "ntp have  been  installed."
 else
@@ -163,12 +163,12 @@ then
 	cd /etc/yum.repos.d/ &&  rm -rf CentOS-*
 	fn_log "cd /etc/yum.repos.d/ &&  rm -rf CentOS-*"
 fi
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then
-	mkdir  /etc/openstack-ocata_tag
+	mkdir  /etc/openstack_tag
 fi
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/presystem.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/presystem.tag
 echo -e "\033[32m #################################### \033[0m"
 echo -e "\033[32m ##   Configure  Systen Sucessed.#### \033[0m"
 echo -e "\033[32m #################################### \033[0m"

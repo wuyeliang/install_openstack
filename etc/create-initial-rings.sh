@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -32,7 +32,7 @@ fi
 
 
 
-if [ -f  /etc/openstack-ocata_tag/config_keystone.tag ]
+if [ -f  /etc/openstack_tag/config_keystone.tag ]
 then 
 	log_info "mkeystone have installed ."
 else
@@ -41,14 +41,14 @@ else
 fi
 
 
-if [ ! -f  /etc/openstack-ocata_tag/install_swift.tag ]
+if [ ! -f  /etc/openstack_tag/install_swift.tag ]
 then 
 	echo -e "\033[41;37m you haved install swift first. \033[0m"
 	log_info "you haved install swift first."	
 	exit 1
 fi
 
-if [  -f  /etc/openstack-ocata_tag/initial_rings.tag ]
+if [  -f  /etc/openstack_tag/initial_rings.tag ]
 then 
 	echo -e "\033[41;37m you haved initial rings \033[0m"
 	log_info "you haved install initial rings."	
@@ -185,11 +185,11 @@ echo -e "\033[32m ###        initial rings Sucessed           #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
 
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
 
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/initial_rings.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/initial_rings.tag
 

@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 
@@ -37,14 +37,14 @@ else
 	echo -e "\033[41;37m you should unset proxy. \033[0m"
 	exit 1
 fi
-if [  -e /etc/openstack-ocata_tag/computer.tag  ]
+if [  -e /etc/openstack_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-ocata_tag/install_mariadb.tag ]
+if [ -f  /etc/openstack_tag/install_mariadb.tag ]
 then 
 	log_info "mariadb have installed ."
 else
@@ -52,9 +52,9 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-ocata_tag/config_keystone.tag ]
+if [ -f  /etc/openstack_tag/config_keystone.tag ]
 then 
-	echo -e "\033[41;37m etc/openstack-ocata_tag/config_keystone.tag \033[0m"
+	echo -e "\033[41;37m etc/openstack_tag/config_keystone.tag \033[0m"
 	log_info "you have  been  install keystone."
 	exit
 fi
@@ -64,8 +64,10 @@ fi
 #create databases
 fn_create_database keystone ${ALL_PASSWORD}
 fn_log "fn_create_database keystone ${ALL_PASSWORD}"
-                   
-		         
+
+
+
+
 yum clean all && yum install openstack-keystone httpd mod_wsgi   memcached python-memcached -y
 fn_log "yum clean all && yum install openstack-keystone httpd mod_wsgi python-openstackclient memcached python-memcached -y"
 
@@ -94,6 +96,7 @@ fn_log "create /tmp/tmp "
 
 fn_set_conf /etc/keystone/keystone.conf
 fn_log "fn_set_conf /etc/keystone/keystone.conf" 
+
 
 su -s /bin/sh -c "keystone-manage db_sync" keystone
 fn_log "su -s /bin/sh -c "keystone-manage db_sync" keystone"
@@ -136,7 +139,7 @@ export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
 export OS_AUTH_URL=http://${MANAGER_IP}:35357/v3
 export OS_IDENTITY_API_VERSION=3
-sleep 10 
+sleep 5 
 
 fn_create_project service "Service Project"
 fn_create_project demo "Demo Project"
@@ -188,8 +191,8 @@ echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###       Install Keystone Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/config_keystone.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/config_keystone.tag

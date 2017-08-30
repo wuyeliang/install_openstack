@@ -41,6 +41,12 @@ cat << EOF
 6) Install Cinder.
 7) Install Neutron.
 8) Install Dashboard.
+9) Install Manila.
+10) Install Heat.
+11) Install Key Manager service.
+12) Install Trove.
+13) Install Magnum.
+14) Install Swift.
 0) Quit
 EOF
 
@@ -86,6 +92,36 @@ case ${install_number} in
 	8)
 		/bin/bash ${INSTALL_PATH}/etc/install_dashboard.sh
 		log_info "/bin/bash ${TOPDIR}/etc/install_dashboard.sh."
+		fn_install_openstack_controller
+	;;
+	9)
+		/bin/bash ${INSTALL_PATH}/etc/install_manila.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_manila.sh."
+		fn_install_openstack_controller	
+	;;
+	10)
+		/bin/bash ${INSTALL_PATH}/etc/install_heat.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_heat.sh."
+		fn_install_openstack_controller
+	;;
+	11)
+		/bin/bash ${INSTALL_PATH}/etc/install_barbican.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_barbican.sh."
+		fn_install_openstack_controller
+	;;
+	12)
+		/bin/bash ${INSTALL_PATH}/etc/install_trove.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_trove.sh."
+		fn_install_openstack_controller
+	;;
+	13)
+		/bin/bash ${INSTALL_PATH}/etc/install_magnum.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_magnum.sh."
+		fn_install_openstack_controller
+	;;
+	14)
+		/bin/bash ${INSTALL_PATH}/etc/install_swift.sh
+		log_info "/bin/bash ${TOPDIR}/etc/install_swift.sh."
 		fn_install_openstack_controller
 	;;
 	0)
@@ -175,6 +211,7 @@ cat << EOF
 1) Install Controller Node Service.
 2) Install Computer Node Service.
 3) Install Block Node Service (Cinder).
+4) Install Storage Node Service.
 0) Quit
 EOF
 read -p "please input one number for install :" install_number
@@ -193,6 +230,12 @@ case ${install_number} in
 		fn_install_openstack_block
 		fn_log "fn_install_openstack_block"
 		fn_install_openstack_block
+	;;
+
+	4)
+		fn_install_openstack_swift
+		fn_log "fn_install_openstack_swift"
+		fn_install_openstack_swift
 	;;
 	0)
 		exit 1

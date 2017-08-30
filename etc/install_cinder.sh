@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -27,13 +27,13 @@ else
 fi
 
 
-if [  -e /etc/openstack-ocata_tag/computer.tag  ]
+if [  -e /etc/openstack_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
-if [ -f  /etc/openstack-ocata_tag/install_nova.tag ]
+if [ -f  /etc/openstack_tag/install_nova.tag ]
 then 
 	log_info "nova have installed ."
 else
@@ -41,7 +41,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-ocata_tag/install_cinder.tag ]
+if [ -f  /etc/openstack_tag/install_cinder.tag ]
 then 
 	echo -e "\033[41;37m you have  been  install cinder \033[0m"
 	log_info "you have  been  install cinder."
@@ -58,8 +58,8 @@ openstack role add --project service --user cinder admin
 fn_log "openstack role add --project service --user cinder admin"
 
 
-fn_create_service cinder "OpenStack Block Storage" volume
-fn_log "fn_create_service cinder "OpenStack Block Storage" volume"
+fn_create_service cinderv3  "OpenStack Block Storage" volumev3
+fn_log "fn_create_service cinderv3  "OpenStack Block Storage" volumev3"
 
 
 fn_create_service cinderv2 "OpenStack Block Storage" volumev2
@@ -67,11 +67,14 @@ fn_log "fn_create_service cinderv2 "OpenStack Block Storage" volumev2"
 
 
 
-fn_create_endpoint_version volume 8776 v1
-fn_log "fn_create_endpoint_version volume 8776 v1"
+
 
 fn_create_endpoint_version volumev2 8776 v2
 fn_log "fn_create_endpoint_version volumev2 8776 v2"
+
+
+fn_create_endpoint_version volumev3 8776 v3
+fn_log "fn_create_endpoint_version volumev3 8776 v3"
 
 #test network
 function fn_test_network () {
@@ -99,12 +102,12 @@ FIRST_ETH_IP=${MANAGER_IP}
 
 
 cat <<END >/tmp/tmp
-database connection   mysql+pymysql://cinder:${ALL_PASSWORD}@${NAMEHOST}/cinder
-DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${NAMEHOST}
-DEFAULT auth_strategy   keystone
-keystone_authtoken auth_uri   http://${NAMEHOST}:5000
-keystone_authtoken auth_url   http://${NAMEHOST}:35357
-keystone_authtoken memcached_servers   ${NAMEHOST}:11211
+database connection   mysql+pymysql://cinder:${ALL_PASSWORD}@${MANAGER_IP}/cinder
+DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
+DEFAULT  auth_strategy   keystone
+keystone_authtoken auth_uri   http://${MANAGER_IP}:5000
+keystone_authtoken auth_url   http://${MANAGER_IP}:35357
+keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
 keystone_authtoken auth_type   password
 keystone_authtoken project_domain_name   default
 keystone_authtoken user_domain_name   default
@@ -240,11 +243,11 @@ fn_log "source /root/admin-openrc.sh && openstack volume service list"
 echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###         Install Cinder Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_cinder.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/install_cinder.tag
 
 
 

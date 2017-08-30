@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 
@@ -31,14 +31,14 @@ else
 fi
 
 
-if [  -e /etc/openstack-ocata_tag/computer.tag  ]
+if [  -e /etc/openstack_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-ocata_tag/config_keystone.tag ]
+if [ -f  /etc/openstack_tag/config_keystone.tag ]
 then 
 	log_info "mkeystone have installed ."
 else
@@ -46,7 +46,7 @@ else
 	exit
 fi
 
-if [ -f  /etc/openstack-ocata_tag/install_glance.tag ]
+if [ -f  /etc/openstack_tag/install_glance.tag ]
 then 
 	echo -e "\033[41;37m you haved install glance \033[0m"
 	log_info "you haved install glance."	
@@ -61,6 +61,8 @@ fn_create_database glance ${ALL_PASSWORD}
 unset http_proxy https_proxy ftp_proxy no_proxy 
 source /root/admin-openrc.sh 
 fn_create_user glance ${ALL_PASSWORD}
+
+
 
 openstack role add --project service --user glance admin
 fn_log "openstack role add --project service --user glance admin"
@@ -181,8 +183,8 @@ echo -e "\033[32m ###        Install Glance Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
 
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_glance.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/install_glance.tag

@@ -1,10 +1,10 @@
 #!/bin/bash
 #log function
-if [  -e $PWD/lib/ocata-log.sh ]
+if [  -e $PWD/lib/openstack-log.sh ]
 then	
-	source $PWD/lib/ocata-log.sh
+	source $PWD/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m $PWD/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m $PWD/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -27,13 +27,13 @@ else
 fi
 
 
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
+if [  -e /etc/openstack_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
 	exit 1
 fi
-if [ -f  /etc/openstack-ocata_tag/computer.tag ]
+if [ -f  /etc/openstack_tag/computer.tag ]
 then 
 	echo -e "\033[41;37m you had installed computer \033[0m"
 	log_info "you had installed computer."	
@@ -57,6 +57,13 @@ fn_log "yum clean all && yum install -y openstack-utils"
 
 COMPUTER_MANAGER_IP=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
 
+#for computer node
+function fn_computer_service () {
+yum clean all && yum install openstack-nova-compute -y
+fn_log "yum clean all && yum install openstack-nova-compute -y"
+
+FIRST_ETH_IP=${COMPUTER_MANAGER_IP}
+
 HARDWARE=`egrep -c '(vmx|svm)' /proc/cpuinfo`
 if [ ${HARDWARE}  -eq 0 ]
 then 
@@ -66,59 +73,46 @@ else
 	openstack-config --set  /etc/nova/nova.conf libvirt virt_type  kvm
 	log_info  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu sucessed."
 fi
-cat <<END >/tmp/tmp
-DEFAULT enabled_apis   osapi_compute,metadata
-DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
-api auth_strategy   keystone
-keystone_authtoken auth_uri   http://${MANAGER_IP}:5000
-keystone_authtoken auth_url   http://${MANAGER_IP}:35357
-keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
-keystone_authtoken auth_type   password
-keystone_authtoken project_domain_name   default
-keystone_authtoken user_domain_name   default
-keystone_authtoken project_name   service
-keystone_authtoken username   nova
-keystone_authtoken password   ${ALL_PASSWORD}
-DEFAULT my_ip   ${COMPUTER_MANAGER_IP}
-DEFAULT use_neutron   True
-DEFAULT firewall_driver   nova.virt.firewall.NoopFirewallDriver
-vnc enabled   True
-vnc vncserver_listen   0.0.0.0
-vnc vncserver_proxyclient_address   \$my_ip
-vnc novncproxy_base_url   http://${MANAGER_IP}:6080/vnc_auto.html
-glance api_servers   http://${MANAGER_IP}:9292
-oslo_concurrency lock_path   /var/lib/nova/tmp
-END
-fn_log "create /tmp/tmp "
-
-fn_set_conf /etc/nova/nova.conf
-fn_log "fn_set_conf /etc/nova/nova.conf"
-
-
-#fix bug PlacementNotConfigured: This compute is not configured to talk to the placement service
 
 cat <<END >/tmp/tmp
-placement auth_uri  http://${MANAGER_IP}:5000
-placement auth_url  http://${MANAGER_IP}:35357
-placement memcached_servers  ${MANAGER_IP}:11211
-placement auth_type  password
-placement project_domain_name  default
-placement user_domain_name  default
+DEFAULT enabled_apis  osapi_compute,metadata
+DEFAULT  transport_url  rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
+api auth_strategy  keystone
+keystone_authtoken auth_uri  http://${MANAGER_IP}:5000
+keystone_authtoken auth_url  http://${MANAGER_IP}:35357
+keystone_authtoken memcached_servers  ${MANAGER_IP}:11211
+keystone_authtoken auth_type  password
+keystone_authtoken project_domain_name  default
+keystone_authtoken user_domain_name  default
+keystone_authtoken project_name  service
+keystone_authtoken username  nova
+keystone_authtoken password  ${ALL_PASSWORD}
+DEFAULT my_ip  ${FIRST_ETH_IP}
+DEFAULT use_neutron  True
+DEFAULT firewall_driver  nova.virt.firewall.NoopFirewallDriver
+vnc enabled  True
+vnc vncserver_listen  0.0.0.0
+vnc vncserver_proxyclient_address  \$my_ip
+vnc novncproxy_base_url  http://${MANAGER_IP}:6080/vnc_auto.html
+glance api_servers  http://${MANAGER_IP}:9292
+oslo_concurrency lock_path  /var/lib/nova/tmp
+placement os_region_name  RegionOne
+placement project_domain_name  Default
 placement project_name  service
+placement auth_type  password
+placement user_domain_name  Default
+placement auth_url  http://${MANAGER_IP}:35357/v3
 placement username  placement
 placement password  ${ALL_PASSWORD}
-placement os_region_name  RegionOne
-placement_database connection  mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova_placement
-wsgi api_paste_config  /etc/nova/api-paste.ini
-libvirt cpu_mode none
+libvirt cpu_mode  none
 END
 fn_log "create /tmp/tmp "
 
 fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
-systemctl restart openstack-nova-compute.service
 
-cat <<END >/tmp/tmp
+
+cat <<"END" >/tmp/tmp
 DEFAULT resize_confirm_window  1
 DEFAULT allow_resize_to_same_host True
 DEFAULT scheduler_default_filters RetryFilter,AvailabilityZoneFilter,RamFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter
@@ -158,26 +152,84 @@ fn_log "/etc/sysconfig/libvirtd"
 
 
 
+systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service 
+fn_log "systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service "
+su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+fn_log "su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova"
+}
 
 
+fn_computer_service 
+
+function fn_neutron_computer_node () {
+yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y
+fn_log "yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y"
+cat <<END >/tmp/tmp
+DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
+DEFAULT auth_strategy   keystone
+keystone_authtoken auth_uri   http://${MANAGER_IP}:5000
+keystone_authtoken auth_url   http://${MANAGER_IP}:35357
+keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
+keystone_authtoken auth_type   password
+keystone_authtoken project_domain_name   default
+keystone_authtoken user_domain_name   default
+keystone_authtoken project_name   service
+keystone_authtoken username   neutron
+keystone_authtoken password   ${ALL_PASSWORD}
+oslo_concurrency lock_path   /var/lib/neutron/tmp
+END
+fn_log "create /tmp/tmp "
+
+fn_set_conf /etc/neutron/neutron.conf
+fn_log "fn_set_conf /etc/neutron/neutron.conf"
+
+cat <<END >/tmp/tmp
+neutron url   http://${MANAGER_IP}:9696
+neutron auth_url   http://${MANAGER_IP}:35357
+neutron auth_type   password
+neutron project_domain_name   default
+neutron user_domain_name   default
+neutron region_name   RegionOne
+neutron project_name   service
+neutron username   neutron
+neutron password   ${ALL_PASSWORD}
+END
+fn_log "create /tmp/tmp "
+
+fn_set_conf /etc/nova/nova.conf
+fn_log "fn_set_conf /etc/nova/nova.conf"
+
+systemctl restart openstack-nova-compute.service
+fn_log "systemctl restart openstack-nova-compute.service"
 
 
-HARDWARE=`egrep -c '(vmx|svm)' /proc/cpuinfo`
-if [ ${HARDWARE}  -eq 0 ]
-then 
-	openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu 
-	fn_log  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu sucessed."
+systemctl enable neutron-linuxbridge-agent.service
+fn_log "systemctl enable neutron-linuxbridge-agent.service"
+cat <<END >/tmp/tmp
+linux_bridge physical_interface_mappings   provider:${DEV_NETWORK}
+vxlan  enable_vxlan   true
+vxlan local_ip   ${LOCAL_MANAGER_IP}
+vxlan l2_population   true
+securitygroup enable_security_group   true
+securitygroup firewall_driver   neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+END
+fn_log "create /tmp/tmp "
 
-else
-	openstack-config --set  /etc/nova/nova.conf libvirt virt_type  kvm
-	fn_log  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu ."
-fi
+fn_set_conf /etc/neutron/plugins/ml2/linuxbridge_agent.ini
+fn_log "fn_set_conf /etc/neutron/plugins/ml2/linuxbridge_agent.ini"
 
-systemctl enable libvirtd.service openstack-nova-compute.service  && systemctl restart libvirtd.service openstack-nova-compute.service
-fn_log "systemctl enable libvirtd.service openstack-nova-compute.service  && systemctl restart libvirtd.service openstack-nova-compute.service"
+systemctl restart openstack-nova-compute.service
+fn_log "systemctl restart openstack-nova-compute.service"
 
-#su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts"
-# fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 discover_hosts""
+systemctl enable neutron-linuxbridge-agent.service
+fn_log "systemctl enable neutron-linuxbridge-agent.service"
+systemctl start neutron-linuxbridge-agent.service
+fn_log "systemctl start neutron-linuxbridge-agent.service"
+
+
+}
+
+fn_neutron_computer_node
 
 
 cat <<END >/root/admin-openrc.sh 
@@ -205,85 +257,11 @@ END
 
 source /root/admin-openrc.sh
 fn_log "source /root/admin-openrc.sh"
-sleep 20
+sleep 10
 openstack compute service list
 fn_log "openstack compute service list"
 
 
-yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y
-fn_log "yum clean all && yum install openstack-neutron-linuxbridge ebtables ipset -y"
-
-cat <<END >/tmp/tmp
-database connection   mysql+pymysql://neutron:${ALL_PASSWORD}@${MANAGER_IP}/neutron
-DEFAULT core_plugin   ml2
-DEFAULT service_plugins   router
-DEFAULT allow_overlapping_ips   true
-DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
-DEFAULT  auth_strategy   keystone
-keystone_authtoken auth_uri   http://${MANAGER_IP}:5000
-keystone_authtoken  auth_url   http://${MANAGER_IP}:35357
-keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
-keystone_authtoken  auth_type   password
-keystone_authtoken  project_domain_name   default
-keystone_authtoken  user_domain_name   default
-keystone_authtoken  project_name   service
-keystone_authtoken  username   neutron
-keystone_authtoken  password   ${ALL_PASSWORD}
-DEFAULT notify_nova_on_port_status_changes   true
-DEFAULT notify_nova_on_port_data_changes   true
-nova auth_url   http://${MANAGER_IP}:35357
-nova auth_type   password
-nova project_domain_name   default
-nova user_domain_name   default
-nova region_name   RegionOne
-nova project_name   service
-nova username   nova
-nova  password   ${ALL_PASSWORD}
-oslo_concurrency lock_path   /var/lib/neutron/tmp
-END
-fn_log "create /tmp/tmp "
-
-fn_set_conf /etc/neutron/neutron.conf
-fn_log "fn_set_conf /etc/neutron/neutron.conf"
-
-
-cat <<END >/tmp/tmp
-linux_bridge physical_interface_mappings   provider:${DEV_NETWORK}
-vxlan enable_vxlan   true
-vxlan local_ip   ${COMPUTER_MANAGER_IP}
-vxlan l2_population   true
-securitygroup enable_security_group   true
-securitygroup firewall_driver   neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
-END
-fn_log "create /tmp/tmp "
-
-fn_set_conf /etc/neutron/plugins/ml2/linuxbridge_agent.ini
-fn_log "fn_set_conf /etc/neutron/plugins/ml2/linuxbridge_agent.ini"
-
-nmcli con mod ${DEV_NETWORK} connection.autoconnect yes 
-fn_log "nmcli con mod ${DEV_NETWORK} connection.autoconnect yes " 
-
-
-
-openstack-config --set  /etc/nova/nova.conf neutron url  http://${MANAGER_IP}:9696 && \
-openstack-config --set  /etc/nova/nova.conf neutron auth_url  http://${MANAGER_IP}:35357 && \
-openstack-config --set  /etc/nova/nova.conf neutron auth_type  password && \
-openstack-config --set  /etc/nova/nova.conf neutron project_domain_name  default && \
-openstack-config --set  /etc/nova/nova.conf neutron user_domain_name  default && \
-openstack-config --set  /etc/nova/nova.conf neutron region_name  RegionOne && \
-openstack-config --set  /etc/nova/nova.conf neutron project_name  service && \
-openstack-config --set  /etc/nova/nova.conf neutron username  neutron && \
-openstack-config --set  /etc/nova/nova.conf neutron password  ${ALL_PASSWORD}
-fn_log "config /etc/nova/nova.conf"
-
-
-
-
-
-systemctl restart openstack-nova-compute.service 
-fn_log "systemctl restart openstack-nova-compute.service "
-systemctl enable neutron-linuxbridge-agent.service && systemctl start neutron-linuxbridge-agent.service
-fn_log "systemctl enable neutron-linuxbridge-agent.service && systemctl start neutron-linuxbridge-agent.service"
 
 #for ceilometer
 function fn_install_ceilometer () {
@@ -347,11 +325,19 @@ echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###       Install Computer Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/computer.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/computer.tag
+
+
+
+
+
+
+
+
     
 	
 	
