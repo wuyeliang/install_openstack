@@ -232,7 +232,7 @@ fi
 
 
 
-sleep 15
+sleep 5
 
 
 source /root/admin-openrc.sh && openstack volume service list

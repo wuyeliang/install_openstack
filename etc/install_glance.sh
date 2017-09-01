@@ -156,7 +156,7 @@ fn_log "systemctl enable openstack-glance-api.service   openstack-glance-registr
 
 
 
-sleep 20
+sleep 5
 
 
 
