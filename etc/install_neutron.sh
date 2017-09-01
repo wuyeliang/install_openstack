@@ -267,9 +267,9 @@ fn_log "systemctl restart openstack-nova-compute.service"
 systemctl enable neutron-linuxbridge-agent.service
 fn_log "systemctl enable neutron-linuxbridge-agent.service"
 cat <<END >/tmp/tmp
-linux_bridge physical_interface_mappings   provider:${DEV_NETWORK}
+linux_bridge physical_interface_mappings   provider:${NET_DEVICE_NAME}
 vxlan  enable_vxlan   true
-vxlan local_ip   ${LOCAL_MANAGER_IP}
+vxlan local_ip   ${MANAGER_IP}
 vxlan l2_population   true
 securitygroup enable_security_group   true
 securitygroup firewall_driver   neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
