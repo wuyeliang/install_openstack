@@ -201,8 +201,23 @@ su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
 fn_log "su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova"
 
 
-su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
-fn_log "su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova"
+function fn_sync_create_cell () {
+
+su -s /bin/sh -c nova-manage cell_v2 create_cell --name=cell1 --verbose nova
+fn_log " su -s /bin/sh -c nova-manage cell_v2 create_cell --name=cell1 --verbose nova"
+
+
+}
+
+nova-manage cell_v2 list_cells --verbose  | grep -v UUID | grep -v  none  | grep mysql+pymysql  >/dev/null
+if [ $? -eq 0 ]
+then
+    log_info "cell1 have been sync."
+else
+    fn_sync_create_cell
+fi
+
+
 
 
 su -s /bin/sh -c "nova-manage db sync" nova
