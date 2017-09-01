@@ -72,7 +72,9 @@ fn_log "yum clean all &&  yum install mariadb mariadb-server python2-PyMySQL  -y
 rm -rf /etc/my.cnf.d/openstack.cnf &&  cp -a ${TOPDIR}/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf
 fn_log "cp -a ${TOPDIR}/lib/mariadb_openstack.cnf /etc/my.cnf.d/openstack.cnf"
 echo " " >>/etc/my.cnf.d/openstack.cnf
-echo "bind-address = ${FIRST_ETH_IP}" >>/etc/my.cnf.d/openstack.cnf
+fn_log "echo " " >>/etc/my.cnf.d/openstack.cnf"
+echo "bind-address = 0.0.0.0  >>/etc/my.cnf.d/openstack.cnf
+fn_log "echo "bind-address = 0.0.0.0  >>/etc/my.cnf.d/openstack.cnf"
 
 #start mariadb
 systemctl enable mariadb.service &&  systemctl start mariadb.service 
