@@ -9,6 +9,16 @@ from openstack_dashboard.settings import HORIZON_CONFIG
 
 DEBUG = False
 
+# This setting controls whether or not compression is enabled. Disabling
+# compression makes Horizon considerably slower, but makes it much easier
+# to debug JS and CSS changes
+#COMPRESS_ENABLED = not DEBUG
+
+# This setting controls whether compression happens on the fly, or offline
+# with `python manage.py compress`
+# See https://django-compressor.readthedocs.io/en/latest/usage/#offline-compression
+# for more information
+#COMPRESS_OFFLINE = not DEBUG
 
 # WEBROOT is the location relative to Webserver root
 # should end with a slash.
@@ -53,17 +63,37 @@ ALLOWED_HOSTS = ['*', ]
 # use of the decimal point, so valid options would be 2.0 or 3.
 # Minimum compute version to get the instance locked status is 2.9.
 OPENSTACK_API_VERSIONS = {
-    "data-processing": 1.1,
     "identity": 3,
     "image": 2,
     "volume": 2,
-    "compute": 2,
 }
+
+#OPENSTACK_API_VERSIONS = {
+#    "data-processing": 1.1,
+#    "identity": 3,
+#    "image": 2,
+#    "volume": 2,
+#    "compute": 2,
+#}
 
 # Set this to True if running on a multi-domain model. When this is enabled, it
 # will require the user to enter the Domain name in addition to the username
 # for login.
 #OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = False
+
+# Set this to True if you want available domains displayed as a dropdown menu
+# on the login screen. It is strongly advised NOT to enable this for public
+# clouds, as advertising enabled domains to unauthenticated customers
+# irresponsibly exposes private information. This should only be used for
+# private clouds where the dashboard sits behind a corporate firewall.
+#OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN = False
+
+# If OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN is enabled, this option can be used to
+# set the available domains to choose from. This is a list of pairs whose first
+# value is the domain name and the second is the display name.
+#OPENSTACK_KEYSTONE_DOMAIN_CHOICES = (
+#  ('Default', 'Default'),
+#)
 
 # Overrides the default domain used when running on single-domain model
 # with Keystone V3. All entities will be created in the default domain.
@@ -134,11 +164,7 @@ SECRET_KEY='1772ea2eee780ff9a634'
 #    },
 #}
 
-#CACHES = {
-#    'default': {
-#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#    },
-#}
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 CACHES = {
@@ -147,6 +173,7 @@ CACHES = {
          'LOCATION': 'controller:11211',
     }
 }
+
 
 # Send email to the console by default
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -168,7 +195,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 OPENSTACK_HOST = "controller"
 #OPENSTACK_KEYSTONE_URL = "http://%s:5000/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
+#OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"
+
+# For setting the default service region on a per-endpoint basis. Note that the
+# default value for this setting is {}, and below is just an example of how it
+# should be specified.
+#DEFAULT_SERVICE_REGIONS = {
+#    OPENSTACK_KEYSTONE_URL: 'RegionOne'
+#}
 
 # Enables keystone web single-sign-on if set to True.
 #WEBSSO_ENABLED = False
@@ -240,7 +275,7 @@ OPENSTACK_KEYSTONE_BACKEND = {
 # This setting allows deployers to control whether a token is deleted on log
 # out. This can be helpful when there are often long running processes being
 # run in the Horizon environment.
-#TOKEN_DELETE_DISABLED = False
+#TOKEN_DELETION_DISABLED = False
 
 # The Launch Instance user experience has been significantly enhanced.
 # You can choose whether to enable the new launch instance experience,
@@ -260,11 +295,12 @@ OPENSTACK_KEYSTONE_BACKEND = {
 # properties found in the Launch Instance modal.
 #LAUNCH_INSTANCE_DEFAULTS = {
 #    'config_drive': False,
-#    'enable_scheduler_hints': True
+#    'enable_scheduler_hints': True,
 #    'disable_image': False,
 #    'disable_instance_snapshot': False,
 #    'disable_volume': False,
 #    'disable_volume_snapshot': False,
+#    'create_volume': True,
 #}
 
 # The Xen Hypervisor has the ability to set the mount point for volumes
@@ -305,12 +341,6 @@ OPENSTACK_NEUTRON_NETWORK = {
     # real deployments
     # 'default_dns_nameservers': ["8.8.8.8", "8.8.4.4", "208.67.222.222"],
 
-    # The profile_support option is used to detect if an external router can be
-    # configured via the dashboard. When using specific plugins the
-    # profile_support can be turned on if needed.
-    'profile_support': None,
-    #'profile_support': 'cisco',
-
     # Set which provider network types are supported. Only the network types
     # in this list will be available to choose from when creating a network.
     # Network types include local, flat, vlan, gre, vxlan and geneve.
@@ -335,9 +365,17 @@ OPENSTACK_NEUTRON_NETWORK = {
     # Set which VNIC types are supported for port binding. Only the VNIC
     # types in this list will be available to choose from when creating a
     # port.
-    # VNIC types include 'normal', 'macvtap' and 'direct'.
+    # VNIC types include 'normal', 'direct', 'direct-physical', 'macvtap',
+    # 'baremetal' and 'virtio-forwarder'
     # Set to empty list or None to disable VNIC type selection.
     'supported_vnic_types': ['*'],
+
+    # Set list of available physical networks to be selected in the physical
+    # network field on the admin create network modal. If it's set to an empty
+    # list, the field will be a regular input field.
+    # e.g. ['default', 'test']
+    'physical_networks': [],
+
 }
 
 # The OPENSTACK_HEAT_STACK settings can be used to disable password
@@ -362,6 +400,7 @@ OPENSTACK_HEAT_STACK = {
 #        ('raw', _('Raw')),
 #        ('vdi', _('VDI - Virtual Disk Image')),
 #        ('vhd', _('VHD - Virtual Hard Disk')),
+#        ('vhdx', _('VHDX - Large Virtual Hard Disk')),
 #        ('vmdk', _('VMDK - Virtual Machine Disk')),
 #    ],
 #}
@@ -393,6 +432,11 @@ IMAGE_RESERVED_CUSTOM_PROPERTIES = []
 # configuration and policies allow setting locations.
 #IMAGES_ALLOW_LOCATION = False
 
+# A dictionary of default settings for create image modal.
+#CREATE_IMAGE_DEFAULTS = {
+#    'image_visibility': "public",
+#}
+
 # OPENSTACK_ENDPOINT_TYPE specifies the endpoint type to use for the endpoints
 # in the Keystone service catalog. Use this setting when Horizon is running
 # external to the OpenStack environment. The default is 'publicURL'.
@@ -422,6 +466,7 @@ DROPDOWN_MAX_ITEMS = 30
 
 # The timezone of the server. This should correspond with the timezone
 # of your entire OpenStack installation, and hopefully be in UTC.
+
 TIME_ZONE = "Asia/Shanghai"
 
 # When launching an instance, the menu of available flavors is
@@ -501,11 +546,18 @@ LOGGING = {
     # if nothing is specified here and disable_existing_loggers is True,
     # django.db.backends will still log unless it is disabled explicitly.
     'disable_existing_loggers': False,
+    # If apache2 mod_wsgi is used to deploy OpenStack dashboard
+    # timestamp is output by mod_wsgi. If WSGI framework you use does not
+    # output timestamp for logging, add %(asctime)s in the following
+    # format definitions.
     'formatters': {
+        'console': {
+            'format': '%(levelname)s %(name)s %(message)s'
+        },
         'operation': {
             # The format of "%(message)s" is defined by
             # OPERATION_LOG_OPTIONS['format']
-            'format': '%(asctime)s %(message)s'
+            'format': '%(message)s'
         },
     },
     'handlers': {
@@ -517,6 +569,7 @@ LOGGING = {
             # Set the level to "DEBUG" for verbose output logging.
             'level': 'INFO',
             'class': 'logging.StreamHandler',
+            'formatter': 'console',
         },
         'operation': {
             'level': 'INFO',
@@ -764,7 +817,8 @@ SECURITY_GROUP_RULES = {
 REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
                               'LAUNCH_INSTANCE_DEFAULTS',
                               'OPENSTACK_IMAGE_FORMATS',
-                              'OPENSTACK_KEYSTONE_DEFAULT_DOMAIN']
+                              'OPENSTACK_KEYSTONE_DEFAULT_DOMAIN',
+                              'CREATE_IMAGE_DEFAULTS']
 
 # Additional settings can be made available to the client side for
 # extensibility by specifying them in REST_API_ADDITIONAL_SETTINGS
@@ -795,7 +849,9 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
 #OPERATION_LOG_OPTIONS = {
 #    'mask_fields': ['password'],
 #    'target_methods': ['POST'],
-#    'format': ("[%(domain_name)s] [%(domain_id)s] [%(project_name)s]"
+#    'ignored_urls': ['/js/', '/static/', '^/api/'],
+#    'format': ("[%(client_ip)s] [%(domain_name)s]"
+#        " [%(domain_id)s] [%(project_name)s]"
 #        " [%(project_id)s] [%(user_name)s] [%(user_id)s] [%(request_scheme)s]"
 #        " [%(referer_url)s] [%(request_url)s] [%(message)s] [%(method)s]"
 #        " [%(http_status)s] [%(param)s]"),
@@ -835,18 +891,22 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
 #}
 ALLOWED_PRIVATE_SUBNET_CIDR = {'ipv4': [], 'ipv6': []}
 
-# Project and user can have any attributes by keystone v3 mechanism.
-# This settings can treat these attributes on Horizon.
-# It means, when you show Create/Update modal, attribute below is
-# shown and you can specify any value.
-# If you'd like to display these extra data in project or user index table,
-# Keystone v3 allows you to add extra properties to Project and Users.
-# Horizon's customization (http://docs.openstack.org/developer/horizon/topics/customizing.html#horizon-customization-module-overrides)
-# allows you to display this extra information in the Create/Update modal and
-# the corresponding tables.
+# Projects and users can have extra attributes as defined by keystone v3.
+# Horizon has the ability to display these extra attributes via this setting.
+# If you'd like to display extra data in the project or user tables, set the
+# corresponding dict key to the attribute name, followed by the display name.
+# For more information, see horizon's customization (http://docs.openstack.org/developer/horizon/topics/customizing.html#horizon-customization-module-overrides)
 #PROJECT_TABLE_EXTRA_INFO = {
 #   'phone_num': _('Phone Number'),
 #}
 #USER_TABLE_EXTRA_INFO = {
 #   'phone_num': _('Phone Number'),
 #}
+
+# Password will have an expiration date when using keystone v3 and enabling the
+# feature.
+# This setting allows you to set the number of days that the user will be alerted
+# prior to the password expiration.
+# Once the password expires keystone will deny the access and users must
+# contact an admin to change their password.
+#PASSWORD_EXPIRES_WARNING_THRESHOLD_DAYS = 0
