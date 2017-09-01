@@ -136,8 +136,8 @@ else
 fi
 
 
-yum clean all &&yum install openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler openstack-nova-placement-api
-fn_log  "yum clean all && yum install openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler openstack-nova-placement-api"
+yum clean all &&yum install -y openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler openstack-nova-placement-api
+fn_log  "yum clean all && yum install -y  openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler openstack-nova-placement-api"
 FIRST_ETH=`ip addr | grep ^2: |awk -F ":" '{print$2}'`
 FIRST_ETH_IP=${MANAGER_IP}
 
