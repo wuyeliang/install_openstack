@@ -319,8 +319,8 @@ else
 	fn_log "openstack keypair create --public-key ~/.ssh/id_dsa.pub mykey"
 fi
 
-SECRULE=`nova secgroup-list-rules  default | grep 22 | awk -F " " '{print$4}'`
-if [ x${SECRULE} = x22 ]
+SECRULE=`openstack security group rule list default | grep 22`
+if [ $? -eq  0  ]
 then 
 	log_info "port 22 and icmp have  been  add to secgroup."
 else
