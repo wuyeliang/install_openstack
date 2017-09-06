@@ -154,8 +154,8 @@ fn_log "/etc/sysconfig/libvirtd"
 
 systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service 
 fn_log "systemctl enable libvirtd.service openstack-nova-compute.service &&  systemctl start libvirtd.service openstack-nova-compute.service "
-su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
-fn_log "su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova"
+#su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+#fn_log "su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova"
 }
 
 
