@@ -47,17 +47,17 @@ else
 	exit 1
 fi
 	
-if [  ${OS_VERSION}x  = 7.3x  ] 
+if [  ${OS_VERSION}x  = 7.4x  ] 
 then
 	echo "system is rhel7.3"
 	fn_log "echo "system is rhel7.3""
-elif [ ${OS_VERSION}x = 7.3.1611x   ]
+elif [ ${OS_VERSION}x = 7.4.1708x   ]
 then
 	echo "system is CentOS7.3"
-	fn_log "echo "system is CentOS7.3""	
+	fn_log "echo "system is CentOS7.4""	
 else
-	echo "please install system by CentOS-7-x86_64-Minimal-1611.iso"
-	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1611.iso""
+	echo "please install system by CentOS-7-x86_64-Minimal-1708.iso"
+	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1708.iso""
 	exit 1
 fi 
 
@@ -211,7 +211,8 @@ else
 fi
 
 
-
+yum install openstack-selinux python-openstackclient -y
+fn_log "yum install openstack-selinux python-openstackclient -y"
 
 echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/presystem.tag
 echo -e "\033[32m ##################################### \033[0m"

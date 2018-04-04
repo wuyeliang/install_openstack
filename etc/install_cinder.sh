@@ -172,10 +172,10 @@ else
 	pvcreate ${CINDER_DISK}  && vgcreate cinder-volumes ${CINDER_DISK}
 	fn_log "pvcreate ${CINDER_DISK}  && vgcreate cinder-volumes ${CINDER_DISK}"
 fi
-yum clean all &&  yum install openstack-cinder targetcli python-keystone   -y
-fn_log "yum clean all &&  yum install openstack-cinder targetcli python-keystone -y"
-unset http_proxy https_proxy ftp_proxy no_proxy 
 
+
+yum clean all &&  yum install openstack-cinder targetcli python-keystone  device-mapper-persistent-data  -y
+fn_log "yum clean all &&  yum install openstack-cinder targetcli python-keystone  device-mapper-persistent-data -y"
 
 
 

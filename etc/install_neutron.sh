@@ -139,6 +139,14 @@ fn_log "create /tmp/tmp "
 fn_set_conf /etc/neutron/plugins/ml2/linuxbridge_agent.ini
 fn_log "fn_set_conf /etc/neutron/plugins/ml2/linuxbridge_agent.ini"
 
+cat <<END >/etc/sysctl.conf
+net.bridge.bridge-nf-call-iptables
+net.bridge.bridge-nf-call-ip6tables
+END
+fn_log "/etc/sysctl.conf"
+
+sysctl -p
+fn_log " sysctl -p" 
 
 
 cat <<END >/tmp/tmp
@@ -152,14 +160,22 @@ fn_log "fn_set_conf /etc/neutron/l3_agent.ini"
 
 
 cat <<END >/tmp/tmp
-DEFAULT interface_driver   linuxbridge
-DEFAULT dhcp_driver   neutron.agent.linux.dhcp.Dnsmasq
-DEFAULT enable_isolated_metadata   true
+DEFAULT interface_driver  linuxbridge
+DEFAULT dhcp_driver  neutron.agent.linux.dhcp.Dnsmasq
+DEFAULT enable_isolated_metadata  true
+DEFAULT dnsmasq_config_file /etc/neutron/dnsmasq-neutron.conf
 END
 fn_log "create /tmp/tmp "
 
 fn_set_conf /etc/neutron/dhcp_agent.ini
 fn_log "fn_set_conf /etc/neutron/dhcp_agent.ini"
+
+
+cat <<END > /etc/neutron/dnsmasq-neutron.conf
+dhcp-option-force=26,1500
+END
+fn_log "/etc/neutron/dnsmasq-neutron.conf"
+
 
 
 
