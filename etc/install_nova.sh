@@ -155,6 +155,10 @@ placement username   placement
 placement password   ${ALL_PASSWORD}
 placement_database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova_placement
 wsgi api_paste_config   /etc/nova/api-paste.ini
+vnc enabled  True
+vnc server_listen  0.0.0.0
+vnc server_proxyclient_address  ${MANAGER_IP}
+vnc novncproxy_base_url  http://${MANAGER_IP}:6080/vnc_auto.html 
 END
 fn_log "create /tmp/tmp "
 
@@ -241,37 +245,39 @@ else
 	openstack-config --set  /etc/nova/nova.conf libvirt virt_type  kvm
 	log_info  "openstack-config --set  /etc/nova/nova.conf libvirt virt_type  qemu sucessed."
 fi
-
+COMPUTER_MANAGER_IP=${MANAGER_IP}
+fn_log "COMPUTER_MANAGER_IP=${MANAGER_IP}"
 cat <<END >/tmp/tmp
-DEFAULT enabled_apis  osapi_compute,metadata
-DEFAULT  transport_url  rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
-api auth_strategy  keystone
-keystone_authtoken auth_uri  http://${MANAGER_IP}:5000
-keystone_authtoken auth_url  http://${MANAGER_IP}:35357
-keystone_authtoken memcached_servers  ${MANAGER_IP}:11211
-keystone_authtoken auth_type  password
-keystone_authtoken project_domain_name  default
-keystone_authtoken user_domain_name  default
-keystone_authtoken project_name  service
-keystone_authtoken username  nova
-keystone_authtoken password  ${ALL_PASSWORD}
-DEFAULT my_ip  ${FIRST_ETH_IP}
-DEFAULT use_neutron  True
-DEFAULT firewall_driver  nova.virt.firewall.NoopFirewallDriver
-vnc enabled  True
-vnc vncserver_listen  0.0.0.0
-vnc vncserver_proxyclient_address  \$my_ip
-vnc novncproxy_base_url  http://${MANAGER_IP}:6080/vnc_auto.html
-glance api_servers  http://${MANAGER_IP}:9292
-oslo_concurrency lock_path  /var/lib/nova/tmp
-placement os_region_name  RegionOne
-placement project_domain_name  Default
-placement project_name  service
-placement auth_type  password
-placement user_domain_name  Default
-placement auth_url  http://${MANAGER_IP}:35357/v3
-placement username  placement
-placement password  ${ALL_PASSWORD}
+DEFAULT my_ip   ${COMPUTER_MANAGER_IP}
+DEFAULT state_path   /var/lib/nova
+DEFAULT enabled_apis   osapi_compute,metadata
+DEFAULT log_dir   /var/log/nova
+DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
+api auth_strategy   keystone
+vnc enabled   True
+vnc server_listen   0.0.0.0
+vnc server_proxyclient_address   ${COMPUTER_MANAGER_IP}
+vnc novncproxy_base_url   http://${MANAGER_IP}:6080/vnc_auto.html 
+glance api_servers   http://${MANAGER_IP}:9292
+oslo_concurrency lock_path   /var/lib/nova/tmp
+keystone_authtoken www_authenticate_uri   http://${MANAGER_IP}:5000
+keystone_authtoken auth_url   http://${MANAGER_IP}:5000
+keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
+keystone_authtoken auth_type   password
+keystone_authtoken project_domain_name   default
+keystone_authtoken user_domain_name   default
+keystone_authtoken project_name   service
+keystone_authtoken username   nova
+keystone_authtoken password   ${ALL_PASSWORD}
+placement auth_url   http://${MANAGER_IP}:5000
+placement os_region_name   RegionOne
+placement auth_type   password
+placement project_domain_name   default
+placement user_domain_name   default
+placement project_name   service
+placement username   placement
+placement password   ${ALL_PASSWORD}
+wsgi api_paste_config   /etc/nova/api-paste.ini
 libvirt cpu_mode  none
 END
 fn_log "create /tmp/tmp "
