@@ -116,24 +116,7 @@ fn_log "fn_create_endpoint placement 8778"
 
 
 
-#test network
-function fn_test_network () {
-if [ -f ${TOPDIR}/lib/proxy.sh ]
-then 
-	source  ${TOPDIR}/lib/proxy.sh
-fi
-curl www.baidu.com >/dev/null   
-fn_log "curl www.baidu.com >/dev/null"
-}
 
-
-
-if  [ -f /etc/yum.repos.d/repo.repo ]
-then
-	log_info " use local yum."
-else 
-	fn_test_network
-fi
 
 
 yum clean all &&yum install -y openstack-nova-api openstack-nova-conductor   openstack-nova-console openstack-nova-novncproxy   openstack-nova-scheduler openstack-nova-placement-api
@@ -143,37 +126,35 @@ FIRST_ETH_IP=${MANAGER_IP}
 
 
 cat <<END >/tmp/tmp
-DEFAULT enabled_apis    osapi_compute,metadata
-api_database connection    mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova_api
-database connection    mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova
-DEFAULT transport_url    rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
-api auth_strategy    keystone
-keystone_authtoken auth_uri    http://${MANAGER_IP}:5000
-keystone_authtoken auth_url    http://${MANAGER_IP}:35357
-keystone_authtoken memcached_servers    ${MANAGER_IP}:11211
-keystone_authtoken auth_type    password
-keystone_authtoken project_domain_name    default
-keystone_authtoken user_domain_name    default
-keystone_authtoken project_name    service
-keystone_authtoken username    nova
-keystone_authtoken password    ${ALL_PASSWORD}
-DEFAULT my_ip    ${MANAGER_IP}
-DEFAULT  use_neutron    True
-DEFAULT firewall_driver    nova.virt.firewall.NoopFirewallDriver
-vnc enabled    true
-vnc vncserver_listen    \$my_ip
-vnc vncserver_proxyclient_address    \$my_ip
-glance api_servers    http://${MANAGER_IP}:9292
-oslo_concurrency lock_path    /var/lib/nova/tmp
-placement os_region_name    RegionOne
-placement project_domain_name    Default
-placement project_name    service
-placement auth_type    password
-placement user_domain_name    Default
-placement auth_url    http://${MANAGER_IP}:35357/v3
-placement username    placement
-placement  password    ${ALL_PASSWORD}
-scheduler discover_hosts_in_cells_interval  60
+DEFAULT my_ip   ${MANAGER_IP}
+DEFAULT state_path   /var/lib/nova
+DEFAULT enabled_apis   osapi_compute,metadata
+DEFAULT log_dir   /var/log/nova
+DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
+api auth_strategy   keystone
+glance api_servers   http://${MANAGER_IP}:9292
+oslo_concurrency lock_path   /var/lib/nova/tmp
+api_database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova_api
+database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova
+keystone_authtoken www_authenticate_uri   http://${MANAGER_IP}:5000
+keystone_authtoken auth_url   http://${MANAGER_IP}:5000
+keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
+keystone_authtoken auth_type   password
+keystone_authtoken project_domain_name   default
+keystone_authtoken user_domain_name   default
+keystone_authtoken project_name   service
+keystone_authtoken username   nova
+keystone_authtoken password   ${ALL_PASSWORD}
+placement auth_url   http://${MANAGER_IP}:5000
+placement os_region_name   RegionOne
+placement auth_type   password
+placement project_domain_name   default
+placement user_domain_name   default
+placement project_name   service
+placement username   placement
+placement password   ${ALL_PASSWORD}
+placement_database connection   mysql+pymysql://nova:${ALL_PASSWORD}@${MANAGER_IP}/nova_placement
+wsgi api_paste_config   /etc/nova/api-paste.ini
 END
 fn_log "create /tmp/tmp "
 
