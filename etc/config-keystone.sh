@@ -98,6 +98,7 @@ fn_set_conf /etc/keystone/keystone.conf
 fn_log "fn_set_conf /etc/keystone/keystone.conf" 
 
 
+
 su -s /bin/bash keystone -c "keystone-manage db_sync"
 fn_log "su -s /bin/bash keystone -c "keystone-manage db_sync""
 
