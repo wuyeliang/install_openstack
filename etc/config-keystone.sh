@@ -98,8 +98,8 @@ fn_set_conf /etc/keystone/keystone.conf
 fn_log "fn_set_conf /etc/keystone/keystone.conf" 
 
 
-su -s /bin/sh -c "keystone-manage db_sync" keystone
-fn_log "su -s /bin/sh -c "keystone-manage db_sync" keystone"
+su -s /bin/bash keystone -c "keystone-manage db_sync"
+fn_log "su -s /bin/bash keystone -c "keystone-manage db_sync""
 
 keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
 fn_log "keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone "
@@ -128,8 +128,11 @@ fi
 rm -f /etc/httpd/conf.d/wsgi-keystone.conf  && ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/
 fn_log "rm -f /etc/httpd/conf.d/wsgi-keystone.conf  && ln -s /usr/share/keystone/wsgi-keystone.conf /etc/httpd/conf.d/ "
 
-systemctl enable httpd.service && systemctl start httpd.service 
-fn_log "systemctl enable httpd.service && systemctl start httpd.service "
+
+cat ${TOPDIR}/lib/wsgi-keystone.conf > /etc/httpd/conf.d/wsgi-keystone.conf
+fn_log "cat ${TOPDIR}/lib/wsgi-keystone.conf > /etc/httpd/conf.d/wsgi-keystone.conf"
+systemctl enable httpd.service && systemctl restart httpd.service
+fn_log "systemctl enable httpd.service && systemctl restart httpd.service "
 unset http_proxy https_proxy ftp_proxy no_proxy 
 
 export OS_USERNAME=admin

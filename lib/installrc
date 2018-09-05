@@ -1,10 +1,10 @@
 #controller system information
-HOST_NAME=queens
+HOST_NAME=rocky
 #controller manager IP
-MANAGER_IP=10.130.70.72
+MANAGER_IP=10.21.198.31
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
-NET_DEVICE_NAME=eth1
+NET_DEVICE_NAME=ens224
 #install openstack-nova-compute on controller
 CONTROLLER_COMPUTER=True
 
