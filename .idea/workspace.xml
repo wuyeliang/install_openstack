@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="rocky">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/etc/config-keystone.sh" beforeDir="false" afterPath="$PROJECT_DIR$/etc/config-keystone.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/hosts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/hosts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/installrc" beforeDir="false" afterPath="$PROJECT_DIR$/lib/installrc" afterDir="false" />
+    <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="fix keystone bug">
+      <change beforePath="$PROJECT_DIR$/etc/install_nova.sh" beforeDir="false" afterPath="$PROJECT_DIR$/etc/install_nova.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,15 +13,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="install_glance.sh" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/etc/install_glance.sh">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="171" column="47" selection-start-line="171" selection-start-column="47" selection-end-line="171" selection-end-column="47" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="install_mariadb.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/etc/install_mariadb.sh">
           <provider selected="true" editor-type-id="text-editor">
@@ -46,8 +34,17 @@
       <file leaf-file-name="install_nova.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/etc/install_nova.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
+            <state relative-caret-position="450">
+              <caret line="378" selection-start-line="378" selection-end-line="378" selection-end-column="69" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="openstack-computer_install.sh" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/etc/openstack-computer_install.sh">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="468">
+              <caret line="106" column="22" lean-forward="true" selection-start-line="106" selection-start-column="22" selection-end-line="106" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -80,7 +77,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config-keystone.sh" pinned="false" current-in-tab="true">
+      <file leaf-file-name="config-keystone.sh" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/etc/config-keystone.sh">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="2160">
@@ -103,6 +100,7 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>had</find>
+      <find>FIRST_ETH_IP</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -147,6 +145,7 @@
         <option value="$PROJECT_DIR$/lib/hosts" />
         <option value="$PROJECT_DIR$/lib/wsgi-keystone.conf" />
         <option value="$PROJECT_DIR$/etc/config-keystone.sh" />
+        <option value="$PROJECT_DIR$/etc/install_nova.sh" />
       </list>
     </option>
   </component>
@@ -315,7 +314,14 @@
       <option name="project" value="LOCAL" />
       <updated>1536128006337</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="fix keystone bug">
+      <created>1536135229572</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1536135229572</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -369,10 +375,10 @@
     <MESSAGE value="enable dashboard ssl" />
     <MESSAGE value="fix vxlan bug" />
     <MESSAGE value="rocky" />
-    <option name="LAST_COMMIT_MESSAGE" value="rocky" />
+    <MESSAGE value="fix keystone bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix keystone bug" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/etc/install_heat.sh" />
     <entry file="file://$PROJECT_DIR$/etc/install_magnum.sh" />
     <entry file="file://$PROJECT_DIR$/etc/install_manila.sh" />
     <entry file="file://$PROJECT_DIR$/etc/install_mariadb.sh" />
@@ -494,13 +500,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/etc/install_nova.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="58" lean-forward="true" selection-start-line="58" selection-end-line="58" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/etc/openstack-block_install.sh">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -532,6 +531,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2160">
           <caret line="138" column="34" lean-forward="true" selection-start-line="138" selection-start-column="34" selection-end-line="138" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_nova.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="378" selection-start-line="378" selection-end-line="378" selection-end-column="69" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/openstack-computer_install.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="468">
+          <caret line="106" column="22" lean-forward="true" selection-start-line="106" selection-start-column="22" selection-end-line="106" selection-end-column="22" />
         </state>
       </provider>
     </entry>
