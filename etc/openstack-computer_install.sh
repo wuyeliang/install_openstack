@@ -326,6 +326,7 @@ echo -e "\033[32m ################################################ \033[0m"
 echo -e "\033[32m ###       Install Computer Sucessed         #### \033[0m"
 echo -e "\033[32m ################################################ \033[0m"
 
+
 if  [ ! -d /etc/openstack_tag ]
 then 
 	mkdir -p /etc/openstack_tag  
