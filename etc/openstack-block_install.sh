@@ -77,31 +77,45 @@ fi
 
 BLOCK_MANAGER_IP=`cat /etc/hosts | grep -v localhost | grep ${HOSTNAME} | awk -F " " '{print$1}'`
 cat <<END >/tmp/tmp
-database connection   mysql+pymysql://cinder:${ALL_PASSWORD}@${MANAGER_IP}/cinder
-DEFAULT transport_url   rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
-DEFAULT auth_strategy   keystone
-keystone_authtoken auth_uri   http://${MANAGER_IP}:5000
-keystone_authtoken auth_url   http://${MANAGER_IP}:35357
-keystone_authtoken memcached_servers   ${MANAGER_IP}:11211
-keystone_authtoken auth_type   password
-keystone_authtoken project_domain_name   default
-keystone_authtoken user_domain_name   default
-keystone_authtoken project_name   service
-keystone_authtoken username   cinder
-keystone_authtoken password   ${ALL_PASSWORD}
-DEFAULT my_ip    ${BLOCK_MANAGER_IP}
-lvm volume_driver   cinder.volume.drivers.lvm.LVMVolumeDriver
-lvm volume_group   cinder-volumes
-lvm iscsi_protocol   iscsi
-lvm iscsi_helper   lioadm
+DEFAULT my_ip  ${BLOCK_MANAGER_IP}
+DEFAULT log_dir  /var/log/cinder
+DEFAULT state_path  /var/lib/cinder
+DEFAULT auth_strategy  keystone
+DEFAULT transport_url  rabbit://openstack:${ALL_PASSWORD}@${MANAGER_IP}
+DEFAULT glance_api_servers  http://${MANAGER_IP}:9292
+DEFAULT enable_v3_api  True
+database connection  mysql+pymysql://cinder:${ALL_PASSWORD}@${MANAGER_IP}/cinder
+keystone_authtoken www_authenticate_uri  http://${MANAGER_IP}:5000
+keystone_authtoken auth_url  http://${MANAGER_IP}:5000
+keystone_authtoken memcached_servers  ${MANAGER_IP}:11211
+keystone_authtoken auth_type  password
+keystone_authtoken project_domain_name  default
+keystone_authtoken user_domain_name  default
+keystone_authtoken project_name  service
+keystone_authtoken username  cinder
+keystone_authtoken password  ${ALL_PASSWORD}
+oslo_concurrency lock_path  /var/lib/cinder/tmp
 END
 fn_log "create /tmp/tmp "
 
-
-
-
 fn_set_conf /etc/cinder/cinder.conf
 fn_log "fn_set_conf /etc/cinder/cinder.conf" 
+
+
+
+
+cat <<END >/tmp/tmp
+DEFAULT enabled_backends  lvm
+lvm target_helper  lioadm
+lvm  target_protocol  iscsi
+lvm  target_ip_address  ${BLOCK_MANAGER_IP}
+lvm volume_group  cinder-volumes
+lvm volume_driver  cinder.volume.drivers.lvm.LVMVolumeDriver
+lvm volumes_dir  /var/lib/cinder/volumes
+END
+
+fn_set_conf /etc/cinder/cinder.conf
+fn_log "fn_set_conf /etc/cinder/cinder.conf"
 
 chown cinder:cinder /etc/cinder/cinder.conf
 fn_log "chown cinder:cinder /etc/cinder/cinder.conf"

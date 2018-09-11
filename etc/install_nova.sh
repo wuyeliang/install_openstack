@@ -173,23 +173,21 @@ fn_log "cat ${TOPDIR}/lib/00-nova-placement-api.conf >  /etc/httpd/conf.d/00-nov
 systemctl restart httpd
 fn_log "systemctl restart httpd"
 
-
-su -s /bin/sh -c "nova-manage api_db sync" nova
-fn_log "su -s /bin/sh -c "nova-manage api_db sync" nova"
-
+su -s /bin/bash nova -c "nova-manage api_db sync"
+fn_log "su -s /bin/bash nova -c "nova-manage api_db sync""
 
 
-su -s /bin/sh -c "nova-manage db sync" nova
-fn_log "su -s /bin/sh -c "nova-manage db sync" nova"
 
-su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
-fn_log "su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova"
+su -s /bin/bash nova -c "nova-manage db sync"
+fn_log "su -s /bin/bash nova -c "nova-manage db sync""
 
+su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0
+fn_log "su -s /bin/bash nova -c "nova-manage cell_v2 map_cell0"
 
 function fn_sync_create_cell () {
 
-su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
-fn_log " su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova"
+su -s /bin/bash nova -c "nova-manage cell_v2 create_cell --name cell1
+fn_log " su -s /bin/bash nova -c "nova-manage cell_v2 create_cell --name cell1"
 
 
 }
@@ -202,11 +200,13 @@ else
     fn_sync_create_cell
 fi
 
+chown nova. /var/log/nova/nova-placement-api.log
+fn_log "chown nova. /var/log/nova/nova-placement-api.log"
+
+systemctl restart httpd
+fn_log " systemctl restart httpd "
 
 
-
-su -s /bin/sh -c "nova-manage db sync" nova
-fn_log "su -s /bin/sh -c "nova-manage db sync" nova"
 
 nova-manage cell_v2 list_cells
 fn_log "nova-manage cell_v2 list_cells"
@@ -297,6 +297,8 @@ fn_log "create /tmp/tmp "
 fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
 
+openstack-config --set  /etc/nova/nova.conf libvirt live_migration_flag   'VIR_MIGRATE_UNDEFINE_SOURCE, VIR_MIGRATE_PEER2PEER, VIR_MIGRATE_LIVE, VIR_MIGRATE_TUNNELLED,VIR_MIGRATE_UNSAFE'
+fn_log "openstack-config --set  /etc/nova/nova.conf libvirt live_migration_flag   'VIR_MIGRATE_UNDEFINE_SOURCE, VIR_MIGRATE_PEER2PEER, VIR_MIGRATE_LIVE, VIR_MIGRATE_TUNNELLED,VIR_MIGRATE_UNSAFE'"
 
 
 cat <<"END" >/etc/libvirt/qemu.conf

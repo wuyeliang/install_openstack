@@ -124,6 +124,8 @@ fn_log "create /tmp/tmp "
 fn_set_conf /etc/nova/nova.conf
 fn_log "fn_set_conf /etc/nova/nova.conf"
 
+openstack-config --set  /etc/nova/nova.conf libvirt live_migration_flag   'VIR_MIGRATE_UNDEFINE_SOURCE, VIR_MIGRATE_PEER2PEER, VIR_MIGRATE_LIVE, VIR_MIGRATE_TUNNELLED,VIR_MIGRATE_UNSAFE'
+fn_log "openstack-config --set  /etc/nova/nova.conf libvirt live_migration_flag   'VIR_MIGRATE_UNDEFINE_SOURCE, VIR_MIGRATE_PEER2PEER, VIR_MIGRATE_LIVE, VIR_MIGRATE_TUNNELLED,VIR_MIGRATE_UNSAFE'"
 
 
 cat <<"END" >/etc/libvirt/qemu.conf
@@ -209,7 +211,7 @@ fn_log "systemctl enable neutron-linuxbridge-agent.service"
 cat <<END >/tmp/tmp
 linux_bridge physical_interface_mappings   provider:${DEV_NETWORK}
 vxlan  enable_vxlan   true
-vxlan local_ip   ${LOCAL_MANAGER_IP}
+vxlan local_ip   ${COMPUTER_MANAGER_IP}
 vxlan l2_population   true
 securitygroup enable_security_group   true
 securitygroup firewall_driver   neutron.agent.linux.iptables_firewall.IptablesFirewallDriver

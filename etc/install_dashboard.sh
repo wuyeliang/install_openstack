@@ -104,7 +104,7 @@ systemctl | grep cinder | grep running  | awk -F " " '{print$1}' | xargs systemc
 fn_log "systemctl | grep cinder | grep running  | awk -F " " '{print$1}' | xargs systemctl restart"
 echo -e "\033[32m ############################################################################# \033[0m"
 echo -e "\033[32m ###                     Install Openstack Dashboard                     ##### \033[0m"
-echo -e "\033[32m ###       You can login openstack by http://${MANAGER_IP}/dashboard/    ##### \033[0m"
+echo -e "\033[32m ###       You can login openstack by https://${MANAGER_IP}/dashboard/    ##### \033[0m"
 echo -e "\033[32m ############################################################################# \033[0m"
 if  [ ! -d /etc/openstack_tag ]
 then 
