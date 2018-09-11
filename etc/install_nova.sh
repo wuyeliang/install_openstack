@@ -367,8 +367,7 @@ fn_log "openstack catalog list"
 openstack image list
 fn_log "openstack image list"
 
-nova-status upgrade check
-fn_log "nova-status upgrade check"
+
 
 
 echo -e "\033[32m ################################################ \033[0m"
