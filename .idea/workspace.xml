@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c0347183-e216-4827-a586-bd8f4d68f0b0" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etc/install_nova.sh" beforeDir="false" afterPath="$PROJECT_DIR$/etc/install_nova.sh" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -31,20 +32,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="install_nova.sh" pinned="false" current-in-tab="false">
+      <file leaf-file-name="install_nova.sh" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/etc/install_nova.sh">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="558">
-              <caret line="255" column="28" selection-start-line="255" selection-start-column="28" selection-end-line="255" selection-end-column="28" />
+            <state relative-caret-position="126">
+              <caret line="369" lean-forward="true" selection-start-line="369" selection-end-line="369" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="source-function" pinned="false" current-in-tab="true">
+      <file leaf-file-name="source-function" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/source-function">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="360">
               <caret line="19" column="2" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
+            <state split_layout="SPLIT">
+              <first_editor />
+              <second_editor>
+                <markdownNavigatorState />
+              </second_editor>
             </state>
           </provider>
         </entry>
@@ -112,6 +125,8 @@
         <option value="$PROJECT_DIR$/etc/presystem.sh" />
         <option value="$PROJECT_DIR$/etc/install_dashboard.sh" />
         <option value="$PROJECT_DIR$/lib/installrc" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/etc/install_nova.sh" />
       </list>
     </option>
   </component>
@@ -141,6 +156,11 @@
             <path>
               <item name="install_openstack" type="b2602c69:ProjectViewProjectNode" />
               <item name="install_openstack" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="install_openstack" type="b2602c69:ProjectViewProjectNode" />
+              <item name="install_openstack" type="462c0819:PsiDirectoryNode" />
+              <item name="etc" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -298,11 +318,19 @@
       <option name="project" value="LOCAL" />
       <updated>1536646586750</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="delete readme">
+      <created>1536647424605</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1536647424605</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="2" width="1932" height="1045" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
@@ -346,7 +374,8 @@
     <MESSAGE value="fix keystone bug" />
     <MESSAGE value="fix nova and  cinder bug" />
     <MESSAGE value="for  rocky dev branch" />
-    <option name="LAST_COMMIT_MESSAGE" value="for  rocky dev branch" />
+    <MESSAGE value="delete readme" />
+    <option name="LAST_COMMIT_MESSAGE" value="delete readme" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/etc/install_manila.sh" />
@@ -410,13 +439,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1743">
           <caret line="216" lean-forward="true" selection-start-line="216" selection-end-line="216" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="186" column="11" lean-forward="true" selection-start-line="186" selection-start-column="11" selection-end-line="186" selection-end-column="11" />
         </state>
       </provider>
     </entry>
@@ -507,13 +529,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/etc/install_nova.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="558">
-          <caret line="255" column="28" selection-start-line="255" selection-start-column="28" selection-end-line="255" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/etc/openstack-block_install.sh">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="532">
@@ -525,6 +540,28 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="19" column="2" selection-start-line="19" selection-start-column="2" selection-end-line="19" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="186" column="11" lean-forward="true" selection-start-line="186" selection-start-column="11" selection-end-line="186" selection-end-column="11" />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
+        <state split_layout="SPLIT">
+          <first_editor />
+          <second_editor>
+            <markdownNavigatorState />
+          </second_editor>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/etc/install_nova.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="369" lean-forward="true" selection-start-line="369" selection-end-line="369" />
         </state>
       </provider>
     </entry>
