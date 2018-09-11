@@ -1,11 +1,11 @@
 #!/bin/bash
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -18,13 +18,13 @@ else
 fi
 
 
-if [ -f  /etc/openstack-ocata_tag/presystem.tag ]
+if [ -f  /etc/openstack_tag/presystem-computer.tag ]
 then 
 	echo -e "\033[41;37m you haved config Basic environment \033[0m"
 	log_info "you haved config Basic environment."	
 	exit
 fi
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
+if [  -e /etc/openstack_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
@@ -41,29 +41,29 @@ then
 		fn_log "OS_VERSION=`cat /etc/redhat-release | awk -F " " '{print$4}'`"
 	fi
 else
-	echo -e "\033[41;37m please run script on rhel7.2 or CentOS7.2 \033[0m"
-	log_error "please run script on rhel7.2 or CentOS7.2"
+	echo -e "\033[41;37m please run script on rhel7.3 or CentOS7.3 \033[0m"
+	log_error "please run script on rhel7.3 or CentOS7.3"
 	exit 1
 fi
 	
-if [  ${OS_VERSION}x  = 7.2x  ] 
+if [  ${OS_VERSION}x  = 7.4x  ] 
 then
-	echo "system is rhel7.2"
-	fn_log "echo "system is rhel7.2""
-elif [ ${OS_VERSION}x = 7.2.1511x   ]
+	echo "system is rhel7.3"
+	fn_log "echo "system is rhel7.3""
+elif [ ${OS_VERSION}x = 7.4.1708x   ]
 then
-	echo "system is CentOS7.2"
-	fn_log "echo "system is CentOS7.2""	
+	echo "system is CentOS7.3"
+	fn_log "echo "system is CentOS7.4""	
 else
-	echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso"
-	log_error "echo "please install system by rhel-server-7.2-x86_64-dvd.iso or CentOS-7-x86_64-DVD-1511.iso""
+	echo "please install system by CentOS-7-x86_64-Minimal-1708.iso"
+	log_error "echo "please install system by CentOS-7-x86_64-Minimal-1708.iso""
 	exit 1
 fi 
 
 }
 fn_check_os_version
 
-if [  -e /etc/openstack-ocata_tag/config_keystone.tag  ]
+if [  -e /etc/openstack_tag/config_keystone.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script oncontroller.  \033[0m"
 	log_error "Oh no ! you can't execute this script oncontroller. "
@@ -137,10 +137,10 @@ chkconfig chronyd off
 service chronyd stop
 sleep 10
 ntpq -p
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_ntp.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/install_ntp.tag
 }
 
-if  [ -f /etc/openstack-ocata_tag/install_ntp.tag ]
+if  [ -f /etc/openstack_tag/install_ntp.tag ]
 then
 	log_info "ntp have  been  installed."
 else
@@ -163,14 +163,14 @@ then
 	cd /etc/yum.repos.d/ &&  rm -rf CentOS-*
 	fn_log "cd /etc/yum.repos.d/ &&  rm -rf CentOS-*"
 fi
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then
-	mkdir  /etc/openstack-ocata_tag
+	mkdir  /etc/openstack_tag
 fi
 
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/presystem.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/presystem-computer.tag
 echo -e "\033[32m #################################### \033[0m"
-echo -e "\033[32m ##   Configure  Systen Sucessed.#### \033[0m"
+echo -e "\033[32m ##   Configure System Sucessed. #### \033[0m"
 echo -e "\033[32m #################################### \033[0m"
 
 echo -e "\033[41;37m begin to reboot system to enforce kernel \033[0m"

@@ -6,7 +6,7 @@ function log_info ()
 {
 DATE_N=`date "+%Y-%m-%d %H:%M:%S"`
 USER_N=`whoami`
-echo "${DATE_N} ${USER_N} execute $0 [INFO] $@" >>/var/log/openstack-centos-newton.log
+echo "${DATE_N} ${USER_N} execute $0 [INFO] $@" >>/var/log/openstack-centos.log
 
 }
 
@@ -14,7 +14,7 @@ function log_error ()
 {
 DATE_N=`date "+%Y-%m-%d %H:%M:%S"`
 USER_N=`whoami`
-echo -e "${DATE_N} ${USER_N} execute $0 [ERROR] $@ "  >>/var/log/openstack-centos-newton.log
+echo -e "${DATE_N} ${USER_N} execute $0 [ERROR] $@ "  >>/var/log/openstack-centos.log
 
 }
 

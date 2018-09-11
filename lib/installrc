@@ -1,47 +1,36 @@
-#!/bin/bash
-# -*- coding: utf-8 -*-
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
 #controller system information
-HOST_NAME=ocata
+HOST_NAME=rocky
 #controller manager IP
-MANAGER_IP=172.16.8.75
+MANAGER_IP=10.21.198.31
 ALL_PASSWORD=Changeme_123
 #controler secondary net device 
-
+NET_DEVICE_NAME=ens224
 #install openstack-nova-compute on controller
 CONTROLLER_COMPUTER=True
 
 #For neutron information
-
 #[FLOATING_METWORK_ADDR]
-NEUTRON_PUBLIC_NET="10.168.10.0/24"
-PUBLIC_NET_GW="10.168.10.1"
-PUBLIC_NET_START="10.168.10.10"
-PUBLIC_NET_END="10.168.10.240"
-SECOND_NET="10.168.10.253/24"
+NEUTRON_PUBLIC_NET="10.18.10.0/24"
+PUBLIC_NET_GW="10.18.10.1"
+PUBLIC_NET_START="10.18.10.10"
+PUBLIC_NET_END="10.18.10.240"
+SECOND_NET="10.18.10.253/24"
 NEUTRON_DNS="8.8.8.8"
 
 
 #[DEMO_NET_ADDR]
-NEUTRON_PRIVATE_NET="10.168.124.0/24"
-PRIVATE_NET_GW="10.168.124.1"
+NEUTRON_PRIVATE_NET="10.16.12.0/24"
+PRIVATE_NET_GW="10.16.12.1"
 PRIVATE_NET_DNS="8.8.8.8"
-
-
-#[NETWORK node]
-NETWORK_TYPE=vxlan
-IN_DEVICE_NAME=eno33554992
-EXT_NET_DEVICE=ens39
-
 
 #For cinder
 #please input disk or partition by blank to separate
 #eg1:CINDER_DISK='/dev/vdb /dev/vdc'
 #eg2:CINDER_DISK='/dev/vdb1 /dev/vdc1'
 #controller disk for cinder 
-#CINDER_DISK='/dev/sdb' 
+CINDER_DISK='/dev/sdb'
 #block node disk for cinder
-#BLOCK_CINDER_DISK='/dev/sdb'
+BLOCK_CINDER_DISK='/dev/sdb'
 
 
 #for manila
@@ -49,3 +38,8 @@ EXT_NET_DEVICE=ens39
 #MANILA_DISK='/dev/sdb'
 
 #for swift
+#SWIFT_DISK='sdc /sdd'
+#Number of Copies
+#MUTIL_NUM=1
+#object node ip
+#OBJECT_MANAGE_IP="'172.16.8.68 sdc sdd' '172.16.8.69 sdc sdd' '172.16.8.70  sdc sdd'"

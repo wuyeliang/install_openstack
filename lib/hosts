@@ -1,5 +1,5 @@
 127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
 ::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
-172.16.8.75 ocata
-172.16.8.76 network
-172.16.8.77 computer
+10.21.198.31 rocky
+10.21.198.32 node1
+10.21.198.33 node2

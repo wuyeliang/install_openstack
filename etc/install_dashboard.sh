@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 NAMEHOST=$HOSTNAME
-if [  -e ${TOPDIR}/lib/ocata-log.sh ]
+if [  -e ${TOPDIR}/lib/openstack-log.sh ]
 then	
-	source ${TOPDIR}/lib/ocata-log.sh
+	source ${TOPDIR}/lib/openstack-log.sh
 else
-	echo -e "\033[41;37m ${TOPDIR}/ocata-log.sh is not exist. \033[0m"
+	echo -e "\033[41;37m ${TOPDIR}/openstack-log.sh is not exist. \033[0m"
 	exit 1
 fi
 #input variable
@@ -29,21 +29,21 @@ fi
 
 
 
-if [  -e /etc/openstack-ocata_tag/computer.tag  ]
+if [  -e /etc/openstack_tag/computer.tag  ]
 then
 	echo -e "\033[41;37m Oh no ! you can't execute this script on computer node.  \033[0m"
 	log_error "Oh no ! you can't execute this script on computer node. "
 	exit 1 
 fi
 
-if [ -f  /etc/openstack-ocata_tag/install_neutron.tag ]
+if [ -f  /etc/openstack_tag/install_neutron.tag ]
 then 
 	log_info "neutron have installed ."
 else
 	echo -e "\033[41;37m you should install neutron first. \033[0m"
 	exit
 fi
-if [ -f  /etc/openstack-ocata_tag/install_dashboard.tag ]
+if [ -f  /etc/openstack_tag/install_dashboard.tag ]
 then 
 	echo -e "\033[41;37m you haved install dashboard \033[0m"
 	log_info "you haved install dashboard."	
@@ -104,13 +104,13 @@ systemctl | grep cinder | grep running  | awk -F " " '{print$1}' | xargs systemc
 fn_log "systemctl | grep cinder | grep running  | awk -F " " '{print$1}' | xargs systemctl restart"
 echo -e "\033[32m ############################################################################# \033[0m"
 echo -e "\033[32m ###                     Install Openstack Dashboard                     ##### \033[0m"
-echo -e "\033[32m ###       You can login openstack by http://${MANAGER_IP}/dashboard/    ##### \033[0m"
+echo -e "\033[32m ###       You can login openstack by https://${MANAGER_IP}/dashboard/    ##### \033[0m"
 echo -e "\033[32m ############################################################################# \033[0m"
-if  [ ! -d /etc/openstack-ocata_tag ]
+if  [ ! -d /etc/openstack_tag ]
 then 
-	mkdir -p /etc/openstack-ocata_tag  
+	mkdir -p /etc/openstack_tag  
 fi
-echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack-ocata_tag/install_dashboard.tag
+echo `date "+%Y-%m-%d %H:%M:%S"` >/etc/openstack_tag/install_dashboard.tag
 
 
 
