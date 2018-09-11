@@ -121,6 +121,7 @@ chown cinder:cinder /etc/cinder/cinder.conf
 fn_log "chown cinder:cinder /etc/cinder/cinder.conf"
 
 
+
 systemctl enable openstack-cinder-volume.service target.service && systemctl restart openstack-cinder-volume.service target.service
 fn_log "systemctl enable openstack-cinder-volume.service target.service && systemctl restart openstack-cinder-volume.service target.service"
 
